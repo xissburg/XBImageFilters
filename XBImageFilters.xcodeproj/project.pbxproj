@@ -14,7 +14,7 @@
 		1BE16ED014EB4BE600570A64 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ECF14EB4BE600570A64 /* main.m */; };
 		1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ED314EB4BE600570A64 /* AppDelegate.m */; };
 		1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16ED514EB4BE600570A64 /* MainStoryboard.storyboard */; };
-		1BE16EDA14EB4BE600570A64 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ED914EB4BE600570A64 /* ViewController.m */; };
+		1BE16EE814EB4D0900570A64 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16EE714EB4D0900570A64 /* ViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,15 +22,15 @@
 		1BE16EC314EB4BE600570A64 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1BE16EC514EB4BE600570A64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		1BE16ECB14EB4BE600570A64 /* XBImageFilters-Info.plist */ = {isa = PBXFileReference; path = "XBImageFilters-Info.plist"; sourceTree = "<group>"; };
+		1BE16ECB14EB4BE600570A64 /* XBImageFilters-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "XBImageFilters-Info.plist"; sourceTree = "<group>"; };
 		1BE16ECD14EB4BE600570A64 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1BE16ECF14EB4BE600570A64 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		1BE16ED114EB4BE600570A64 /* XBImageFilters-Prefix.pch */ = {isa = PBXFileReference; path = "XBImageFilters-Prefix.pch"; sourceTree = "<group>"; };
-		1BE16ED214EB4BE600570A64 /* AppDelegate.h */ = {isa = PBXFileReference; path = AppDelegate.h; sourceTree = "<group>"; };
+		1BE16ED114EB4BE600570A64 /* XBImageFilters-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "XBImageFilters-Prefix.pch"; sourceTree = "<group>"; };
+		1BE16ED214EB4BE600570A64 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1BE16ED314EB4BE600570A64 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		1BE16ED614EB4BE600570A64 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		1BE16ED814EB4BE600570A64 /* ViewController.h */ = {isa = PBXFileReference; path = ViewController.h; sourceTree = "<group>"; };
-		1BE16ED914EB4BE600570A64 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		1BE16EE614EB4D0900570A64 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = Classes/Sample/ViewController.h; sourceTree = "<group>"; };
+		1BE16EE714EB4D0900570A64 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = Classes/Sample/ViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +50,7 @@
 		1BE16EB414EB4BE500570A64 = {
 			isa = PBXGroup;
 			children = (
-				1BE16EC914EB4BE600570A64 /* XBImageFilters */,
+				1BE16EC914EB4BE600570A64 /* Classes */,
 				1BE16EC214EB4BE600570A64 /* Frameworks */,
 				1BE16EC014EB4BE600570A64 /* Products */,
 			);
@@ -74,16 +74,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		1BE16EC914EB4BE600570A64 /* XBImageFilters */ = {
+		1BE16EC914EB4BE600570A64 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				1BE16EE414EB4CDB00570A64 /* Sample */,
+				1BE16EE514EB4CE400570A64 /* XBImageFilters */,
 				1BE16ED214EB4BE600570A64 /* AppDelegate.h */,
 				1BE16ED314EB4BE600570A64 /* AppDelegate.m */,
 				1BE16ED514EB4BE600570A64 /* MainStoryboard.storyboard */,
-				1BE16ED814EB4BE600570A64 /* ViewController.h */,
-				1BE16ED914EB4BE600570A64 /* ViewController.m */,
 				1BE16ECA14EB4BE600570A64 /* Supporting Files */,
 			);
+			name = Classes;
 			path = XBImageFilters;
 			sourceTree = "<group>";
 		};
@@ -96,6 +97,22 @@
 				1BE16ED114EB4BE600570A64 /* XBImageFilters-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1BE16EE414EB4CDB00570A64 /* Sample */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16EE614EB4D0900570A64 /* ViewController.h */,
+				1BE16EE714EB4D0900570A64 /* ViewController.m */,
+			);
+			name = Sample;
+			sourceTree = "<group>";
+		};
+		1BE16EE514EB4CE400570A64 /* XBImageFilters */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = XBImageFilters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -162,7 +179,7 @@
 			files = (
 				1BE16ED014EB4BE600570A64 /* main.m in Sources */,
 				1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */,
-				1BE16EDA14EB4BE600570A64 /* ViewController.m in Sources */,
+				1BE16EE814EB4D0900570A64 /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

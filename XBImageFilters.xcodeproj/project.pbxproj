@@ -1,0 +1,281 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1BE16EC414EB4BE600570A64 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC314EB4BE600570A64 /* UIKit.framework */; };
+		1BE16EC614EB4BE600570A64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC514EB4BE600570A64 /* Foundation.framework */; };
+		1BE16EC814EB4BE600570A64 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */; };
+		1BE16ECE14EB4BE600570A64 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16ECC14EB4BE600570A64 /* InfoPlist.strings */; };
+		1BE16ED014EB4BE600570A64 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ECF14EB4BE600570A64 /* main.m */; };
+		1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ED314EB4BE600570A64 /* AppDelegate.m */; };
+		1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16ED514EB4BE600570A64 /* MainStoryboard.storyboard */; };
+		1BE16EDA14EB4BE600570A64 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ED914EB4BE600570A64 /* ViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1BE16EBF14EB4BE600570A64 /* XBImageFilters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBImageFilters.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1BE16EC314EB4BE600570A64 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1BE16EC514EB4BE600570A64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		1BE16ECB14EB4BE600570A64 /* XBImageFilters-Info.plist */ = {isa = PBXFileReference; path = "XBImageFilters-Info.plist"; sourceTree = "<group>"; };
+		1BE16ECD14EB4BE600570A64 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1BE16ECF14EB4BE600570A64 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1BE16ED114EB4BE600570A64 /* XBImageFilters-Prefix.pch */ = {isa = PBXFileReference; path = "XBImageFilters-Prefix.pch"; sourceTree = "<group>"; };
+		1BE16ED214EB4BE600570A64 /* AppDelegate.h */ = {isa = PBXFileReference; path = AppDelegate.h; sourceTree = "<group>"; };
+		1BE16ED314EB4BE600570A64 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		1BE16ED614EB4BE600570A64 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		1BE16ED814EB4BE600570A64 /* ViewController.h */ = {isa = PBXFileReference; path = ViewController.h; sourceTree = "<group>"; };
+		1BE16ED914EB4BE600570A64 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1BE16EBC14EB4BE600570A64 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BE16EC414EB4BE600570A64 /* UIKit.framework in Frameworks */,
+				1BE16EC614EB4BE600570A64 /* Foundation.framework in Frameworks */,
+				1BE16EC814EB4BE600570A64 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1BE16EB414EB4BE500570A64 = {
+			isa = PBXGroup;
+			children = (
+				1BE16EC914EB4BE600570A64 /* XBImageFilters */,
+				1BE16EC214EB4BE600570A64 /* Frameworks */,
+				1BE16EC014EB4BE600570A64 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1BE16EC014EB4BE600570A64 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16EBF14EB4BE600570A64 /* XBImageFilters.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1BE16EC214EB4BE600570A64 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16EC314EB4BE600570A64 /* UIKit.framework */,
+				1BE16EC514EB4BE600570A64 /* Foundation.framework */,
+				1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1BE16EC914EB4BE600570A64 /* XBImageFilters */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16ED214EB4BE600570A64 /* AppDelegate.h */,
+				1BE16ED314EB4BE600570A64 /* AppDelegate.m */,
+				1BE16ED514EB4BE600570A64 /* MainStoryboard.storyboard */,
+				1BE16ED814EB4BE600570A64 /* ViewController.h */,
+				1BE16ED914EB4BE600570A64 /* ViewController.m */,
+				1BE16ECA14EB4BE600570A64 /* Supporting Files */,
+			);
+			path = XBImageFilters;
+			sourceTree = "<group>";
+		};
+		1BE16ECA14EB4BE600570A64 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16ECB14EB4BE600570A64 /* XBImageFilters-Info.plist */,
+				1BE16ECC14EB4BE600570A64 /* InfoPlist.strings */,
+				1BE16ECF14EB4BE600570A64 /* main.m */,
+				1BE16ED114EB4BE600570A64 /* XBImageFilters-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1BE16EBE14EB4BE600570A64 /* XBImageFilters */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1BE16EDD14EB4BE600570A64 /* Build configuration list for PBXNativeTarget "XBImageFilters" */;
+			buildPhases = (
+				1BE16EBB14EB4BE600570A64 /* Sources */,
+				1BE16EBC14EB4BE600570A64 /* Frameworks */,
+				1BE16EBD14EB4BE600570A64 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = XBImageFilters;
+			productName = XBImageFilters;
+			productReference = 1BE16EBF14EB4BE600570A64 /* XBImageFilters.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1BE16EB614EB4BE500570A64 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 1BE16EB914EB4BE500570A64 /* Build configuration list for PBXProject "XBImageFilters" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 1BE16EB414EB4BE500570A64;
+			productRefGroup = 1BE16EC014EB4BE600570A64 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1BE16EBE14EB4BE600570A64 /* XBImageFilters */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1BE16EBD14EB4BE600570A64 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BE16ECE14EB4BE600570A64 /* InfoPlist.strings in Resources */,
+				1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1BE16EBB14EB4BE600570A64 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BE16ED014EB4BE600570A64 /* main.m in Sources */,
+				1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */,
+				1BE16EDA14EB4BE600570A64 /* ViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		1BE16ECC14EB4BE600570A64 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1BE16ECD14EB4BE600570A64 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		1BE16ED514EB4BE600570A64 /* MainStoryboard.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1BE16ED614EB4BE600570A64 /* en */,
+			);
+			name = MainStoryboard.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1BE16EDB14EB4BE600570A64 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		1BE16EDC14EB4BE600570A64 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1BE16EDE14EB4BE600570A64 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
+				INFOPLIST_FILE = "XBImageFilters/XBImageFilters-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		1BE16EDF14EB4BE600570A64 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
+				INFOPLIST_FILE = "XBImageFilters/XBImageFilters-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1BE16EB914EB4BE500570A64 /* Build configuration list for PBXProject "XBImageFilters" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1BE16EDB14EB4BE600570A64 /* Debug */,
+				1BE16EDC14EB4BE600570A64 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1BE16EDD14EB4BE600570A64 /* Build configuration list for PBXNativeTarget "XBImageFilters" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1BE16EDE14EB4BE600570A64 /* Debug */,
+				1BE16EDF14EB4BE600570A64 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1BE16EB614EB4BE500570A64 /* Project object */;
+}

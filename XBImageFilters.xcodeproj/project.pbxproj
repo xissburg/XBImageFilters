@@ -15,6 +15,12 @@
 		1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16ED314EB4BE600570A64 /* AppDelegate.m */; };
 		1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16ED514EB4BE600570A64 /* MainStoryboard.storyboard */; };
 		1BE16EE814EB4D0900570A64 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16EE714EB4D0900570A64 /* ViewController.m */; };
+		1BE16EEB14EB4DD000570A64 /* XBFilteredImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE16EEA14EB4DD000570A64 /* XBFilteredImageView.m */; };
+		1BE16EEE14EB4E5B00570A64 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EEC14EB4E5B00570A64 /* GLKit.framework */; };
+		1BE16EEF14EB4E5B00570A64 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EED14EB4E5B00570A64 /* OpenGLES.framework */; };
+		1BE16EF114EB50B100570A64 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EF014EB50B100570A64 /* QuartzCore.framework */; };
+		1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF414EB56EB00570A64 /* LucasCorrea.png */; };
+		1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +37,13 @@
 		1BE16ED614EB4BE600570A64 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
 		1BE16EE614EB4D0900570A64 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = Classes/Sample/ViewController.h; sourceTree = "<group>"; };
 		1BE16EE714EB4D0900570A64 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = Classes/Sample/ViewController.m; sourceTree = "<group>"; };
+		1BE16EE914EB4DD000570A64 /* XBFilteredImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredImageView.h; path = Classes/XBImageFilters/XBFilteredImageView.h; sourceTree = "<group>"; };
+		1BE16EEA14EB4DD000570A64 /* XBFilteredImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredImageView.m; path = Classes/XBImageFilters/XBFilteredImageView.m; sourceTree = "<group>"; };
+		1BE16EEC14EB4E5B00570A64 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		1BE16EED14EB4E5B00570A64 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		1BE16EF014EB50B100570A64 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		1BE16EF414EB56EB00570A64 /* LucasCorrea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LucasCorrea.png; sourceTree = "<group>"; };
+		1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LucasCorrea@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +51,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BE16EF114EB50B100570A64 /* QuartzCore.framework in Frameworks */,
+				1BE16EEE14EB4E5B00570A64 /* GLKit.framework in Frameworks */,
+				1BE16EEF14EB4E5B00570A64 /* OpenGLES.framework in Frameworks */,
 				1BE16EC414EB4BE600570A64 /* UIKit.framework in Frameworks */,
 				1BE16EC614EB4BE600570A64 /* Foundation.framework in Frameworks */,
 				1BE16EC814EB4BE600570A64 /* CoreGraphics.framework in Frameworks */,
@@ -51,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				1BE16EC914EB4BE600570A64 /* Classes */,
+				1BE16EF214EB56EB00570A64 /* Resources */,
 				1BE16EC214EB4BE600570A64 /* Frameworks */,
 				1BE16EC014EB4BE600570A64 /* Products */,
 			);
@@ -67,6 +84,9 @@
 		1BE16EC214EB4BE600570A64 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1BE16EF014EB50B100570A64 /* QuartzCore.framework */,
+				1BE16EEC14EB4E5B00570A64 /* GLKit.framework */,
+				1BE16EED14EB4E5B00570A64 /* OpenGLES.framework */,
 				1BE16EC314EB4BE600570A64 /* UIKit.framework */,
 				1BE16EC514EB4BE600570A64 /* Foundation.framework */,
 				1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */,
@@ -111,8 +131,28 @@
 		1BE16EE514EB4CE400570A64 /* XBImageFilters */ = {
 			isa = PBXGroup;
 			children = (
+				1BE16EE914EB4DD000570A64 /* XBFilteredImageView.h */,
+				1BE16EEA14EB4DD000570A64 /* XBFilteredImageView.m */,
 			);
 			name = XBImageFilters;
+			sourceTree = "<group>";
+		};
+		1BE16EF214EB56EB00570A64 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16EF314EB56EB00570A64 /* Images */,
+			);
+			name = Resources;
+			path = XBImageFilters/Resources;
+			sourceTree = "<group>";
+		};
+		1BE16EF314EB56EB00570A64 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				1BE16EF414EB56EB00570A64 /* LucasCorrea.png */,
+				1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */,
+			);
+			path = Images;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,6 +207,8 @@
 			files = (
 				1BE16ECE14EB4BE600570A64 /* InfoPlist.strings in Resources */,
 				1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */,
+				1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */,
+				1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,6 +222,7 @@
 				1BE16ED014EB4BE600570A64 /* main.m in Sources */,
 				1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */,
 				1BE16EE814EB4D0900570A64 /* ViewController.m in Sources */,
+				1BE16EEB14EB4DD000570A64 /* XBFilteredImageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,10 +296,12 @@
 		1BE16EDE14EB4BE600570A64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
 				INFOPLIST_FILE = "XBImageFilters/XBImageFilters-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -264,10 +309,12 @@
 		1BE16EDF14EB4BE600570A64 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
 				INFOPLIST_FILE = "XBImageFilters/XBImageFilters-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

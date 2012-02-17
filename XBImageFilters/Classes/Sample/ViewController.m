@@ -22,7 +22,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     self.filteredImageView.image = self.imageView.image;
+    self.filteredImageView.contentMode = UIViewContentModeBottom;
 }
 
 - (void)viewDidUnload

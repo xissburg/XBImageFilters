@@ -37,6 +37,18 @@
     <resources>
         <image name="LucasCorrea.png" width="320" height="460"/>
     </resources>
+    <classes>
+        <class className="ViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="filteredImageView" candidateClass="XBFilteredImageView"/>
+                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
+            </relationships>
+        </class>
+        <class className="XBFilteredImageView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredImageView.h"/>
+        </class>
+    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

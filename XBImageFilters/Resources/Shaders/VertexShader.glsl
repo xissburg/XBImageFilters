@@ -10,11 +10,12 @@ attribute vec4 a_position;
 attribute vec2 a_texCoord;
 
 uniform vec2 u_texCoordScale;
+uniform mat4 u_contentTransform;
 
 varying vec2 v_texCoord;
 
 void main()
 {
-    v_texCoord = a_texCoord*u_texCoordScale;
-    gl_Position = a_position;
+    v_texCoord = a_texCoord * u_texCoordScale;
+    gl_Position = u_contentTransform * a_position;
 }

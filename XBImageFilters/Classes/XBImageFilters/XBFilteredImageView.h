@@ -12,5 +12,6 @@
 @interface XBFilteredImageView : UIView <GLKViewDelegate>
 
 @property (strong, nonatomic) UIImage *image;
+@property (assign, nonatomic) GLKMatrix4 contentTransfom;
 
 @end

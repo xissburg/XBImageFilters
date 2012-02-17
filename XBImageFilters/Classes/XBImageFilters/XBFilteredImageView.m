@@ -26,6 +26,7 @@ typedef struct {
 @property (assign, nonatomic) GLint positionHandle;
 @property (assign, nonatomic) GLint texCoordHandle;
 @property (assign, nonatomic) GLint textureHandle;
+@property (assign, nonatomic) GLint transformHandle;
 
 /**
  * The texCoordScale is a vec2 that is multipled by the texCoords of each vertex in the vertex shader. We have to do this because in
@@ -39,6 +40,9 @@ typedef struct {
 - (void)destroyGL;
 - (GLuint)createShaderFromFile:(NSString *)filename type:(GLenum)type;
 
+- (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit;
+- (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode;
+
 @end
 
 @implementation XBFilteredImageView
@@ -51,7 +55,9 @@ typedef struct {
 @synthesize positionHandle = _positionHandle;
 @synthesize texCoordHandle = _texCoordHandle;
 @synthesize textureHandle = _textureHandle;
+@synthesize transformHandle = _transformHandle;
 @synthesize texCoordScale = _texCoordScale;
+@synthesize contentTransfom = _contentTransfom;
 @synthesize image = _image;
 
 /**
@@ -65,6 +71,7 @@ typedef struct {
     self.glkView = [[GLKView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) context:self.context];
     self.glkView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.glkView.delegate = self;
+    self.glkView.enableSetNeedsDisplay = YES;
     [self addSubview:self.glkView];
     
     [self setupGL];
@@ -133,8 +140,8 @@ typedef struct {
     
     glGenTextures(1, &_imageTexture);
     glBindTexture(GL_TEXTURE_2D, self.imageTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
@@ -190,7 +197,11 @@ typedef struct {
     self.positionHandle = glGetAttribLocation(self.imageFilterProgram, "a_position");
     self.texCoordHandle = glGetAttribLocation(self.imageFilterProgram, "a_texCoord");
     self.texCoordScale = glGetUniformLocation(self.imageFilterProgram, "u_texCoordScale");
+    self.transformHandle = glGetUniformLocation(self.imageFilterProgram, "u_contentTransform");
     self.textureHandle = glGetUniformLocation(self.imageFilterProgram, "s_texture");
+    
+    // Initialize transform to the most basic projection
+    self.contentTransfom = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
 }
 
 - (void)destroyGL
@@ -239,18 +250,128 @@ typedef struct {
     [super setContentMode:contentMode];
 }
 
+- (void)setNeedsDisplay
+{
+    [super setNeedsDisplay];
+    [self.glkView setNeedsDisplay];
+}
+
+- (void)layoutSubviews
+{
+    switch (self.contentMode) {
+        case UIViewContentModeScaleToFill:
+            self.contentTransfom = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+            break;
+            
+        case UIViewContentModeScaleAspectFit:
+            self.contentTransfom = [self transformForAspectFitOrFill:YES];
+            break;
+            
+        case UIViewContentModeScaleAspectFill:
+            self.contentTransfom = [self transformForAspectFitOrFill:NO];
+            break;
+            
+        case UIViewContentModeCenter:
+        case UIViewContentModeBottom:
+        case UIViewContentModeTop:
+        case UIViewContentModeLeft:
+        case UIViewContentModeRight:
+        case UIViewContentModeBottomLeft:
+        case UIViewContentModeBottomRight:
+        case UIViewContentModeTopLeft:
+        case UIViewContentModeTopRight:
+            self.contentTransfom = [self transformForPositionalContentMode:self.contentMode];
+            break;
+            
+        case UIViewContentModeRedraw:
+            break;
+            
+        default:
+            break;
+    }
+    
+    [self.glkView setNeedsDisplay];
+}
+
+- (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit
+{
+    float imageAspect = self.image.size.width/self.image.size.height;
+    float viewAspect = self.bounds.size.width/self.bounds.size.height;
+    GLKMatrix4 transform;
+    
+    if ((imageAspect > viewAspect && fit) || (imageAspect < viewAspect && !fit)) {
+        transform = GLKMatrix4MakeOrtho(-1, 1, -imageAspect/viewAspect, imageAspect/viewAspect, -1, 1);
+    }
+    else {
+        transform = GLKMatrix4MakeOrtho(-viewAspect/imageAspect, viewAspect/imageAspect, -1, 1, -1, 1);
+    }
+    
+    return transform;
+}
+
+- (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode
+{
+    float widthRatio = self.bounds.size.width/self.image.size.width;
+    float heightRatio = self.bounds.size.height/self.image.size.height;
+    GLKMatrix4 transform = GLKMatrix4Identity;
+    
+    switch (contentMode) {
+        case UIViewContentModeCenter:
+            transform = GLKMatrix4MakeOrtho(-widthRatio, widthRatio, -heightRatio, heightRatio, -1, 1);
+            break;
+            
+        case UIViewContentModeBottom:
+            transform = GLKMatrix4MakeOrtho(-widthRatio, widthRatio, -1, 2*heightRatio - 1, -1, 1);
+            break;
+            
+        case UIViewContentModeTop:
+            transform = GLKMatrix4MakeOrtho(-widthRatio, widthRatio, -2*heightRatio + 1, 1, -1, 1);
+            break;
+            
+        case UIViewContentModeLeft:
+            transform = GLKMatrix4MakeOrtho(-1, 2*widthRatio - 1, -heightRatio, heightRatio, -1, 1);
+            break;
+            
+        case UIViewContentModeRight:
+            transform = GLKMatrix4MakeOrtho(-2*widthRatio + 1, 1, -heightRatio, heightRatio, -1, 1);
+            break;
+            
+        case UIViewContentModeTopLeft:
+            transform = GLKMatrix4MakeOrtho(-1, 2*widthRatio - 1, -2*heightRatio + 1, 1, -1, 1);
+            break;
+            
+        case UIViewContentModeTopRight:
+            transform = GLKMatrix4MakeOrtho(-2*widthRatio + 1, 1, -2*heightRatio + 1, 1, -1, 1);
+            break;
+            
+        case UIViewContentModeBottomLeft:
+            transform = GLKMatrix4MakeOrtho(-1, 2*widthRatio - 1, -1, 2*heightRatio - 1, -1, 1);
+            break;
+            
+        case UIViewContentModeBottomRight:
+            transform = GLKMatrix4MakeOrtho(-2*widthRatio + 1, 1, -1, 2*heightRatio - 1, -1, 1);
+            break;
+            
+        default:
+            NSLog(@"Warning: Invalid contentMode given to transformForPositionalContentMode: %d", contentMode);
+            break;
+    }
+    
+    return transform;
+}
+
 #pragma mark - GLKViewDelegate
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    [EAGLContext setCurrentContext:self.context];
-    
     CGFloat r, g, b, a;
     [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
     
     glUseProgram(self.imageFilterProgram);
+    
+    glUniformMatrix4fv(self.transformHandle, 1, GL_FALSE, self.contentTransfom.m);
     
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glVertexAttribPointer(self.positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));

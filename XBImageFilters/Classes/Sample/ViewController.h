@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "XBFilteredImageView.h"
 
 @interface ViewController : UIViewController
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet XBFilteredImageView *filteredImageView;
 
 @end

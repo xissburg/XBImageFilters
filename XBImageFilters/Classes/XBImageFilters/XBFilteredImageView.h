@@ -11,4 +11,6 @@
 
 @interface XBFilteredImageView : UIView <GLKViewDelegate>
 
+@property (strong, nonatomic) UIImage *image;
+
 @end

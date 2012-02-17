@@ -9,6 +9,8 @@
 #import "ViewController.h"
 
 @implementation ViewController
+@synthesize imageView;
+@synthesize filteredImageView;
 
 - (void)didReceiveMemoryWarning
 {
@@ -20,10 +22,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.filteredImageView.image = self.imageView.image;
 }
 
 - (void)viewDidUnload
 {
+    [self setImageView:nil];
+    [self setFilteredImageView:nil];
     [super viewDidUnload];
 }
 

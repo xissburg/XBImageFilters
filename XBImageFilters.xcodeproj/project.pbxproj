@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B675E7114EE5DF300ED8402 /* VertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6D14EE5D6F00ED8402 /* VertexShader.glsl */; };
+		1B675E7214EE5DF300ED8402 /* FragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6F14EE5DBC00ED8402 /* FragmentShader.glsl */; };
 		1BE16EC414EB4BE600570A64 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC314EB4BE600570A64 /* UIKit.framework */; };
 		1BE16EC614EB4BE600570A64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC514EB4BE600570A64 /* Foundation.framework */; };
 		1BE16EC814EB4BE600570A64 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */; };
@@ -24,6 +26,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B675E6D14EE5D6F00ED8402 /* VertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = VertexShader.glsl; path = Shaders/VertexShader.glsl; sourceTree = "<group>"; };
+		1B675E6F14EE5DBC00ED8402 /* FragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = FragmentShader.glsl; path = Shaders/FragmentShader.glsl; sourceTree = "<group>"; };
 		1BE16EBF14EB4BE600570A64 /* XBImageFilters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBImageFilters.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BE16EC314EB4BE600570A64 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1BE16EC514EB4BE600570A64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -63,6 +67,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1B675E6B14EE5D4B00ED8402 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				1B675E6D14EE5D6F00ED8402 /* VertexShader.glsl */,
+				1B675E6F14EE5DBC00ED8402 /* FragmentShader.glsl */,
+			);
+			name = Shaders;
+			sourceTree = "<group>";
+		};
 		1BE16EB414EB4BE500570A64 = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +153,7 @@
 		1BE16EF214EB56EB00570A64 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1B675E6B14EE5D4B00ED8402 /* Shaders */,
 				1BE16EF314EB56EB00570A64 /* Images */,
 			);
 			name = Resources;
@@ -205,6 +219,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B675E7114EE5DF300ED8402 /* VertexShader.glsl in Resources */,
+				1B675E7214EE5DF300ED8402 /* FragmentShader.glsl in Resources */,
 				1BE16ECE14EB4BE600570A64 /* InfoPlist.strings in Resources */,
 				1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */,
 				1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */,
@@ -338,6 +354,7 @@
 				1BE16EDF14EB4BE600570A64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

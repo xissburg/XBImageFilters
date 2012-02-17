@@ -26,6 +26,13 @@ typedef struct {
 @property (assign, nonatomic) GLint positionHandle;
 @property (assign, nonatomic) GLint texCoordHandle;
 @property (assign, nonatomic) GLint textureHandle;
+
+/**
+ * The texCoordScale is a vec2 that is multipled by the texCoords of each vertex in the vertex shader. We have to do this because in
+ * OpenGL ES 2 the texture sides must be power of two, but most of the images won't be power of two on each side, then we have to 
+ * adjust the texture coordinates so that the image will fit perfectly in the rectangle/quad. This vec2 is actually equals to
+ * vec2(imageWidth/textureWidth, imageHeight/textureHeight).
+ */
 @property (assign, nonatomic) GLint texCoordScale;
 
 - (void)setupGL;
@@ -135,7 +142,7 @@ typedef struct {
     
     UIGraphicsEndImageContext();
     
-    // Update image size in shader
+    // Update tex coord scale in shader
     glUseProgram(self.imageFilterProgram);
     glUniform2f(self.texCoordScale, (GLfloat)width/textureWidth, (GLfloat)height/textureHeight);
     glUseProgram(0);

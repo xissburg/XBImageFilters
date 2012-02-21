@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1B675E7114EE5DF300ED8402 /* VertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6D14EE5D6F00ED8402 /* VertexShader.glsl */; };
-		1B675E7214EE5DF300ED8402 /* FragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6F14EE5DBC00ED8402 /* FragmentShader.glsl */; };
+		1B675E7114EE5DF300ED8402 /* DefaultVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */; };
+		1B675E7214EE5DF300ED8402 /* LuminanceFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */; };
 		1BE16EC414EB4BE600570A64 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC314EB4BE600570A64 /* UIKit.framework */; };
 		1BE16EC614EB4BE600570A64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC514EB4BE600570A64 /* Foundation.framework */; };
 		1BE16EC814EB4BE600570A64 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EC714EB4BE600570A64 /* CoreGraphics.framework */; };
@@ -23,11 +23,16 @@
 		1BE16EF114EB50B100570A64 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EF014EB50B100570A64 /* QuartzCore.framework */; };
 		1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF414EB56EB00570A64 /* LucasCorrea.png */; };
 		1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */; };
+		1BE4DB1B14F2D5E2003EE965 /* GLKProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */; };
+		1BE4DB1C14F2D5E2003EE965 /* GLKUniform.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */; };
+		1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2814F31488003EE965 /* GLKAttribute.m */; };
+		1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */; };
+		1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1B675E6D14EE5D6F00ED8402 /* VertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = VertexShader.glsl; path = Shaders/VertexShader.glsl; sourceTree = "<group>"; };
-		1B675E6F14EE5DBC00ED8402 /* FragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = FragmentShader.glsl; path = Shaders/FragmentShader.glsl; sourceTree = "<group>"; };
+		1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultVertexShader.glsl; path = Shaders/DefaultVertexShader.glsl; sourceTree = "<group>"; };
+		1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = LuminanceFragmentShader.glsl; path = Shaders/LuminanceFragmentShader.glsl; sourceTree = "<group>"; };
 		1BE16EBF14EB4BE600570A64 /* XBImageFilters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XBImageFilters.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BE16EC314EB4BE600570A64 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1BE16EC514EB4BE600570A64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -48,6 +53,15 @@
 		1BE16EF014EB50B100570A64 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		1BE16EF414EB56EB00570A64 /* LucasCorrea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LucasCorrea.png; sourceTree = "<group>"; };
 		1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LucasCorrea@2x.png"; sourceTree = "<group>"; };
+		1BE4DB1714F2D5E2003EE965 /* GLKProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKProgram.h; sourceTree = "<group>"; };
+		1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKProgram.m; sourceTree = "<group>"; };
+		1BE4DB1914F2D5E2003EE965 /* GLKUniform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKUniform.h; sourceTree = "<group>"; };
+		1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKUniform.m; sourceTree = "<group>"; };
+		1BE4DB2714F31488003EE965 /* GLKAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKAttribute.h; sourceTree = "<group>"; };
+		1BE4DB2814F31488003EE965 /* GLKAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKAttribute.m; sourceTree = "<group>"; };
+		1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKShaderVariable.h; sourceTree = "<group>"; };
+		1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKShaderVariable.m; sourceTree = "<group>"; };
+		1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultFragmentShader.glsl; path = Shaders/DefaultFragmentShader.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +84,9 @@
 		1B675E6B14EE5D4B00ED8402 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				1B675E6D14EE5D6F00ED8402 /* VertexShader.glsl */,
-				1B675E6F14EE5DBC00ED8402 /* FragmentShader.glsl */,
+				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
+				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
+				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
 			);
 			name = Shaders;
 			sourceTree = "<group>";
@@ -144,6 +159,7 @@
 		1BE16EE514EB4CE400570A64 /* XBImageFilters */ = {
 			isa = PBXGroup;
 			children = (
+				1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */,
 				1BE16EE914EB4DD000570A64 /* XBFilteredImageView.h */,
 				1BE16EEA14EB4DD000570A64 /* XBFilteredImageView.m */,
 			);
@@ -167,6 +183,22 @@
 				1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */,
 			);
 			path = Images;
+			sourceTree = "<group>";
+		};
+		1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */ = {
+			isa = PBXGroup;
+			children = (
+				1BE4DB1714F2D5E2003EE965 /* GLKProgram.h */,
+				1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */,
+				1BE4DB1914F2D5E2003EE965 /* GLKUniform.h */,
+				1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */,
+				1BE4DB2714F31488003EE965 /* GLKAttribute.h */,
+				1BE4DB2814F31488003EE965 /* GLKAttribute.m */,
+				1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */,
+				1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */,
+			);
+			name = GLKitAdditions;
+			path = Classes/XBImageFilters/GLKitAdditions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,8 +251,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1B675E7114EE5DF300ED8402 /* VertexShader.glsl in Resources */,
-				1B675E7214EE5DF300ED8402 /* FragmentShader.glsl in Resources */,
+				1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */,
+				1B675E7114EE5DF300ED8402 /* DefaultVertexShader.glsl in Resources */,
+				1B675E7214EE5DF300ED8402 /* LuminanceFragmentShader.glsl in Resources */,
 				1BE16ECE14EB4BE600570A64 /* InfoPlist.strings in Resources */,
 				1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */,
 				1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */,
@@ -239,6 +272,10 @@
 				1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */,
 				1BE16EE814EB4D0900570A64 /* ViewController.m in Sources */,
 				1BE16EEB14EB4DD000570A64 /* XBFilteredImageView.m in Sources */,
+				1BE4DB1B14F2D5E2003EE965 /* GLKProgram.m in Sources */,
+				1BE4DB1C14F2D5E2003EE965 /* GLKUniform.m in Sources */,
+				1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */,
+				1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

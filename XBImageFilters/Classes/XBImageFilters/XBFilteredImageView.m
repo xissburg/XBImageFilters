@@ -7,6 +7,7 @@
 //
 
 #import "XBFilteredImageView.h"
+#import "GLKProgram.h"
 
 typedef struct {
     GLKVector3 position;
@@ -17,16 +18,11 @@ typedef struct {
 
 @property (strong, nonatomic) EAGLContext *context;
 @property (strong, nonatomic) GLKView *glkView;
+@property (strong, nonatomic) GLKProgram *program;
 
 @property (assign, nonatomic) GLuint imageQuadVertexBuffer;
-@property (assign, nonatomic) GLuint imageFilterProgram;
-
 @property (assign, nonatomic) GLuint imageTexture;
-
-@property (assign, nonatomic) GLint positionHandle;
-@property (assign, nonatomic) GLint texCoordHandle;
-@property (assign, nonatomic) GLint textureHandle;
-@property (assign, nonatomic) GLint transformHandle;
+@property (assign, nonatomic) GLint textureWidth, textureHeight;
 
 /**
  * The texCoordScale is a vec2 that is multipled by the texCoords of each vertex in the vertex shader. We have to do this because in
@@ -38,7 +34,6 @@ typedef struct {
 
 - (void)setupGL;
 - (void)destroyGL;
-- (GLuint)createShaderFromFile:(NSString *)filename type:(GLenum)type;
 
 - (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit;
 - (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode;
@@ -49,13 +44,10 @@ typedef struct {
 
 @synthesize context = _context;
 @synthesize glkView = _glkView;
+@synthesize program = _program;
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
-@synthesize imageFilterProgram = _imageFilterProgram;
 @synthesize imageTexture = _imageTexture;
-@synthesize positionHandle = _positionHandle;
-@synthesize texCoordHandle = _texCoordHandle;
-@synthesize textureHandle = _textureHandle;
-@synthesize transformHandle = _transformHandle;
+@synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
 @synthesize texCoordScale = _texCoordScale;
 @synthesize contentTransfom = _contentTransfom;
 @synthesize image = _image;
@@ -119,18 +111,18 @@ typedef struct {
     CGFloat scaledHeight = height*self.contentScaleFactor;
     
     //Compute the lowest power of two that is greater than the scaled image size
-    GLint textureWidth  = 1<<((int)floorf(log2f(scaledWidth - 1)) + 1);
-    GLint textureHeight = 1<<((int)floorf(log2f(scaledHeight - 1)) + 1);
+    self.textureWidth  = 1<<((int)floorf(log2f(scaledWidth - 1)) + 1);
+    self.textureHeight = 1<<((int)floorf(log2f(scaledHeight - 1)) + 1);
     
-    if (textureWidth < 64) {
-        textureWidth = 64;
+    if (self.textureWidth < 64) {
+        self.textureWidth = 64;
     }
     
-    if (textureHeight < 64) {
-        textureHeight = 64;
+    if (self.textureHeight < 64) {
+        self.textureHeight = 64;
     }
     
-    CGSize imageSize = CGSizeMake(textureWidth, textureHeight);
+    CGSize imageSize = CGSizeMake(self.textureWidth, self.textureHeight);
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, self.contentScaleFactor);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextTranslateCTM(context, 0, 0);
@@ -144,20 +136,34 @@ typedef struct {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     UIGraphicsEndImageContext();
     
     // Update tex coord scale in shader
-    glUseProgram(self.imageFilterProgram);
-    glUniform2f(self.texCoordScale, (GLfloat)width/textureWidth, (GLfloat)height/textureHeight);
-    glUseProgram(0);
+    GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
+    [self.program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
     
     [self.glkView setNeedsDisplay];
 }
 
-#pragma mark - Methods
+#pragma mark - Public Methods
+
+- (void)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error
+{
+    [EAGLContext setCurrentContext:self.context];
+    NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    self.program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:path error:error];
+    
+    // Update tex coord scale in shader
+    GLfloat texCoordScale[] = {(GLfloat)self.image.size.width/self.textureWidth, (GLfloat)self.image.size.height/self.textureHeight};
+    [self.program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+    
+    [self setNeedsDisplay];
+}
+
+#pragma mark - Private Methods
 
 - (void)setupGL
 {
@@ -176,29 +182,16 @@ typedef struct {
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
-    // Setup shader
-    GLuint vertexShader = [self createShaderFromFile:@"VertexShader.glsl" type:GL_VERTEX_SHADER];
-    GLuint fragmentShader = [self createShaderFromFile:@"FragmentShader.glsl" type:GL_FRAGMENT_SHADER];
-    self.imageFilterProgram = glCreateProgram();
+    // Setup default shader
+    NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
     
-    glAttachShader(self.imageFilterProgram, vertexShader);
-    glAttachShader(self.imageFilterProgram, fragmentShader);
-    glLinkProgram(self.imageFilterProgram);
+    NSError *error = nil;
+    self.program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:&error];
     
-    GLint linked = 0;
-    glGetProgramiv(self.imageFilterProgram, GL_LINK_STATUS, &linked);
-    
-    if (linked == 0) {
-        glDeleteProgram(self.imageFilterProgram);
-        return;
+    if (error != nil) {
+        NSLog(@"%@", [error localizedDescription]);
     }
-    
-    // Get handles to uniform shader variables
-    self.positionHandle = glGetAttribLocation(self.imageFilterProgram, "a_position");
-    self.texCoordHandle = glGetAttribLocation(self.imageFilterProgram, "a_texCoord");
-    self.texCoordScale = glGetUniformLocation(self.imageFilterProgram, "u_texCoordScale");
-    self.transformHandle = glGetUniformLocation(self.imageFilterProgram, "u_contentTransform");
-    self.textureHandle = glGetUniformLocation(self.imageFilterProgram, "s_texture");
     
     // Initialize transform to the most basic projection
     self.contentTransfom = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
@@ -208,41 +201,10 @@ typedef struct {
 {
     [EAGLContext setCurrentContext:self.context];
     
-    glDeleteProgram(self.imageFilterProgram);
-    self.imageFilterProgram = 0;
+    self.program = nil;
     
     glDeleteBuffers(1, &_imageQuadVertexBuffer);
     self.imageQuadVertexBuffer = 0;
-}
-
-- (GLuint)createShaderFromFile:(NSString *)filename type:(GLenum)type 
-{
-    GLuint shader = glCreateShader(type);
-    
-    if (shader == 0) {
-        return 0;
-    }
-    
-    NSString *path = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:filename];
-    NSString *shaderString = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-    const GLchar *shaderSource = [shaderString cStringUsingEncoding:NSUTF8StringEncoding];
-    
-    glShaderSource(shader, 1, &shaderSource, NULL);
-    glCompileShader(shader);
-    
-    GLint success = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    
-    if (success == 0) {
-        char errorMsg[2048];
-        glGetShaderInfoLog(shader, sizeof(errorMsg), NULL, errorMsg);
-        NSString *errorString = [NSString stringWithCString:errorMsg encoding:NSUTF8StringEncoding];
-        NSLog(@"Failed to compile %@: %@", filename, errorString);
-        glDeleteShader(shader);
-        return 0;
-    }
-    
-    return shader;
 }
 
 - (void)setContentMode:(UIViewContentMode)contentMode
@@ -369,21 +331,24 @@ typedef struct {
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
     
-    glUseProgram(self.imageFilterProgram);
-    
-    glUniformMatrix4fv(self.transformHandle, 1, GL_FALSE, self.contentTransfom.m);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
-    glVertexAttribPointer(self.positionHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
-    glEnableVertexAttribArray(self.positionHandle);
-    
     if (self.imageTexture != 0) {
-        glVertexAttribPointer(self.texCoordHandle, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
-        glEnableVertexAttribArray(self.texCoordHandle);
+        GLKAttribute *texCoordAttribute = [self.program.attributes objectForKey:@"a_texCoord"];
+        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
+        glEnableVertexAttribArray(texCoordAttribute.location);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, self.imageTexture);
-        glUniform1i(self.textureHandle, 0);
+        GLint sampler = 0;
+        [self.program setValue:&sampler forUniformNamed:@"s_texture"];
     }
+    
+    [self.program setValue:self.contentTransfom.m forUniformNamed:@"u_contentTransform"];
+    
+    [self.program prepareToDraw];
+    
+    GLKAttribute *positionAttribute = [self.program.attributes objectForKey:@"a_position"];
+    glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
+    glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+    glEnableVertexAttribArray(positionAttribute.location);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     

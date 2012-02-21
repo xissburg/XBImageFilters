@@ -14,4 +14,6 @@
 @property (strong, nonatomic) UIImage *image;
 @property (assign, nonatomic) GLKMatrix4 contentTransfom;
 
+- (void)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
+
 @end

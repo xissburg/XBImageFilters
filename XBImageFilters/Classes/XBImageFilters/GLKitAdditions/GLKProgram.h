@@ -31,7 +31,6 @@ enum {
  */
 @interface GLKProgram : NSObject
 
-@property (readonly, copy, nonatomic) NSDictionary *uniforms;
 @property (readonly, copy, nonatomic) NSDictionary *attributes;
 @property (readonly, nonatomic) GLuint program;
 

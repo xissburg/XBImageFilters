@@ -15,7 +15,7 @@
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="top" image="LucasCorrea.png" id="0qh-fN-4s6">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="230"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <view contentMode="scaleToFill" id="WuR-pY-W2c" customClass="XBFilteredImageView">
                                 <rect key="frame" x="0.0" y="230" width="320" height="230"/>
@@ -31,7 +31,7 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="146" y="147"/>
+            <point key="canvasLocation" x="-36" y="123"/>
         </scene>
     </scenes>
     <resources>

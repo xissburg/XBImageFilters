@@ -58,6 +58,8 @@ typedef struct {
  */
 - (void)initialize
 {
+    self.contentScaleFactor = [[UIScreen mainScreen] scale];
+    
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
     self.glkView = [[GLKView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) context:self.context];
@@ -107,12 +109,9 @@ typedef struct {
     size_t width = CGImageGetWidth(image.CGImage);
     size_t height = CGImageGetHeight(image.CGImage);
     
-    CGFloat scaledWidth = width*self.contentScaleFactor;
-    CGFloat scaledHeight = height*self.contentScaleFactor;
-    
-    //Compute the lowest power of two that is greater than the scaled image size
-    self.textureWidth  = 1<<((int)floorf(log2f(scaledWidth - 1)) + 1);
-    self.textureHeight = 1<<((int)floorf(log2f(scaledHeight - 1)) + 1);
+    //Compute the lowest power of two that is greater than the image size
+    self.textureWidth  = 1<<((int)floorf(log2f(width - 1)) + 1);
+    self.textureHeight = 1<<((int)floorf(log2f(height - 1)) + 1);
     
     if (self.textureWidth < 64) {
         self.textureWidth = 64;
@@ -122,7 +121,7 @@ typedef struct {
         self.textureHeight = 64;
     }
     
-    CGSize imageSize = CGSizeMake(self.textureWidth, self.textureHeight);
+    CGSize imageSize = CGSizeMake(self.textureWidth/self.contentScaleFactor, self.textureHeight/self.contentScaleFactor);
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, self.contentScaleFactor);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextTranslateCTM(context, 0, 0);
@@ -134,8 +133,8 @@ typedef struct {
     glBindTexture(GL_TEXTURE_2D, self.imageTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
@@ -157,7 +156,9 @@ typedef struct {
     self.program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:path error:error];
     
     // Update tex coord scale in shader
-    GLfloat texCoordScale[] = {(GLfloat)self.image.size.width/self.textureWidth, (GLfloat)self.image.size.height/self.textureHeight};
+    size_t width = CGImageGetWidth(self.image.CGImage);
+    size_t height = CGImageGetHeight(self.image.CGImage);
+    GLfloat texCoordScale[] = {(GLfloat)width*self.contentScaleFactor/self.textureWidth, (GLfloat)height*self.contentScaleFactor/self.textureHeight};
     [self.program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
     
     [self.program bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];

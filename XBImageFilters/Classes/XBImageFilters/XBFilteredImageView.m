@@ -160,6 +160,8 @@ typedef struct {
     GLfloat texCoordScale[] = {(GLfloat)self.image.size.width/self.textureWidth, (GLfloat)self.image.size.height/self.textureHeight};
     [self.program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
     
+    [self.program bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];
+    
     [self setNeedsDisplay];
 }
 
@@ -331,24 +333,18 @@ typedef struct {
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
     
-    if (self.imageTexture != 0) {
-        GLKAttribute *texCoordAttribute = [self.program.attributes objectForKey:@"a_texCoord"];
-        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
-        glEnableVertexAttribArray(texCoordAttribute.location);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, self.imageTexture);
-        GLint sampler = 0;
-        [self.program setValue:&sampler forUniformNamed:@"s_texture"];
-    }
-    
     [self.program setValue:self.contentTransfom.m forUniformNamed:@"u_contentTransform"];
-    
     [self.program prepareToDraw];
     
-    GLKAttribute *positionAttribute = [self.program.attributes objectForKey:@"a_position"];
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
+    
+    GLKAttribute *positionAttribute = [self.program.attributes objectForKey:@"a_position"];
     glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
     glEnableVertexAttribArray(positionAttribute.location);
+    
+    GLKAttribute *texCoordAttribute = [self.program.attributes objectForKey:@"a_texCoord"];
+    glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
+    glEnableVertexAttribArray(texCoordAttribute.location);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     

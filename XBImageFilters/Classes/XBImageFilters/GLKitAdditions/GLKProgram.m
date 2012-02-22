@@ -12,6 +12,8 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 
 @interface GLKProgram ()
 
+@property (strong, nonatomic) NSMutableDictionary *samplerBindings;
+
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error;
 - (GLuint)createProgramWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error;
 - (NSMutableDictionary *)uniformsForProgram:(GLuint)program;
@@ -26,6 +28,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 @synthesize uniforms = _uniforms;
 @synthesize attributes = _attributes;
 @synthesize program = _program;
+@synthesize samplerBindings = _samplerBindings;
 
 - (id)initWithVertexShaderFromFile:(NSString *)vertexShaderPath fragmentShaderFromFile:(NSString *)fragmentShaderPath error:(NSError *__autoreleasing *)error
 {
@@ -56,6 +59,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
         
         _uniforms = [[self uniformsForProgram:self.program] copy];
         _attributes = [[self attributesForProgram:self.program] copy];
+        self.samplerBindings = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -71,6 +75,17 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 {
     GLKUniform *uniform = [self.uniforms objectForKey:uniformName];
     uniform.value = value;
+}
+
+- (void)bindSamplerNamed:(NSString *)samplerName toTexture:(GLuint)texture unit:(GLint)unit
+{
+    GLKUniform *uniform = [self.uniforms objectForKey:samplerName];
+    
+    if (uniform == nil) {
+        return;
+    }
+    
+    [self.samplerBindings setObject:[NSNumber numberWithUnsignedInt:texture] forKey:samplerName];
 }
 
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error
@@ -235,7 +250,15 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
             
         case GL_SAMPLER_2D:
         case GL_SAMPLER_CUBE:
+        {
             glUniform1iv(uniform.location, uniform.size, uniform.value);
+            NSNumber *texture = [self.samplerBindings objectForKey:uniform.name];
+            
+            if (texture != nil) {
+                glActiveTexture(GL_TEXTURE0 + *(GLint *)uniform.value);
+                glBindTexture(GL_TEXTURE_2D, texture.unsignedIntValue);
+            }
+        }   
             break;
             
         default:

@@ -13,3 +13,7 @@ Convoluted Gaussian Blur, an example of a multi-pass filter. It uses two fragmen
 ## Project Status
 
 This project is in a very early stage of development so not all features advertised are functional yet.
+
+## License
+
+This project is under the MIT license (details in COPYRIGHT.txt). Do whatever you want with it and contributions of any form are very welcome.

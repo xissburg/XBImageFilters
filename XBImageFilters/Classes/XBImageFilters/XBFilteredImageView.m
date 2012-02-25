@@ -125,19 +125,11 @@ typedef struct {
     self.textureWidth  = 1<<((int)floorf(log2f(width - 1)) + 1);
     self.textureHeight = 1<<((int)floorf(log2f(height - 1)) + 1);
     
-    if (self.textureWidth < 64) {
-        self.textureWidth = 64;
-    }
-    
-    if (self.textureHeight < 64) {
-        self.textureHeight = 64;
-    }
-    
     CGSize imageSize = CGSizeMake(self.textureWidth/self.contentScaleFactor, self.textureHeight/self.contentScaleFactor);
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, self.contentScaleFactor);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextTranslateCTM(context, 0, 0);
-    CGContextScaleCTM(context, 1, 1);
+    CGContextScaleCTM(context, 1.f/self.contentScaleFactor, 1.f/self.contentScaleFactor);
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
@@ -152,15 +144,12 @@ typedef struct {
     
     UIGraphicsEndImageContext();
     
-    // Update tex coord scale in shaders
-    GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
-    
-    for (GLKProgram *program in self.programs) {
-        [program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
-    }
-    
-    // Update the texture in the first filter shader
+    // Update tex coord scale in the last shader and update the texture in the first shader
     if (self.programs.count > 0) {
+        GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
+        GLKProgram *lastProgram = [self.programs lastObject];
+        [lastProgram setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+        
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];
     }
@@ -172,9 +161,8 @@ typedef struct {
 {
     _contentTransfom = contentTransfom;
     
-    for (GLKProgram *program in self.programs) {
-        [program setValue:_contentTransfom.m forUniformNamed:@"u_contentTransform"];
-    }
+    GLKProgram *lastProgram = [self.programs lastObject];
+    [lastProgram setValue:_contentTransfom.m forUniformNamed:@"u_contentTransform"];
 }
 
 #pragma mark - Public Methods
@@ -228,6 +216,10 @@ typedef struct {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
+    size_t width = CGImageGetWidth(self.image.CGImage);
+    size_t height = CGImageGetHeight(self.image.CGImage);
+    GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
+    
     NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:paths.count];
     NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
     
@@ -236,10 +228,15 @@ typedef struct {
         GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:error];
         
         // Update tex coord scale in shader
-        size_t width = CGImageGetWidth(self.image.CGImage);
-        size_t height = CGImageGetHeight(self.image.CGImage);
-        GLfloat texCoordScale[] = {(GLfloat)width*self.contentScaleFactor/self.textureWidth, (GLfloat)height*self.contentScaleFactor/self.textureHeight};
-        [program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+        if (i == paths.count - 1) {
+            [program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+        }
+        else {
+            GLfloat scale[] = {1, 1};
+            [program setValue:scale forUniformNamed:@"u_texCoordScale"];
+        }
+        
+        [program setValue:(void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
         
         GLuint sourceTexture = 0;
         
@@ -443,9 +440,11 @@ typedef struct {
             [self.glkView bindDrawable];
         }
         else if (pass%2 == 0) {
+            glViewport(0, 0, self.textureWidth, self.textureHeight);
             glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
         }
         else {
+            glViewport(0, 0, self.textureWidth, self.textureHeight);
             glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
         }
         

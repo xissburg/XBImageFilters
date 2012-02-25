@@ -26,8 +26,11 @@
     self.filteredImageView.image = self.imageView.image;
     self.filteredImageView.contentMode = UIViewContentModeBottom;
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
-    [self.filteredImageView setFilterFragmentShaderFromFile:path error:nil];
+    //NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
+    NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
+    NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
+    NSArray *paths = [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, nil];
+    [self.filteredImageView setFilterFragmentShadersFromFiles:paths error:nil];
 }
 
 - (void)viewDidUnload

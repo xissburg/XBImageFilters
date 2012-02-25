@@ -23,6 +23,8 @@
 		1BE16EF114EB50B100570A64 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EF014EB50B100570A64 /* QuartzCore.framework */; };
 		1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF414EB56EB00570A64 /* LucasCorrea.png */; };
 		1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */; };
+		1BE4179014F92E1600EB0ADD /* HGaussianBlur.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */; };
+		1BE4179214F92E5E00EB0ADD /* VGaussianBlur.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */; };
 		1BE4DB1B14F2D5E2003EE965 /* GLKProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */; };
 		1BE4DB1C14F2D5E2003EE965 /* GLKUniform.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */; };
 		1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2814F31488003EE965 /* GLKAttribute.m */; };
@@ -53,6 +55,8 @@
 		1BE16EF014EB50B100570A64 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		1BE16EF414EB56EB00570A64 /* LucasCorrea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LucasCorrea.png; sourceTree = "<group>"; };
 		1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LucasCorrea@2x.png"; sourceTree = "<group>"; };
+		1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = HGaussianBlur.glsl; path = Shaders/HGaussianBlur.glsl; sourceTree = "<group>"; };
+		1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = VGaussianBlur.glsl; path = Shaders/VGaussianBlur.glsl; sourceTree = "<group>"; };
 		1BE4DB1714F2D5E2003EE965 /* GLKProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKProgram.h; sourceTree = "<group>"; };
 		1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKProgram.m; sourceTree = "<group>"; };
 		1BE4DB1914F2D5E2003EE965 /* GLKUniform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKUniform.h; sourceTree = "<group>"; };
@@ -84,6 +88,8 @@
 		1B675E6B14EE5D4B00ED8402 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */,
+				1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */,
 				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
 				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
 				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
@@ -251,6 +257,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BE4179014F92E1600EB0ADD /* HGaussianBlur.glsl in Resources */,
 				1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */,
 				1B675E7114EE5DF300ED8402 /* DefaultVertexShader.glsl in Resources */,
 				1B675E7214EE5DF300ED8402 /* LuminanceFragmentShader.glsl in Resources */,
@@ -258,6 +265,7 @@
 				1BE16ED714EB4BE600570A64 /* MainStoryboard.storyboard in Resources */,
 				1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */,
 				1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */,
+				1BE4179214F92E5E00EB0ADD /* VGaussianBlur.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

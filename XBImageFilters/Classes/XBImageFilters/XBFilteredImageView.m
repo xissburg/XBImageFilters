@@ -18,11 +18,19 @@ typedef struct {
 
 @property (strong, nonatomic) EAGLContext *context;
 @property (strong, nonatomic) GLKView *glkView;
-@property (strong, nonatomic) GLKProgram *program;
 
 @property (assign, nonatomic) GLuint imageQuadVertexBuffer;
 @property (assign, nonatomic) GLuint imageTexture;
 @property (assign, nonatomic) GLint textureWidth, textureHeight;
+
+/**
+ * Multi-pass filtering support.
+ */
+@property (strong, nonatomic) NSArray *programs;
+@property (assign, nonatomic) GLuint oddPassTexture;
+@property (assign, nonatomic) GLuint evenPassTexture;
+@property (assign, nonatomic) GLuint oddPassFramebuffer;
+@property (assign, nonatomic) GLuint evenPassFrambuffer;
 
 /**
  * The texCoordScale is a vec2 that is multipled by the texCoords of each vertex in the vertex shader. We have to do this because in
@@ -44,13 +52,17 @@ typedef struct {
 
 @synthesize context = _context;
 @synthesize glkView = _glkView;
-@synthesize program = _program;
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
 @synthesize imageTexture = _imageTexture;
 @synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
 @synthesize texCoordScale = _texCoordScale;
 @synthesize contentTransfom = _contentTransfom;
 @synthesize image = _image;
+@synthesize programs = _programs;
+@synthesize oddPassTexture = _oddPassTexture;
+@synthesize evenPassTexture = _evenPassTexture;
+@synthesize oddPassFramebuffer = _oddPassFramebuffer;
+@synthesize evenPassFrambuffer = _evenPassFrambuffer;
 
 /**
  * Actual initializer. Called both in initWithFrame: when creating an instance programatically and in awakeFromNib when creating an instance
@@ -140,28 +152,115 @@ typedef struct {
     
     UIGraphicsEndImageContext();
     
-    // Update tex coord scale in shader
+    // Update tex coord scale in shaders
     GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
-    [self.program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+    
+    for (GLKProgram *program in self.programs) {
+        [program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+    }
+    
+    // Update the texture in the first filter shader
+    if (self.programs.count > 0) {
+        GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+        [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];
+    }
     
     [self.glkView setNeedsDisplay];
+}
+
+- (void)setContentTransfom:(GLKMatrix4)contentTransfom
+{
+    _contentTransfom = contentTransfom;
+    
+    for (GLKProgram *program in self.programs) {
+        [program setValue:_contentTransfom.m forUniformNamed:@"u_contentTransform"];
+    }
 }
 
 #pragma mark - Public Methods
 
 - (void)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error
 {
+    NSArray *paths = [[NSArray alloc] initWithObjects:path, nil];
+    [self setFilterFragmentShadersFromFiles:paths error:error];
+}
+
+- (void)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error
+{
     [EAGLContext setCurrentContext:self.context];
+    
+    /* Create frame buffers for render to texture in multi-pass filters if necessary. If we have a single pass/fragment shader, we'll render
+     * directly to the framebuffer. If we have two passes, we'll render to the evenPassFramebuffer using the original image as the filter source
+     * texture and then render directly to the framebuffer using the evenPassTexture as the filter source. If we have three passes, the second
+     * filter will instead render to the oddPassFramebuffer and the third/last pass will render to the framebuffer using the oddPassTexture.
+     * And so on... */
+    if (paths.count >= 2) {
+        // Two or more passes, create evenPass*
+        glGenTextures(1, &_evenPassTexture);
+        glBindTexture(GL_TEXTURE_2D, self.evenPassTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        glGenFramebuffers(1, &_evenPassFrambuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.evenPassTexture, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    
+    if (paths.count > 2) {
+        // More than two passes, create oddPass*
+        glGenTextures(1, &_oddPassTexture);
+        glBindTexture(GL_TEXTURE_2D, self.oddPassTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
+        glGenFramebuffers(1, &_oddPassFramebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.oddPassTexture, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    
+    NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:paths.count];
     NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
-    self.program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:path error:error];
     
-    // Update tex coord scale in shader
-    size_t width = CGImageGetWidth(self.image.CGImage);
-    size_t height = CGImageGetHeight(self.image.CGImage);
-    GLfloat texCoordScale[] = {(GLfloat)width*self.contentScaleFactor/self.textureWidth, (GLfloat)height*self.contentScaleFactor/self.textureHeight};
-    [self.program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+    for (int i = 0; i < paths.count; ++i) {
+        NSString *fragmentShaderPath = [paths objectAtIndex:i];
+        GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:error];
+        
+        // Update tex coord scale in shader
+        size_t width = CGImageGetWidth(self.image.CGImage);
+        size_t height = CGImageGetHeight(self.image.CGImage);
+        GLfloat texCoordScale[] = {(GLfloat)width*self.contentScaleFactor/self.textureWidth, (GLfloat)height*self.contentScaleFactor/self.textureHeight};
+        [program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
+        
+        GLuint sourceTexture = 0;
+        
+        if (i == 0) { // First pass always uses the original image
+            sourceTexture = self.imageTexture;
+        }
+        else if (i%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = self.evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = self.oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        
+        [programs addObject:program];
+    }
     
-    [self.program bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];
+    self.programs = [programs copy];
+    
+    self.contentTransfom = _contentTransfom;
     
     [self setNeedsDisplay];
 }
@@ -186,11 +285,9 @@ typedef struct {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
     // Setup default shader
-    NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
     NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
-    
     NSError *error = nil;
-    self.program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:&error];
+    [self setFilterFragmentShaderFromFile:fragmentShaderPath error:&error];
     
     if (error != nil) {
         NSLog(@"%@", [error localizedDescription]);
@@ -203,11 +300,16 @@ typedef struct {
 - (void)destroyGL
 {
     [EAGLContext setCurrentContext:self.context];
-    
-    self.program = nil;
-    
+
     glDeleteBuffers(1, &_imageQuadVertexBuffer);
     self.imageQuadVertexBuffer = 0;
+    
+    glDeleteTextures(1, &_imageTexture);
+    glDeleteTextures(1, &_evenPassTexture);
+    glDeleteTextures(1, &_oddPassTexture);
+    
+    glDeleteFramebuffers(1, &_evenPassFrambuffer);
+    glDeleteFramebuffers(1, &_oddPassFramebuffer);
 }
 
 - (void)setContentMode:(UIViewContentMode)contentMode
@@ -334,20 +436,33 @@ typedef struct {
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
     
-    [self.program setValue:self.contentTransfom.m forUniformNamed:@"u_contentTransform"];
-    [self.program prepareToDraw];
-    
-    glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
-    
-    GLKAttribute *positionAttribute = [self.program.attributes objectForKey:@"a_position"];
-    glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
-    glEnableVertexAttribArray(positionAttribute.location);
-    
-    GLKAttribute *texCoordAttribute = [self.program.attributes objectForKey:@"a_texCoord"];
-    glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
-    glEnableVertexAttribArray(texCoordAttribute.location);
-    
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        
+        if (pass == self.programs.count - 1) { // Last pass
+            [self.glkView bindDrawable];
+        }
+        else if (pass%2 == 0) {
+            glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+        }
+        else {
+            glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+        }
+        
+        [program prepareToDraw];
+        
+        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
+        
+        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
+        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+        glEnableVertexAttribArray(positionAttribute.location);
+        
+        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
+        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
+        glEnableVertexAttribArray(texCoordAttribute.location);
+        
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
     
 #ifdef DEBUG
     GLenum error = glGetError();
@@ -358,25 +473,3 @@ typedef struct {
 }
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

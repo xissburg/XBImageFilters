@@ -23,6 +23,7 @@
 		1BE16EF114EB50B100570A64 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BE16EF014EB50B100570A64 /* QuartzCore.framework */; };
 		1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF414EB56EB00570A64 /* LucasCorrea.png */; };
 		1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */; };
+		1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE37E321500FA5C0074D29C /* XBFilteredView.m */; };
 		1BE4179014F92E1600EB0ADD /* HGaussianBlur.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */; };
 		1BE4179214F92E5E00EB0ADD /* VGaussianBlur.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */; };
 		1BE4DB1B14F2D5E2003EE965 /* GLKProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */; };
@@ -55,6 +56,8 @@
 		1BE16EF014EB50B100570A64 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		1BE16EF414EB56EB00570A64 /* LucasCorrea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LucasCorrea.png; sourceTree = "<group>"; };
 		1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LucasCorrea@2x.png"; sourceTree = "<group>"; };
+		1BE37E311500FA5C0074D29C /* XBFilteredView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredView.h; path = Classes/XBImageFilters/XBFilteredView.h; sourceTree = "<group>"; };
+		1BE37E321500FA5C0074D29C /* XBFilteredView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredView.m; path = Classes/XBImageFilters/XBFilteredView.m; sourceTree = "<group>"; };
 		1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = HGaussianBlur.glsl; path = Shaders/HGaussianBlur.glsl; sourceTree = "<group>"; };
 		1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = VGaussianBlur.glsl; path = Shaders/VGaussianBlur.glsl; sourceTree = "<group>"; };
 		1BE4DB1714F2D5E2003EE965 /* GLKProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKProgram.h; sourceTree = "<group>"; };
@@ -168,6 +171,8 @@
 				1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */,
 				1BE16EE914EB4DD000570A64 /* XBFilteredImageView.h */,
 				1BE16EEA14EB4DD000570A64 /* XBFilteredImageView.m */,
+				1BE37E311500FA5C0074D29C /* XBFilteredView.h */,
+				1BE37E321500FA5C0074D29C /* XBFilteredView.m */,
 			);
 			name = XBImageFilters;
 			sourceTree = "<group>";
@@ -233,7 +238,7 @@
 		1BE16EB614EB4BE500570A64 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 1BE16EB914EB4BE500570A64 /* Build configuration list for PBXProject "XBImageFilters" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -284,6 +289,7 @@
 				1BE4DB1C14F2D5E2003EE965 /* GLKUniform.m in Sources */,
 				1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */,
 				1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */,
+				1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

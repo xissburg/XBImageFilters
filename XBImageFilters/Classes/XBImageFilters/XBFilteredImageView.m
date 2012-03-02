@@ -32,14 +32,6 @@ typedef struct {
 @property (assign, nonatomic) GLuint oddPassFramebuffer;
 @property (assign, nonatomic) GLuint evenPassFrambuffer;
 
-/**
- * The texCoordScale is a vec2 that is multipled by the texCoords of each vertex in the vertex shader. We have to do this because in
- * OpenGL ES 2 the texture sides must be power of two, but most of the images won't be power of two on each side, then we have to 
- * adjust the texture coordinates so that the image will fit perfectly in the rectangle/quad. This vec2 is actually equals to
- * vec2(imageWidth/textureWidth, imageHeight/textureHeight).
- */
-@property (assign, nonatomic) GLint texCoordScale;
-
 - (void)setupGL;
 - (void)destroyGL;
 
@@ -55,7 +47,6 @@ typedef struct {
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
 @synthesize imageTexture = _imageTexture;
 @synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
-@synthesize texCoordScale = _texCoordScale;
 @synthesize contentTransfom = _contentTransfom;
 @synthesize image = _image;
 @synthesize programs = _programs;
@@ -118,19 +109,15 @@ typedef struct {
         return;
     }
     
-    size_t width = CGImageGetWidth(image.CGImage);
-    size_t height = CGImageGetHeight(image.CGImage);
-    
-    //Compute the lowest power of two that is greater than the image size
-    self.textureWidth  = 1<<((int)floorf(log2f(width - 1)) + 1);
-    self.textureHeight = 1<<((int)floorf(log2f(height - 1)) + 1);
+    self.textureWidth = CGImageGetWidth(image.CGImage);
+    self.textureHeight = CGImageGetHeight(image.CGImage);
     
     CGSize imageSize = CGSizeMake(self.textureWidth/self.contentScaleFactor, self.textureHeight/self.contentScaleFactor);
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, self.contentScaleFactor);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextTranslateCTM(context, 0, 0);
     CGContextScaleCTM(context, 1.f/self.contentScaleFactor, 1.f/self.contentScaleFactor);
-    CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
+    CGContextDrawImage(context, CGRectMake(0, 0, self.textureWidth, self.textureHeight), image.CGImage);
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
     glGenTextures(1, &_imageTexture);
@@ -144,12 +131,8 @@ typedef struct {
     
     UIGraphicsEndImageContext();
     
-    // Update tex coord scale in the last shader and update the texture in the first shader
+    // Update the texture in the first shader
     if (self.programs.count > 0) {
-        GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
-        GLKProgram *lastProgram = [self.programs lastObject];
-        [lastProgram setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
-        
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];
     }
@@ -216,25 +199,12 @@ typedef struct {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     
-    size_t width = CGImageGetWidth(self.image.CGImage);
-    size_t height = CGImageGetHeight(self.image.CGImage);
-    GLfloat texCoordScale[] = {(GLfloat)width/self.textureWidth, (GLfloat)height/self.textureHeight};
-    
     NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:paths.count];
     NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
     
     for (int i = 0; i < paths.count; ++i) {
         NSString *fragmentShaderPath = [paths objectAtIndex:i];
         GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:error];
-        
-        // Update tex coord scale in shader
-        if (i == paths.count - 1) {
-            [program setValue:texCoordScale forUniformNamed:@"u_texCoordScale"];
-        }
-        else {
-            GLfloat scale[] = {1, 1};
-            [program setValue:scale forUniformNamed:@"u_texCoordScale"];
-        }
         
         [program setValue:(void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
         

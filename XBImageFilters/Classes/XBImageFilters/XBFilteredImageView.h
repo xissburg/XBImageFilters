@@ -7,14 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <GLKit/GLKit.h>
+#import "XBFilteredView.h"
 
-@interface XBFilteredImageView : UIView <GLKViewDelegate>
+@interface XBFilteredImageView : XBFilteredView
 
 @property (strong, nonatomic) UIImage *image;
-@property (assign, nonatomic) GLKMatrix4 contentTransfom;
-
-- (void)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
-- (void)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
 
 @end

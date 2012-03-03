@@ -38,6 +38,7 @@
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image.CGImage);
     GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
     
+    [self setContentSize:CGSizeMake(width, height)];
     [self _setTextureData:textureData width:width height:height];
     
     UIGraphicsEndImageContext();

@@ -23,7 +23,7 @@
 - (void)_XBFilteredCameraViewInit
 {
     self.contentMode = UIViewContentModeScaleAspectFill;
-    self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1), GLKMatrix4MakeScale(1, -1, 1));
+    self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1)); // Compensate for weird camera rotation
     
     self.videoHeight = self.videoWidth = 0;
     
@@ -90,6 +90,7 @@
     if (width != self.videoWidth || height != self.videoHeight) {
         self.videoWidth = width;
         self.videoHeight = height;
+        self.contentSize = CGSizeMake(height, width);
         [self _setTextureData:baseAddress width:self.videoWidth height:self.videoHeight];
     }
     else {

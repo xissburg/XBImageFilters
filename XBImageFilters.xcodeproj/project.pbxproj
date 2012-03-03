@@ -111,8 +111,8 @@
 			children = (
 				1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */,
 				1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */,
-				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
 				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
+				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
 				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
 			);
 			name = Shaders;

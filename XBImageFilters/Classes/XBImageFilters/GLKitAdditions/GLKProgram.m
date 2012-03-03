@@ -97,8 +97,10 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     GLuint shader = glCreateShader(type);
     
     if (shader == 0) {
-        NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:@"glCreateShader failed.", NSLocalizedDescriptionKey, nil];
-        *error = [[NSError alloc] initWithDomain:GLKProgramErrorDomain code:GLKProgramErrorFailedToCreateShader userInfo:userInfo];
+        if (error != NULL) {
+            NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:@"glCreateShader failed.", NSLocalizedDescriptionKey, nil];
+            *error = [[NSError alloc] initWithDomain:GLKProgramErrorDomain code:GLKProgramErrorFailedToCreateShader userInfo:userInfo];
+        }
         return 0;
     }
     
@@ -111,11 +113,13 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     
     if (success == 0) {
-        char errorMsg[2048];
-        glGetShaderInfoLog(shader, sizeof(errorMsg), NULL, errorMsg);
-        NSString *errorString = [NSString stringWithCString:errorMsg encoding:NSUTF8StringEncoding];
-        NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:errorString, NSLocalizedDescriptionKey, nil];
-        *error = [[NSError alloc] initWithDomain:GLKProgramErrorDomain code:GLKProgramErrorCompilationFailed userInfo:userInfo];
+        if (error != NULL) {
+            char errorMsg[2048];
+            glGetShaderInfoLog(shader, sizeof(errorMsg), NULL, errorMsg);
+            NSString *errorString = [NSString stringWithCString:errorMsg encoding:NSUTF8StringEncoding];
+            NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:errorString, NSLocalizedDescriptionKey, nil];
+            *error = [[NSError alloc] initWithDomain:GLKProgramErrorDomain code:GLKProgramErrorCompilationFailed userInfo:userInfo];
+        }
         glDeleteShader(shader);
         return 0;
     }
@@ -145,11 +149,13 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     GLint linked = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &linked);
     if (linked == 0) {
-        char errorMsg[2048];
-        glGetProgramInfoLog(program, sizeof(errorMsg), NULL, errorMsg);
-        NSString *errorString = [NSString stringWithCString:errorMsg encoding:NSUTF8StringEncoding];
-        NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:errorString, NSLocalizedDescriptionKey, nil];
-        *error = [[NSError alloc] initWithDomain:GLKProgramErrorDomain code:GLKProgramErrorLinkFailed userInfo:userInfo];
+        if (error != NULL) {
+            char errorMsg[2048];
+            glGetProgramInfoLog(program, sizeof(errorMsg), NULL, errorMsg);
+            NSString *errorString = [NSString stringWithCString:errorMsg encoding:NSUTF8StringEncoding];
+            NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:errorString, NSLocalizedDescriptionKey, nil];
+            *error = [[NSError alloc] initWithDomain:GLKProgramErrorDomain code:GLKProgramErrorLinkFailed userInfo:userInfo];
+        }
         glDeleteProgram(program);
         return 0;
     }

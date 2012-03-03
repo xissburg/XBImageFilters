@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.1" toolsVersion="2177" systemVersion="11D50b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="KIW-52-JQ5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.0" toolsVersion="1938" systemVersion="11D50b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="KIW-52-JQ5">
     <dependencies>
         <development defaultVersion="4200" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1173"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="933"/>
     </dependencies>
     <scenes>
-        <!--Root View Controller - XBImageFilters-->
         <scene sceneID="VGd-s9-a0C">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Bg-5I-tbm" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -39,7 +38,6 @@
             </objects>
             <point key="canvasLocation" x="-1570" y="294"/>
         </scene>
-        <!--Navigation Controller-->
         <scene sceneID="iXt-4e-n0e">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GJD-EC-hM6" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -54,7 +52,6 @@
             </objects>
             <point key="canvasLocation" x="-2104" y="294"/>
         </scene>
-        <!--Image View Controller - Image Filter-->
         <scene sceneID="5">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
@@ -85,7 +82,6 @@
             </objects>
             <point key="canvasLocation" x="-1023" y="-53"/>
         </scene>
-        <!--Camera View Controller - Camera Filter-->
         <scene sceneID="VH7-RC-c9g">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rZ0-dq-srg" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -99,6 +95,21 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.084568886861313863" green="0.078096486628055573" blue="0.10666628649635036" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="2dN-Rh-XCj">
+                                <rect key="frame" x="96" y="367" width="128" height="37"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Take a Picture">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="takeAPictureButtonTouchUpInside:" destination="EdN-G9-MgA" eventType="touchUpInside" id="vLq-wF-3ZT"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -119,6 +130,7 @@
         <class className="CameraViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/CameraViewController.h"/>
             <relationships>
+                <relationship kind="action" name="takeAPictureButtonTouchUpInside:"/>
                 <relationship kind="outlet" name="cameraView" candidateClass="XBFilteredCameraView"/>
             </relationships>
         </class>

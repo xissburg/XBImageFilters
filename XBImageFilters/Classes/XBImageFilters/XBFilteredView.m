@@ -58,6 +58,7 @@ typedef struct {
 @synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
 @synthesize contentTransform = _contentTransform;
 @synthesize contentModeTransform = _contentModeTransform;
+@synthesize contentSize = _contentSize;
 @synthesize programs = _programs;
 @synthesize oddPassTexture = _oddPassTexture;
 @synthesize evenPassTexture = _evenPassTexture;
@@ -117,6 +118,12 @@ typedef struct {
     [self refreshContentTransform];
 }
 
+- (void)setContentSize:(CGSize)contentSize
+{
+    _contentSize = contentSize;
+    [self refreshContentTransform];
+}
+
 #pragma mark - Protected Methods
 
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height
@@ -129,7 +136,7 @@ typedef struct {
     self.textureHeight = height;
     self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
     
-    // Resize the even and odd textures because they have to match
+    // Resize the even and odd textures because their size have to match that of the mainTexture
     if (self.programs.count >= 2) {
         [self destroyEvenPass];
         [self setupEvenPass];
@@ -172,13 +179,13 @@ typedef struct {
 
 #pragma mark - Public Methods
 
-- (void)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error
+- (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error
 {
     NSArray *paths = [[NSArray alloc] initWithObjects:path, nil];
-    [self setFilterFragmentShadersFromFiles:paths error:error];
+    return [self setFilterFragmentShadersFromFiles:paths error:error];
 }
 
-- (void)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error
+- (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error
 {
     [EAGLContext setCurrentContext:self.context];
     
@@ -210,6 +217,10 @@ typedef struct {
         NSString *fragmentShaderPath = [paths objectAtIndex:i];
         GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:error];
         
+        if (program == nil) {
+            return NO;
+        }
+        
         [program setValue:(void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
         
         GLuint sourceTexture = 0;
@@ -233,6 +244,34 @@ typedef struct {
     
     [self setNeedsLayout];
     [self setNeedsDisplay];
+    
+    return YES;
+}
+
+- (UIImage *)takeScreenshot
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    int width = (int)(self.bounds.size.width * self.contentScaleFactor);
+    int height = (int)(self.bounds.size.height * self.contentScaleFactor);
+    size_t size = width * height * 4;
+    GLvoid *pixels = malloc(size);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    
+    size_t bitsPerComponent = 8;
+    size_t bitsPerPixel = 32;
+    size_t bytesPerRow = width * bitsPerPixel / bitsPerComponent;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, NULL);
+    CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
+    CGDataProviderRelease(provider);
+    
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:UIImageOrientationDownMirrored];
+    CGImageRelease(cgImage);
+    CGColorSpaceRelease(colorSpace);
+    
+    return image;
 }
 
 #pragma mark - Private Methods
@@ -337,7 +376,7 @@ typedef struct {
 
 - (void)refreshContentTransform
 {
-    GLKMatrix4 composedTransform = GLKMatrix4Multiply(self.contentModeTransform, self.contentTransform);
+    GLKMatrix4 composedTransform = GLKMatrix4Multiply(self.contentTransform, self.contentModeTransform);
     GLKProgram *lastProgram = [self.programs lastObject];
     [lastProgram setValue:composedTransform.m forUniformNamed:@"u_contentTransform"];
 }
@@ -392,7 +431,7 @@ typedef struct {
 
 - (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit
 {
-    float imageAspect = (float)self.textureWidth/self.textureHeight;
+    float imageAspect = (float)self.contentSize.width/self.contentSize.height;
     float viewAspect = self.bounds.size.width/self.bounds.size.height;
     GLKMatrix4 transform;
     
@@ -408,8 +447,8 @@ typedef struct {
 
 - (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode
 {
-    float widthRatio = self.bounds.size.width/self.textureWidth*self.contentScaleFactor;
-    float heightRatio = self.bounds.size.height/self.textureHeight*self.contentScaleFactor;
+    float widthRatio = self.bounds.size.width/self.contentSize.width*self.contentScaleFactor;
+    float heightRatio = self.bounds.size.height/self.contentSize.height*self.contentScaleFactor;
     GLKMatrix4 transform = GLKMatrix4Identity;
     
     switch (contentMode) {

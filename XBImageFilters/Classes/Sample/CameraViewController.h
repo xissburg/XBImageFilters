@@ -13,4 +13,6 @@
 
 @property (weak, nonatomic) IBOutlet XBFilteredCameraView *cameraView;
 
+- (IBAction)takeAPictureButtonTouchUpInside:(id)sender;
+
 @end

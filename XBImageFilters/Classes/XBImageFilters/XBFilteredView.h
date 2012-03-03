@@ -11,7 +11,7 @@
 
 @interface XBFilteredView : UIView <GLKViewDelegate>
 
-@property (assign, nonatomic) GLKMatrix4 contentTransfom;
+@property (assign, nonatomic) GLKMatrix4 contentTransform;
 
 - (void)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 - (void)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;

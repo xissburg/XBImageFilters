@@ -22,7 +22,8 @@
 
 - (void)_XBFilteredCameraViewInit
 {
-    self.contentMode = UIViewContentModeScaleAspectFit;
+    self.contentMode = UIViewContentModeScaleAspectFill;
+    self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1), GLKMatrix4MakeScale(1, -1, 1));
     
     self.videoHeight = self.videoWidth = 0;
     

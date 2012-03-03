@@ -23,6 +23,8 @@ typedef struct {
 @property (assign, nonatomic) GLuint mainTexture;
 @property (assign, nonatomic) GLint textureWidth, textureHeight;
 
+@property (assign, nonatomic) GLKMatrix4 contentModeTransform;
+
 /**
  * Multi-pass filtering support.
  */
@@ -40,6 +42,7 @@ typedef struct {
 - (void)destroyEvenPass;
 - (void)setupOddPass;
 - (void)destroyOddPass;
+- (void)refreshContentTransform;
 
 - (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit;
 - (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode;
@@ -53,7 +56,8 @@ typedef struct {
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
 @synthesize mainTexture = _mainTexture;
 @synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
-@synthesize contentTransfom = _contentTransfom;
+@synthesize contentTransform = _contentTransform;
+@synthesize contentModeTransform = _contentModeTransform;
 @synthesize programs = _programs;
 @synthesize oddPassTexture = _oddPassTexture;
 @synthesize evenPassTexture = _evenPassTexture;
@@ -101,12 +105,16 @@ typedef struct {
 
 #pragma mark - Properties
 
-- (void)setContentTransfom:(GLKMatrix4)contentTransfom
+- (void)setContentTransform:(GLKMatrix4)contentTransform
 {
-    _contentTransfom = contentTransfom;
-    
-    GLKProgram *lastProgram = [self.programs lastObject];
-    [lastProgram setValue:_contentTransfom.m forUniformNamed:@"u_contentTransform"];
+    _contentTransform = contentTransform;
+    [self refreshContentTransform];
+}
+
+- (void)setContentModeTransform:(GLKMatrix4)contentModeTransform
+{
+    _contentModeTransform = contentModeTransform;
+    [self refreshContentTransform];
 }
 
 #pragma mark - Protected Methods
@@ -223,8 +231,7 @@ typedef struct {
     
     self.programs = [programs copy];
     
-    self.contentTransfom = _contentTransfom;
-    
+    [self setNeedsLayout];
     [self setNeedsDisplay];
 }
 
@@ -257,7 +264,8 @@ typedef struct {
     }
     
     // Initialize transform to the most basic projection
-    self.contentTransfom = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+    self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+    self.contentTransform = GLKMatrix4Identity;
 }
 
 - (void)destroyGL
@@ -327,6 +335,13 @@ typedef struct {
     self.oddPassFramebuffer = 0;
 }
 
+- (void)refreshContentTransform
+{
+    GLKMatrix4 composedTransform = GLKMatrix4Multiply(self.contentModeTransform, self.contentTransform);
+    GLKProgram *lastProgram = [self.programs lastObject];
+    [lastProgram setValue:composedTransform.m forUniformNamed:@"u_contentTransform"];
+}
+
 - (void)setContentMode:(UIViewContentMode)contentMode
 {
     [super setContentMode:contentMode];
@@ -342,15 +357,15 @@ typedef struct {
 {
     switch (self.contentMode) {
         case UIViewContentModeScaleToFill:
-            self.contentTransfom = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+            self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
             break;
             
         case UIViewContentModeScaleAspectFit:
-            self.contentTransfom = [self transformForAspectFitOrFill:YES];
+            self.contentModeTransform = [self transformForAspectFitOrFill:YES];
             break;
             
         case UIViewContentModeScaleAspectFill:
-            self.contentTransfom = [self transformForAspectFitOrFill:NO];
+            self.contentModeTransform = [self transformForAspectFitOrFill:NO];
             break;
             
         case UIViewContentModeCenter:
@@ -362,7 +377,7 @@ typedef struct {
         case UIViewContentModeBottomRight:
         case UIViewContentModeTopLeft:
         case UIViewContentModeTopRight:
-            self.contentTransfom = [self transformForPositionalContentMode:self.contentMode];
+            self.contentModeTransform = [self transformForPositionalContentMode:self.contentMode];
             break;
             
         case UIViewContentModeRedraw:

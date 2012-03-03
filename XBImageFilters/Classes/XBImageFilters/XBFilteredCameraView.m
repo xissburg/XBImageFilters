@@ -8,24 +8,94 @@
 
 #import "XBFilteredCameraView.h"
 
+@interface XBFilteredCameraView ()
+
+@property (strong, nonatomic) AVCaptureSession *captureSession;
+@property (assign, nonatomic) size_t videoWidth, videoHeight;
+
+@end
+
 @implementation XBFilteredCameraView
+
+@synthesize captureSession = _captureSession;
+@synthesize videoWidth = _videoWidth, videoHeight = _videoHeight;
+
+- (void)_XBFilteredCameraViewInit
+{
+    self.contentMode = UIViewContentModeScaleAspectFit;
+    
+    self.videoHeight = self.videoWidth = 0;
+    
+    self.captureSession = [[AVCaptureSession alloc] init];
+    self.captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    [self.captureSession beginConfiguration];
+    
+    NSError *error = nil;
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    
+    AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
+    
+    if (!input) {
+        NSLog(@"Failed to create device input: %@", [error localizedDescription]);
+    }
+    
+    [self.captureSession addInput:input];
+    
+    AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init];
+    [self.captureSession addOutput:output];
+    output.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+    [output setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+    
+    [self.captureSession commitConfiguration];
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
+        [self _XBFilteredCameraViewInit];
     }
     return self;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
+- (void)awakeFromNib
 {
-    // Drawing code
+    [super awakeFromNib];
+    [self _XBFilteredCameraViewInit];
 }
-*/
+
+#pragma mark - Methods
+
+- (void)startCapturing
+{
+    [self.captureSession startRunning];
+}
+
+- (void)stopCapturing
+{
+    [self.captureSession stopRunning];
+}
+
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
+{
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    if (width != self.videoWidth || height != self.videoHeight) {
+        self.videoWidth = width;
+        self.videoHeight = height;
+        [self _setTextureData:baseAddress width:self.videoWidth height:self.videoHeight];
+    }
+    else {
+        [self _updateTextureWithData:baseAddress];
+    }
+    
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+}
 
 @end

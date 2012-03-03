@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import "XBFilteredView.h"
 
-@interface XBFilteredCameraView : UIView
+@interface XBFilteredCameraView : XBFilteredView <AVCaptureVideoDataOutputSampleBufferDelegate>
+
+- (void)startCapturing;
+- (void)stopCapturing;
 
 @end

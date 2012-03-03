@@ -20,7 +20,7 @@ typedef struct {
 @property (strong, nonatomic) GLKView *glkView;
 
 @property (assign, nonatomic) GLuint imageQuadVertexBuffer;
-@property (assign, nonatomic) GLuint imageTexture;
+@property (assign, nonatomic) GLuint mainTexture;
 @property (assign, nonatomic) GLint textureWidth, textureHeight;
 
 /**
@@ -34,6 +34,12 @@ typedef struct {
 
 - (void)setupGL;
 - (void)destroyGL;
+- (GLuint)generateDefaultTextureWithWidth:(GLint)width height:(GLint)height data:(GLvoid *)data;
+- (GLuint)generateDefaultFramebufferWithTargetTexture:(GLuint)texture;
+- (void)setupEvenPass;
+- (void)destroyEvenPass;
+- (void)setupOddPass;
+- (void)destroyOddPass;
 
 - (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit;
 - (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode;
@@ -45,7 +51,7 @@ typedef struct {
 @synthesize context = _context;
 @synthesize glkView = _glkView;
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
-@synthesize imageTexture = _imageTexture;
+@synthesize mainTexture = _mainTexture;
 @synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
 @synthesize contentTransfom = _contentTransfom;
 @synthesize programs = _programs;
@@ -58,7 +64,7 @@ typedef struct {
  * Actual initializer. Called both in initWithFrame: when creating an instance programatically and in awakeFromNib when creating an instance
  * from a nib/storyboard.
  */
-- (void)initialize
+- (void)_XBFilteredViewInit //Use a weird name to avoid being overidden
 {
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
     
@@ -77,14 +83,14 @@ typedef struct {
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self initialize];
+        [self _XBFilteredViewInit];
     }
     return self;
 }
 
 - (void)awakeFromNib
 {
-    [self initialize];
+    [self _XBFilteredViewInit];
 }
 
 - (void)dealloc
@@ -109,25 +115,42 @@ typedef struct {
 {
     [EAGLContext setCurrentContext:self.context];
     
-    glDeleteTextures(1, &_imageTexture);
+    glDeleteTextures(1, &_mainTexture);
     
     self.textureWidth = width;
     self.textureHeight = height;
+    self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
     
-    glGenTextures(1, &_imageTexture);
-    glBindTexture(GL_TEXTURE_2D, self.imageTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // Resize the even and odd textures because they have to match
+    if (self.programs.count >= 2) {
+        [self destroyEvenPass];
+        [self setupEvenPass];
+    }
+    
+    if (self.programs.count > 2) {
+        [self destroyOddPass];
+        [self setupOddPass];
+    }
     
     // Update the texture in the first shader
     if (self.programs.count > 0) {
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
-        [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.imageTexture unit:0];
+        [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
     }
+    
+    // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
+    [self setNeedsLayout];
+    
+    [self.glkView setNeedsDisplay];
+}
+
+- (void)_updateTextureWithData:(GLvoid *)textureData
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    glBindTexture(GL_TEXTURE_2D, self.mainTexture);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.textureWidth, self.textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+    glBindTexture(GL_TEXTURE_2D, 0);
     
     [self.glkView setNeedsDisplay];
 }
@@ -135,8 +158,8 @@ typedef struct {
 - (void)_deleteMainTexture
 {
     [EAGLContext setCurrentContext:self.context];
-    glDeleteTextures(1, &_imageTexture);
-    _imageTexture = 0;
+    glDeleteTextures(1, &_mainTexture);
+    _mainTexture = 0;
 }
 
 #pragma mark - Public Methods
@@ -158,36 +181,18 @@ typedef struct {
      * And so on... */
     if (paths.count >= 2) {
         // Two or more passes, create evenPass*
-        glGenTextures(1, &_evenPassTexture);
-        glBindTexture(GL_TEXTURE_2D, self.evenPassTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        
-        glGenFramebuffers(1, &_evenPassFrambuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.evenPassTexture, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        [self setupEvenPass];
+    }
+    else {
+        [self destroyEvenPass];
     }
     
     if (paths.count > 2) {
         // More than two passes, create oddPass*
-        glGenTextures(1, &_oddPassTexture);
-        glBindTexture(GL_TEXTURE_2D, self.oddPassTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.textureWidth, self.textureHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        
-        glGenFramebuffers(1, &_oddPassFramebuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self.oddPassTexture, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        [self setupOddPass];
+    }
+    else {
+        [self destroyOddPass];
     }
     
     NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:paths.count];
@@ -202,7 +207,7 @@ typedef struct {
         GLuint sourceTexture = 0;
         
         if (i == 0) { // First pass always uses the original image
-            sourceTexture = self.imageTexture;
+            sourceTexture = self.mainTexture;
         }
         else if (i%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
             sourceTexture = self.evenPassTexture;
@@ -262,12 +267,64 @@ typedef struct {
     glDeleteBuffers(1, &_imageQuadVertexBuffer);
     self.imageQuadVertexBuffer = 0;
     
-    glDeleteTextures(1, &_imageTexture);
+    glDeleteTextures(1, &_mainTexture);
     glDeleteTextures(1, &_evenPassTexture);
     glDeleteTextures(1, &_oddPassTexture);
     
     glDeleteFramebuffers(1, &_evenPassFrambuffer);
     glDeleteFramebuffers(1, &_oddPassFramebuffer);
+}
+
+- (GLuint)generateDefaultTextureWithWidth:(GLint)width height:(GLint)height data:(GLvoid *)data
+{
+    GLuint texture = 0;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return texture;
+}
+
+- (GLuint)generateDefaultFramebufferWithTargetTexture:(GLuint)texture
+{
+    GLuint framebuffer = 0;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return framebuffer;
+}
+
+- (void)setupEvenPass
+{
+    self.evenPassTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:NULL];
+    self.evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:self.evenPassTexture];
+}
+
+- (void)destroyEvenPass
+{
+    glDeleteTextures(1, &_evenPassTexture);
+    self.evenPassTexture = 0;
+    glDeleteFramebuffers(1, &_evenPassFrambuffer);
+    self.evenPassFrambuffer = 0;
+}
+
+- (void)setupOddPass
+{
+    self.oddPassTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:NULL];
+    self.oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:self.oddPassTexture];
+}
+
+- (void)destroyOddPass
+{
+    glDeleteTextures(1, &_oddPassTexture);
+    self.oddPassTexture = 0;
+    glDeleteFramebuffers(1, &_oddPassFramebuffer);
+    self.oddPassFramebuffer = 0;
 }
 
 - (void)setContentMode:(UIViewContentMode)contentMode

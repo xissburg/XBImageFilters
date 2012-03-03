@@ -64,11 +64,11 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="top" image="LucasCorrea.png" id="0qh-fN-4s6">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="230"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="208"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <view contentMode="scaleToFill" id="WuR-pY-W2c" customClass="XBFilteredImageView">
-                                <rect key="frame" x="0.0" y="230" width="320" height="230"/>
+                                <rect key="frame" x="0.0" y="208" width="320" height="208"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.61960786581039429" green="0.62745100259780884" blue="0.64705884456634521" alpha="1" colorSpace="deviceRGB"/>
                             </view>
@@ -85,11 +85,11 @@
             </objects>
             <point key="canvasLocation" x="-1023" y="-53"/>
         </scene>
-        <!--View Controller - Camera Filter-->
+        <!--Camera View Controller - Camera Filter-->
         <scene sceneID="VH7-RC-c9g">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rZ0-dq-srg" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController storyboardIdentifier="CameraViewController" id="EdN-G9-MgA" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="CameraViewController" id="EdN-G9-MgA" customClass="CameraViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Otk-T4-f9Y">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -97,22 +97,31 @@
                             <view contentMode="scaleToFill" id="DgG-Jv-TgY" customClass="XBFilteredCameraView">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.084568886861313863" green="0.078096486628055573" blue="0.10666628649635036" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Camera Filter" id="rMR-bP-Ah9"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="cameraView" destination="DgG-Jv-TgY" id="2fO-Wq-xSr"/>
+                    </connections>
                 </viewController>
             </objects>
             <point key="canvasLocation" x="-1023" y="613"/>
         </scene>
     </scenes>
     <resources>
-        <image name="LucasCorrea.png" width="320" height="460"/>
+        <image name="LucasCorrea.png" width="320" height="416"/>
     </resources>
     <classes>
+        <class className="CameraViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CameraViewController.h"/>
+            <relationships>
+                <relationship kind="outlet" name="cameraView" candidateClass="XBFilteredCameraView"/>
+            </relationships>
+        </class>
         <class className="ImageViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/ImageViewController.h"/>
             <relationships>
@@ -123,7 +132,7 @@
         <class className="RootViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/RootViewController.h"/>
         </class>
-        <class className="XBFilteredCameraView" superclassName="UIView">
+        <class className="XBFilteredCameraView" superclassName="XBFilteredView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredCameraView.h"/>
         </class>
         <class className="XBFilteredImageView" superclassName="XBFilteredView">

@@ -13,6 +13,7 @@
 @end
 
 @implementation CameraViewController
+@synthesize cameraView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -26,16 +27,24 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
+    //NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
+    //NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
+    NSArray *paths = [[NSArray alloc] initWithObjects:luminancePath, nil];
+    [self.cameraView setFilterFragmentShadersFromFiles:paths error:nil];
+    [self.cameraView startCapturing];
 }
 
 - (void)viewDidUnload
 {
+    [self setCameraView:nil];
     [super viewDidUnload];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 @end

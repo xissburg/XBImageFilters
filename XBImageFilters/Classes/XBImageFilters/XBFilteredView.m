@@ -28,7 +28,6 @@ typedef struct {
 /**
  * Multi-pass filtering support.
  */
-@property (strong, nonatomic) NSArray *programs;
 @property (assign, nonatomic) GLuint oddPassTexture;
 @property (assign, nonatomic) GLuint evenPassTexture;
 @property (assign, nonatomic) GLuint oddPassFramebuffer;

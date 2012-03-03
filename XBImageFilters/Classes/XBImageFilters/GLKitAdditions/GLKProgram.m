@@ -13,7 +13,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 @interface GLKProgram ()
 
 @property (readonly, copy, nonatomic) NSDictionary *uniforms;
-@property (strong, nonatomic) NSMutableArray *dirtyUniforms;
+@property (strong, nonatomic) NSMutableDictionary *dirtyUniforms;
 @property (strong, nonatomic) NSMutableDictionary *samplerBindings;
 
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error;
@@ -63,7 +63,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
         _uniforms = [[self uniformsForProgram:self.program] copy];
         _attributes = [[self attributesForProgram:self.program] copy];
         self.samplerBindings = [[NSMutableDictionary alloc] init];
-        self.dirtyUniforms = [[NSMutableArray alloc] init];
+        self.dirtyUniforms = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -79,7 +79,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 {
     GLKUniform *uniform = [self.uniforms objectForKey:uniformName];
     uniform.value = value;
-    [self.dirtyUniforms addObject:uniform];
+    [self.dirtyUniforms setObject:uniform forKey:uniform.name];
 }
 
 - (void)bindSamplerNamed:(NSString *)samplerName toTexture:(GLuint)texture unit:(GLint)unit
@@ -267,7 +267,8 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     glUseProgram(self.program);
     
     // Flush dirty uniforms
-    for (GLKUniform *uniform in self.dirtyUniforms) {
+    for (NSString *name in [self.dirtyUniforms allKeys]) {
+        GLKUniform *uniform = [self.dirtyUniforms objectForKey:name];
         [self flushUniform:uniform];
     }
     

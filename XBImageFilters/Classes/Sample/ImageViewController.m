@@ -30,7 +30,7 @@
     NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
     NSArray *paths = [[NSArray alloc] initWithObjects:vBlurPath, hBlurPath, nil];
-    [self.filteredImageView setFilterFragmentShadersFromFiles:paths error:nil];
+    [self.filteredImageView setFilterFragmentShadersFromFiles:paths error:NULL];
 }
 
 - (void)viewDidUnload

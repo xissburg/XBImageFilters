@@ -32,7 +32,7 @@
     NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
     NSArray *paths = [[NSArray alloc] initWithObjects:luminancePath, nil];
-    [self.cameraView setFilterFragmentShadersFromFiles:paths error:nil];
+    [self.cameraView setFilterFragmentShadersFromFiles:paths error:NULL];
     [self.cameraView startCapturing];
 }
 

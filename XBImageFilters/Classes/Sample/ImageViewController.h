@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  ImageViewController.h
 //  XBImageFilters
 //
 //  Created by xiss burg on 2/15/12.
@@ -9,7 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "XBFilteredImageView.h"
 
-@interface ViewController : UIViewController
+@interface ImageViewController : UIViewController
+
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet XBFilteredImageView *filteredImageView;
 

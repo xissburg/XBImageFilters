@@ -1,16 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.0" toolsVersion="1938" systemVersion="11D50b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="2">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.1" toolsVersion="2177" systemVersion="11D50b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="KIW-52-JQ5">
     <dependencies>
         <development defaultVersion="4200" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="933"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1173"/>
     </dependencies>
     <scenes>
+        <!--Root View Controller - XBImageFilters-->
+        <scene sceneID="VGd-s9-a0C">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6Bg-5I-tbm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tableViewController id="FTc-Bx-YzI" customClass="RootViewController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="1qO-m5-pRO">
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="kV8-Mf-BCw">
+                                <rect key="frame" x="0.0" y="22" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="FTc-Bx-YzI" id="DJu-F5-ueB"/>
+                            <outlet property="delegate" destination="FTc-Bx-YzI" id="AbO-57-ozw"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="XBImageFilters" id="mh9-cX-Wx5"/>
+                    <connections>
+                        <segue destination="2" kind="push" identifier="ImageFilterSegue" id="fAP-XH-Cp7"/>
+                        <segue destination="EdN-G9-MgA" kind="push" identifier="CameraFilterSegue" id="614-Ky-T2h"/>
+                    </connections>
+                </tableViewController>
+            </objects>
+            <point key="canvasLocation" x="-1570" y="294"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="iXt-4e-n0e">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GJD-EC-hM6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <navigationController definesPresentationContext="YES" id="KIW-52-JQ5" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="i1Z-PK-zYR">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="FTc-Bx-YzI" kind="relationship" relationship="rootViewController" id="frF-bu-xTs"/>
+                    </connections>
+                </navigationController>
+            </objects>
+            <point key="canvasLocation" x="-2104" y="294"/>
+        </scene>
+        <!--Image View Controller - Image Filter-->
         <scene sceneID="5">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
-                <viewController id="2" customClass="ViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ImageViewController" id="2" customClass="ImageViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3">
-                        <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="top" image="LucasCorrea.png" id="0qh-fN-4s6">
@@ -25,28 +75,62 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" title="Image Filter" id="FqP-cA-Gjo"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
                         <outlet property="filteredImageView" destination="WuR-pY-W2c" id="HmJ-yV-Ryb"/>
                         <outlet property="imageView" destination="0qh-fN-4s6" id="XDY-RW-xen"/>
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="-36" y="123"/>
+            <point key="canvasLocation" x="-1023" y="-53"/>
+        </scene>
+        <!--View Controller - Camera Filter-->
+        <scene sceneID="VH7-RC-c9g">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rZ0-dq-srg" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController storyboardIdentifier="CameraViewController" id="EdN-G9-MgA" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Otk-T4-f9Y">
+                        <rect key="frame" x="0.0" y="64" width="320" height="416"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" id="DgG-Jv-TgY" customClass="XBFilteredCameraView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Camera Filter" id="rMR-bP-Ah9"/>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="-1023" y="613"/>
         </scene>
     </scenes>
     <resources>
         <image name="LucasCorrea.png" width="320" height="460"/>
     </resources>
     <classes>
-        <class className="ViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ViewController.h"/>
+        <class className="ImageViewController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/ImageViewController.h"/>
             <relationships>
                 <relationship kind="outlet" name="filteredImageView" candidateClass="XBFilteredImageView"/>
                 <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
             </relationships>
         </class>
-        <class className="XBFilteredImageView" superclassName="UIView">
+        <class className="RootViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/RootViewController.h"/>
+        </class>
+        <class className="XBFilteredCameraView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredCameraView.h"/>
+        </class>
+        <class className="XBFilteredImageView" superclassName="XBFilteredView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredImageView.h"/>
+        </class>
+        <class className="XBFilteredView" superclassName="UIView">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredView.h"/>
         </class>
     </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

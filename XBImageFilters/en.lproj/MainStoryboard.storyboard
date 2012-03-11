@@ -6,11 +6,11 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1179"/>
     </dependencies>
     <scenes>
-        <!--Root View Controller - XBImageFilters-->
+        <!--Table View Controller - XBImageFilters-->
         <scene sceneID="VGd-s9-a0C">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Bg-5I-tbm" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tableViewController id="FTc-Bx-YzI" customClass="RootViewController" sceneMemberID="viewController">
+                <tableViewController id="FTc-Bx-YzI" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="1qO-m5-pRO">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -174,9 +174,6 @@
                 <relationship kind="outlet" name="filteredImageView" candidateClass="XBFilteredImageView"/>
                 <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
             </relationships>
-        </class>
-        <class className="RootViewController" superclassName="UITableViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/RootViewController.h"/>
         </class>
         <class className="XBFilteredCameraView" superclassName="XBFilteredView">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredCameraView.h"/>

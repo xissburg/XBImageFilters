@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D529A1501A188007D743A /* XBFilteredCameraView.m */; };
-		1B4D52A21501A23A007D743A /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D52A11501A23A007D743A /* RootViewController.m */; };
 		1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D52A41501A6AA007D743A /* CameraViewController.m */; };
 		1B675E7114EE5DF300ED8402 /* DefaultVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */; };
 		1B675E7214EE5DF300ED8402 /* LuminanceFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */; };
@@ -42,8 +41,6 @@
 /* Begin PBXFileReference section */
 		1B4D52991501A188007D743A /* XBFilteredCameraView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredCameraView.h; path = Classes/XBImageFilters/XBFilteredCameraView.h; sourceTree = "<group>"; };
 		1B4D529A1501A188007D743A /* XBFilteredCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredCameraView.m; path = Classes/XBImageFilters/XBFilteredCameraView.m; sourceTree = "<group>"; };
-		1B4D52A01501A23A007D743A /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootViewController.h; path = Classes/Sample/RootViewController.h; sourceTree = "<group>"; };
-		1B4D52A11501A23A007D743A /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RootViewController.m; path = Classes/Sample/RootViewController.m; sourceTree = "<group>"; };
 		1B4D52A31501A6AA007D743A /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraViewController.h; path = Classes/Sample/CameraViewController.h; sourceTree = "<group>"; };
 		1B4D52A41501A6AA007D743A /* CameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraViewController.m; path = Classes/Sample/CameraViewController.m; sourceTree = "<group>"; };
 		1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultVertexShader.glsl; path = Shaders/DefaultVertexShader.glsl; sourceTree = "<group>"; };
@@ -180,8 +177,6 @@
 		1BE16EE414EB4CDB00570A64 /* Sample */ = {
 			isa = PBXGroup;
 			children = (
-				1B4D52A01501A23A007D743A /* RootViewController.h */,
-				1B4D52A11501A23A007D743A /* RootViewController.m */,
 				1BE16EE614EB4D0900570A64 /* ImageViewController.h */,
 				1BE16EE714EB4D0900570A64 /* ImageViewController.m */,
 				1B4D52A31501A6AA007D743A /* CameraViewController.h */,
@@ -318,7 +313,6 @@
 				1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */,
 				1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */,
 				1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */,
-				1B4D52A21501A23A007D743A /* RootViewController.m in Sources */,
 				1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

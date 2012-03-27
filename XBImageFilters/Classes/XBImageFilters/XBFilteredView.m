@@ -273,6 +273,11 @@ typedef struct {
     return image;
 }
 
+- (void)forceDisplay
+{
+    [self.glkView display];
+}
+
 #pragma mark - Private Methods
 
 - (void)setupGL

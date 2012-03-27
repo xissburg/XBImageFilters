@@ -19,6 +19,11 @@
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
 - (UIImage *)takeScreenshot;
 
+/*
+ * Draws the OpenGL contents immediately.
+ */
+- (void)forceDisplay;
+
 /* These methods are conceptually protected and should not be called directly. They are intended to be called by subclasses. */
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height;
 - (void)_updateTextureWithData:(GLvoid *)textureData;

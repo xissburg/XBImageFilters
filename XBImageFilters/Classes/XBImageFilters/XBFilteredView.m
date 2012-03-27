@@ -249,6 +249,11 @@ typedef struct {
 
 - (UIImage *)takeScreenshot
 {
+    return [self takeScreenshotWithImageOrientation:UIImageOrientationDownMirrored];
+}
+
+- (UIImage *)takeScreenshotWithImageOrientation:(UIImageOrientation)orientation
+{
     [EAGLContext setCurrentContext:self.context];
     
     int width = (int)(self.bounds.size.width * self.contentScaleFactor);
@@ -266,7 +271,7 @@ typedef struct {
     CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
     CGDataProviderRelease(provider);
     
-    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:UIImageOrientationDownMirrored];
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:orientation];
     CGImageRelease(cgImage);
     CGColorSpaceRelease(colorSpace);
     

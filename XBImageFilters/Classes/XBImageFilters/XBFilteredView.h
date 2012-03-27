@@ -18,6 +18,7 @@
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
 - (UIImage *)takeScreenshot;
+- (UIImage *)takeScreenshotWithImageOrientation:(UIImageOrientation)orientation;
 
 /*
  * Draws the OpenGL contents immediately.

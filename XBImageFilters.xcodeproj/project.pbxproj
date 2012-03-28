@@ -54,6 +54,7 @@
 		3295F23D1522FD3100C27406 /* basn6a16.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F22E1522FD3100C27406 /* basn6a16.png */; };
 		3295F2401522FE4D00C27406 /* UIImage+XBImageFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F23F1522FE4D00C27406 /* UIImage+XBImageFilters.m */; };
 		3295F2421522FFDB00C27406 /* marvin.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2411522FFDB00C27406 /* marvin.png */; };
+		3295F27E1523116700C27406 /* russian-ball.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 3295F27D1523116700C27406 /* russian-ball.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -119,6 +120,7 @@
 		3295F23E1522FE4D00C27406 /* UIImage+XBImageFilters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+XBImageFilters.h"; sourceTree = "<group>"; };
 		3295F23F1522FE4D00C27406 /* UIImage+XBImageFilters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+XBImageFilters.m"; sourceTree = "<group>"; };
 		3295F2411522FFDB00C27406 /* marvin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marvin.png; sourceTree = "<group>"; };
+		3295F27D1523116700C27406 /* russian-ball.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "russian-ball.jpeg"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -280,6 +282,7 @@
 		3295F2431523006F00C27406 /* png test set */ = {
 			isa = PBXGroup;
 			children = (
+				3295F27D1523116700C27406 /* russian-ball.jpeg */,
 				3295F2411522FFDB00C27406 /* marvin.png */,
 				3295F2201522FD3100C27406 /* basn0g01.png */,
 				3295F2211522FD3100C27406 /* basn0g02.png */,
@@ -375,6 +378,7 @@
 				3295F23C1522FD3100C27406 /* basn6a08.png in Resources */,
 				3295F23D1522FD3100C27406 /* basn6a16.png in Resources */,
 				3295F2421522FFDB00C27406 /* marvin.png in Resources */,
+				3295F27E1523116700C27406 /* russian-ball.jpeg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

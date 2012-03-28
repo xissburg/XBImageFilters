@@ -47,6 +47,7 @@
               @"basn4a16.png",@"16 bit grayscale + 16 bit alpha",
               @"basn6a08.png",@"3x8 bits rgb color + 8 bit alpha",
               @"basn6a16.png",@"3x16 bits rgb color + 16 bit alpha",
+              @"russian-ball.jpeg",@"Russion ball",
               nil];
     labels = [[images allKeys] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [obj1 compare:obj2];
@@ -106,7 +107,11 @@
     imageView.image = [img imageByApplyingShaders:shaders];
 #else
     UIImage * newImg =  [img imageByApplyingShaders:shaders];
-    NSData * data = UIImagePNGRepresentation(newImg);
+    // We're using UIImageJPEGRepresentation rather than UIImagePNGRepresentation here
+    // as the latter will not honour our orientation. (radar bug #11137002. JPEG
+    // does though.
+    //
+    NSData * data = UIImageJPEGRepresentation(newImg,1.0);
     imageView.image = [UIImage imageWithData:data];
 #endif
     

@@ -3,7 +3,7 @@
 //  XBImageFilters
 //
 //  Created by Dirk-Willem van Gulik on 28-03-12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 webWeaving.org. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

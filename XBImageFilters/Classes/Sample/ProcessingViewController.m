@@ -3,7 +3,7 @@
 //  XBImageFilters
 //
 //  Created by Dirk-Willem van Gulik on 28-03-12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 webWeaving.org. All rights reserved.
 //
 
 #import "ProcessingViewController.h"
@@ -49,6 +49,7 @@
               @"basn6a16.png",@"3x16 bits rgb color + 16 bit alpha",
               @"russian-ball.jpeg",@"Russion ball",
               nil];
+    
     labels = [[images allKeys] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [obj1 compare:obj2];
     }];
@@ -84,6 +85,9 @@
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 
 {
+    // We first assume it is a local image - and then try to fetch it as a
+    // URL if it looks like one.
+    //
     NSString *fileName = [images objectForKey:[labels objectAtIndex:row]];
     UIImage * img =[UIImage imageNamed:fileName];
     if (img == nil) {
@@ -107,6 +111,7 @@
     imageView.image = [img imageByApplyingShaders:shaders];
 #else
     UIImage * newImg =  [img imageByApplyingShaders:shaders];
+    
     // We're using UIImageJPEGRepresentation rather than UIImagePNGRepresentation here
     // as the latter will not honour our orientation. (radar bug #11137002. JPEG
     // does though.
@@ -114,6 +119,5 @@
     NSData * data = UIImageJPEGRepresentation(newImg,1.0);
     imageView.image = [UIImage imageWithData:data];
 #endif
-    
 }
 @end

@@ -11,5 +11,6 @@
 @interface UIImage (UIImagePlusXBImageFilters) {
 }
 
--(UIImage*) imageByApplyingShaders:(NSArray *)paths;
+-(UIImage *)imageByApplyingShaders:(NSArray *)paths;
+-(UIImage *)imageByApplyingShaders:(NSArray *)paths error:(NSError **)errorPtr;
 @end

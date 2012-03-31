@@ -9,7 +9,10 @@
 #import "CameraViewController.h"
 
 @interface CameraViewController ()
-
+{
+    NSArray *paths;
+    int filterIndex;
+}
 @end
 
 @implementation CameraViewController
@@ -26,14 +29,21 @@
 
 - (void)viewDidLoad
 {
+    [self loadFilters];
+    filterIndex = 1;
+    NSArray *file =  [[NSArray alloc] initWithObjects:[paths objectAtIndex:0], nil];
+
+    [self.cameraView setFilterFragmentShadersFromFiles:file error:NULL];
+    [self.cameraView startCapturing];
     [super viewDidLoad];
-    
+}
+
+- (void)loadFilters
+{
     NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
     NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
-    NSArray *paths = [[NSArray alloc] initWithObjects:luminancePath, nil];
-    [self.cameraView setFilterFragmentShadersFromFiles:paths error:NULL];
-    [self.cameraView startCapturing];
+    paths = [[NSArray alloc] initWithObjects:luminancePath, hBlurPath, vBlurPath, nil];
 }
 
 - (void)viewDidUnload
@@ -87,6 +97,18 @@
             [self.cameraView startCapturing];
         }];
     }];
+}
+
+- (IBAction)changeFilterButtonTouchUpInside:(id)sender {
+    NSArray *file =  [[NSArray alloc] initWithObjects:[paths objectAtIndex:filterIndex], nil];
+
+    [self.cameraView setFilterFragmentShadersFromFiles:file error:NULL];
+    [self.cameraView startCapturing];
+    filterIndex++;
+    if (filterIndex > 2) {
+        filterIndex = 0;
+    }
+    
 }
 
 @end

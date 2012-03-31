@@ -387,12 +387,14 @@
 		1BE16EDE14EB4BE600570A64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Fernando Ribeiro (JAXK82PKN8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Fernando Ribeiro (JAXK82PKN8)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
 				INFOPLIST_FILE = "XBImageFilters/XBImageFilters-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "32F94E91-0CD3-431E-906E-FAA3DFB42E80";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "32F94E91-0CD3-431E-906E-FAA3DFB42E80";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -400,12 +402,11 @@
 		1BE16EDF14EB4BE600570A64 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
 				INFOPLIST_FILE = "XBImageFilters/XBImageFilters-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

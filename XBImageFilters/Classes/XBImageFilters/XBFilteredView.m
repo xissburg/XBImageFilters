@@ -136,6 +136,7 @@ typedef struct {
     self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
     
     // Resize the even and odd textures because their size have to match that of the mainTexture
+    //
     if (self.programs.count >= 2) {
         [self destroyEvenPass];
         [self setupEvenPass];
@@ -274,6 +275,7 @@ typedef struct {
     UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:orientation];
     CGImageRelease(cgImage);
     CGColorSpaceRelease(colorSpace);
+    free(pixels);
     
     return image;
 }

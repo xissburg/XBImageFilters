@@ -181,7 +181,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
         GLKUniform *uniform = [[GLKUniform alloc] initWithName:name location:location size:size type:type];
         [uniforms setObject:uniform forKey:name];
     }
-    
+    free(nameBuff);
     return uniforms;
 }
 
@@ -203,7 +203,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
         GLKAttribute *attribute = [[GLKAttribute alloc] initWithName:name location:location size:size type:type];
         [attributes setObject:attribute forKey:name];
     }
-    
+    free(nameBuff);    
     return attributes;
 }
 

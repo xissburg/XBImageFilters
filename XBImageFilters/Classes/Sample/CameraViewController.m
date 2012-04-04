@@ -18,32 +18,18 @@
 @implementation CameraViewController
 @synthesize cameraView;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-
-    }
-    return self;
-}
+#pragma mark - View lifecycle
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
+    
     [self loadFilters];
     filterIndex = 1;
-    NSArray *file =  [[NSArray alloc] initWithObjects:[paths objectAtIndex:0], nil];
+    NSArray *files =  [paths objectAtIndex:0];
 
-    [self.cameraView setFilterFragmentShadersFromFiles:file error:NULL];
+    [self.cameraView setFilterFragmentShadersFromFiles:files error:NULL];
     [self.cameraView startCapturing];
-    [super viewDidLoad];
-}
-
-- (void)loadFilters
-{
-    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
-    NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
-    NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
-    paths = [[NSArray alloc] initWithObjects:luminancePath, hBlurPath, vBlurPath, nil];
 }
 
 - (void)viewDidUnload
@@ -55,6 +41,23 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return interfaceOrientation == UIInterfaceOrientationPortrait;
+}
+
+#pragma mark - Methods
+
+- (void)loadFilters
+{
+    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
+    NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
+    NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
+    NSString *defaultPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
+    paths = [[NSArray alloc] initWithObjects:
+             [[NSArray alloc] initWithObjects:luminancePath, nil], 
+             [[NSArray alloc] initWithObjects:hBlurPath, nil],
+             [[NSArray alloc] initWithObjects:vBlurPath, nil],
+             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, nil],
+             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, luminancePath, nil],
+             [[NSArray alloc] initWithObjects:defaultPath, nil], nil];
 }
 
 #pragma mark - Button Actions
@@ -101,12 +104,12 @@
 
 - (IBAction)changeFilterButtonTouchUpInside:(id)sender 
 {
-    NSArray *file =  [[NSArray alloc] initWithObjects:[paths objectAtIndex:filterIndex], nil];
+    NSArray *files = [paths objectAtIndex:filterIndex];
 
-    [self.cameraView setFilterFragmentShadersFromFiles:file error:NULL];
-    [self.cameraView startCapturing];
+    [self.cameraView setFilterFragmentShadersFromFiles:files error:NULL];
+    
     filterIndex++;
-    if (filterIndex > 2) {
+    if (filterIndex > paths.count - 1) {
         filterIndex = 0;
     }
 }

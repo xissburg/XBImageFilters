@@ -16,6 +16,8 @@
 @implementation ProcessingViewController
 @synthesize ctrl, imageView;
 
+#pragma mark - View lifecycle
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -116,4 +118,5 @@
     imageView.image = [UIImage imageWithData:data];
 #endif
 }
+
 @end

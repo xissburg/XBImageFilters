@@ -130,6 +130,8 @@ typedef struct {
     [EAGLContext setCurrentContext:self.context];
     
     glDeleteTextures(1, &_mainTexture);
+    [self destroyEvenPass];
+    [self destroyOddPass];
     
     self.textureWidth = width;
     self.textureHeight = height;
@@ -137,12 +139,10 @@ typedef struct {
     
     // Resize the even and odd textures because their size have to match that of the mainTexture
     if (self.programs.count >= 2) {
-        [self destroyEvenPass];
         [self setupEvenPass];
     }
     
     if (self.programs.count > 2) {
-        [self destroyOddPass];
         [self setupOddPass];
     }
     
@@ -188,25 +188,23 @@ typedef struct {
 {
     [EAGLContext setCurrentContext:self.context];
     
+    [self destroyEvenPass];
+    [self destroyOddPass];
+    
     /* Create frame buffers for render to texture in multi-pass filters if necessary. If we have a single pass/fragment shader, we'll render
      * directly to the framebuffer. If we have two passes, we'll render to the evenPassFramebuffer using the original image as the filter source
      * texture and then render directly to the framebuffer using the evenPassTexture as the filter source. If we have three passes, the second
      * filter will instead render to the oddPassFramebuffer and the third/last pass will render to the framebuffer using the oddPassTexture.
      * And so on... */
+    
     if (paths.count >= 2) {
         // Two or more passes, create evenPass*
         [self setupEvenPass];
-    }
-    else {
-        [self destroyEvenPass];
     }
     
     if (paths.count > 2) {
         // More than two passes, create oddPass*
         [self setupOddPass];
-    }
-    else {
-        [self destroyOddPass];
     }
     
     NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:paths.count];

@@ -36,6 +36,25 @@
 		1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2814F31488003EE965 /* GLKAttribute.m */; };
 		1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */; };
 		1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */; };
+		3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F2111522EEC500C27406 /* ProcessingViewController.m */; };
+		3295F22F1522FD3100C27406 /* basn0g01.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2201522FD3100C27406 /* basn0g01.png */; };
+		3295F2301522FD3100C27406 /* basn0g02.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2211522FD3100C27406 /* basn0g02.png */; };
+		3295F2311522FD3100C27406 /* basn0g04.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2221522FD3100C27406 /* basn0g04.png */; };
+		3295F2321522FD3100C27406 /* basn0g08.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2231522FD3100C27406 /* basn0g08.png */; };
+		3295F2331522FD3100C27406 /* basn0g16.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2241522FD3100C27406 /* basn0g16.png */; };
+		3295F2341522FD3100C27406 /* basn2c08.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2251522FD3100C27406 /* basn2c08.png */; };
+		3295F2351522FD3100C27406 /* basn2c16.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2261522FD3100C27406 /* basn2c16.png */; };
+		3295F2361522FD3100C27406 /* basn3p01.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2271522FD3100C27406 /* basn3p01.png */; };
+		3295F2371522FD3100C27406 /* basn3p02.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2281522FD3100C27406 /* basn3p02.png */; };
+		3295F2381522FD3100C27406 /* basn3p04.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2291522FD3100C27406 /* basn3p04.png */; };
+		3295F2391522FD3100C27406 /* basn3p08.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F22A1522FD3100C27406 /* basn3p08.png */; };
+		3295F23A1522FD3100C27406 /* basn4a08.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F22B1522FD3100C27406 /* basn4a08.png */; };
+		3295F23B1522FD3100C27406 /* basn4a16.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F22C1522FD3100C27406 /* basn4a16.png */; };
+		3295F23C1522FD3100C27406 /* basn6a08.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F22D1522FD3100C27406 /* basn6a08.png */; };
+		3295F23D1522FD3100C27406 /* basn6a16.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F22E1522FD3100C27406 /* basn6a16.png */; };
+		3295F2401522FE4D00C27406 /* UIImage+XBImageFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F23F1522FE4D00C27406 /* UIImage+XBImageFilters.m */; };
+		3295F2421522FFDB00C27406 /* marvin.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2411522FFDB00C27406 /* marvin.png */; };
+		3295F27E1523116700C27406 /* russian-ball.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 3295F27D1523116700C27406 /* russian-ball.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +100,27 @@
 		1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKShaderVariable.h; sourceTree = "<group>"; };
 		1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKShaderVariable.m; sourceTree = "<group>"; };
 		1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultFragmentShader.glsl; path = Shaders/DefaultFragmentShader.glsl; sourceTree = "<group>"; };
+		3295F2101522EEC500C27406 /* ProcessingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessingViewController.h; path = Classes/Sample/ProcessingViewController.h; sourceTree = "<group>"; };
+		3295F2111522EEC500C27406 /* ProcessingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcessingViewController.m; path = Classes/Sample/ProcessingViewController.m; sourceTree = "<group>"; };
+		3295F2201522FD3100C27406 /* basn0g01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g01.png; sourceTree = "<group>"; };
+		3295F2211522FD3100C27406 /* basn0g02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g02.png; sourceTree = "<group>"; };
+		3295F2221522FD3100C27406 /* basn0g04.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g04.png; sourceTree = "<group>"; };
+		3295F2231522FD3100C27406 /* basn0g08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g08.png; sourceTree = "<group>"; };
+		3295F2241522FD3100C27406 /* basn0g16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g16.png; sourceTree = "<group>"; };
+		3295F2251522FD3100C27406 /* basn2c08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn2c08.png; sourceTree = "<group>"; };
+		3295F2261522FD3100C27406 /* basn2c16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn2c16.png; sourceTree = "<group>"; };
+		3295F2271522FD3100C27406 /* basn3p01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn3p01.png; sourceTree = "<group>"; };
+		3295F2281522FD3100C27406 /* basn3p02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn3p02.png; sourceTree = "<group>"; };
+		3295F2291522FD3100C27406 /* basn3p04.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn3p04.png; sourceTree = "<group>"; };
+		3295F22A1522FD3100C27406 /* basn3p08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn3p08.png; sourceTree = "<group>"; };
+		3295F22B1522FD3100C27406 /* basn4a08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn4a08.png; sourceTree = "<group>"; };
+		3295F22C1522FD3100C27406 /* basn4a16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn4a16.png; sourceTree = "<group>"; };
+		3295F22D1522FD3100C27406 /* basn6a08.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn6a08.png; sourceTree = "<group>"; };
+		3295F22E1522FD3100C27406 /* basn6a16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn6a16.png; sourceTree = "<group>"; };
+		3295F23E1522FE4D00C27406 /* UIImage+XBImageFilters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+XBImageFilters.h"; sourceTree = "<group>"; };
+		3295F23F1522FE4D00C27406 /* UIImage+XBImageFilters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+XBImageFilters.m"; sourceTree = "<group>"; };
+		3295F2411522FFDB00C27406 /* marvin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marvin.png; sourceTree = "<group>"; };
+		3295F27D1523116700C27406 /* russian-ball.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "russian-ball.jpeg"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +221,8 @@
 				1BE16EE714EB4D0900570A64 /* ImageViewController.m */,
 				1B4D52A31501A6AA007D743A /* CameraViewController.h */,
 				1B4D52A41501A6AA007D743A /* CameraViewController.m */,
+				3295F2101522EEC500C27406 /* ProcessingViewController.h */,
+				3295F2111522EEC500C27406 /* ProcessingViewController.m */,
 			);
 			name = Sample;
 			sourceTree = "<group>";
@@ -188,6 +230,8 @@
 		1BE16EE514EB4CE400570A64 /* XBImageFilters */ = {
 			isa = PBXGroup;
 			children = (
+				3295F23E1522FE4D00C27406 /* UIImage+XBImageFilters.h */,
+				3295F23F1522FE4D00C27406 /* UIImage+XBImageFilters.m */,
 				1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */,
 				1BE37E311500FA5C0074D29C /* XBFilteredView.h */,
 				1BE37E321500FA5C0074D29C /* XBFilteredView.m */,
@@ -212,6 +256,7 @@
 		1BE16EF314EB56EB00570A64 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				3295F2431523006F00C27406 /* png test set */,
 				1BE16EF414EB56EB00570A64 /* LucasCorrea.png */,
 				1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */,
 			);
@@ -232,6 +277,30 @@
 			);
 			name = GLKitAdditions;
 			path = Classes/XBImageFilters/GLKitAdditions;
+			sourceTree = "<group>";
+		};
+		3295F2431523006F00C27406 /* png test set */ = {
+			isa = PBXGroup;
+			children = (
+				3295F27D1523116700C27406 /* russian-ball.jpeg */,
+				3295F2411522FFDB00C27406 /* marvin.png */,
+				3295F2201522FD3100C27406 /* basn0g01.png */,
+				3295F2211522FD3100C27406 /* basn0g02.png */,
+				3295F2221522FD3100C27406 /* basn0g04.png */,
+				3295F2231522FD3100C27406 /* basn0g08.png */,
+				3295F2241522FD3100C27406 /* basn0g16.png */,
+				3295F2251522FD3100C27406 /* basn2c08.png */,
+				3295F2261522FD3100C27406 /* basn2c16.png */,
+				3295F2271522FD3100C27406 /* basn3p01.png */,
+				3295F2281522FD3100C27406 /* basn3p02.png */,
+				3295F2291522FD3100C27406 /* basn3p04.png */,
+				3295F22A1522FD3100C27406 /* basn3p08.png */,
+				3295F22B1522FD3100C27406 /* basn4a08.png */,
+				3295F22C1522FD3100C27406 /* basn4a16.png */,
+				3295F22D1522FD3100C27406 /* basn6a08.png */,
+				3295F22E1522FD3100C27406 /* basn6a16.png */,
+			);
+			name = "png test set";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -293,6 +362,23 @@
 				1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */,
 				1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */,
 				1BE4179214F92E5E00EB0ADD /* VGaussianBlur.glsl in Resources */,
+				3295F22F1522FD3100C27406 /* basn0g01.png in Resources */,
+				3295F2301522FD3100C27406 /* basn0g02.png in Resources */,
+				3295F2311522FD3100C27406 /* basn0g04.png in Resources */,
+				3295F2321522FD3100C27406 /* basn0g08.png in Resources */,
+				3295F2331522FD3100C27406 /* basn0g16.png in Resources */,
+				3295F2341522FD3100C27406 /* basn2c08.png in Resources */,
+				3295F2351522FD3100C27406 /* basn2c16.png in Resources */,
+				3295F2361522FD3100C27406 /* basn3p01.png in Resources */,
+				3295F2371522FD3100C27406 /* basn3p02.png in Resources */,
+				3295F2381522FD3100C27406 /* basn3p04.png in Resources */,
+				3295F2391522FD3100C27406 /* basn3p08.png in Resources */,
+				3295F23A1522FD3100C27406 /* basn4a08.png in Resources */,
+				3295F23B1522FD3100C27406 /* basn4a16.png in Resources */,
+				3295F23C1522FD3100C27406 /* basn6a08.png in Resources */,
+				3295F23D1522FD3100C27406 /* basn6a16.png in Resources */,
+				3295F2421522FFDB00C27406 /* marvin.png in Resources */,
+				3295F27E1523116700C27406 /* russian-ball.jpeg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,6 +400,8 @@
 				1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */,
 				1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */,
 				1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */,
+				3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */,
+				3295F2401522FE4D00C27406 /* UIImage+XBImageFilters.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

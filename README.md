@@ -2,13 +2,17 @@
 
 XBImageFilters allows you to obtain filtered versions of any image or from the camera in realtime. It uses OpenGL ES 2 to filter the images through fragment shaders you write yourself so you can filter your images in whatever way you want and it is super fast.
 
-![Luminance](http://xissburg.com/images/XBImageFilters.png)
+![Luminance](http://xissburg.com/images/ImageFilterSingle.png)
 
 In this screenshot of the sample we have on the top half of the screen a regular UIImageView with contentMode set to UIViewContentModeTop, and on the bottom half a XBFilteredImageView with the same image with contentMode set to UIViewContentModeBottom and a filter [a GLSL fragment shader] that outputs the luminance of the pixel color.
 
-![Gaussian Blur](http://xissburg.com/images/XBImageFiltersGaussianBlur.png)
+![Gaussian Blur](http://xissburg.com/images/ImageFilterMultiPass.png)
 
-Convoluted Gaussian Blur, an example of a multi-pass filter. It uses two fragment shaders for this, VGaussianBlur.glsl, HGaussianBlur.glsl. First, it uses VGaussianBlur to perform a vertical blur and the resulting image is stored in an OpenGL texture, then it uses HGaussianBlur to apply a horizontal blur in the previous texture that it rendered into. As a result we have a proper Gaussian Blur with a radial kernel. 
+Convoluted Gaussian Blur, an example of a multi-pass filter. It uses two fragment shaders for this, VGaussianBlur.glsl, HGaussianBlur.glsl. First, it uses VGaussianBlur to perform a vertical blur and the resulting image is stored in an OpenGL texture, then it uses HGaussianBlur to apply a horizontal blur in the previous texture that it rendered into. As a result we have a proper Gaussian Blur with a radial kernel.
+
+![Camera Filter](http://xissburg.com/images/CameraFilter.png)
+
+Real time camera filter. It also allows you to take pictures in `UIImage`s with the filter applied with the `-[XBFilteredView takeScreenshot]` method.
 
 ## Architecture
 

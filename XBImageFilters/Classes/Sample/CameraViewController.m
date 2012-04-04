@@ -12,6 +12,7 @@
 {
     NSArray *paths;
     int filterIndex;
+    BOOL flashLight;
 }
 @end
 
@@ -114,4 +115,13 @@
     }
 }
 
+- (IBAction)flashLightButtonTouchUpInside:(id)sender {
+    flashLight ? (flashLight = NO) : (flashLight = YES);
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if ([device hasTorch]) {
+        [device lockForConfiguration:nil];
+        [device setTorchMode:flashLight ? AVCaptureTorchModeOn : AVCaptureTorchModeOff];
+        [device unlockForConfiguration];
+    }
+}
 @end

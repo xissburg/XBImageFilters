@@ -32,7 +32,6 @@
 	int pixelsHigh = self.size.height;
 
     XBFilteredImageView *filteredImageView = [[XBFilteredImageView alloc] initWithFrame:CGRectMake(0, 0, pixelsWide, pixelsHigh)];
-    [filteredImageView setContentSize:CGSizeMake(pixelsWide, pixelsHigh)];
     
     if (![filteredImageView setFilterFragmentShadersFromFiles:paths error:error]) {
         return nil;

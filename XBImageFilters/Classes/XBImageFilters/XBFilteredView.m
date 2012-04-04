@@ -300,6 +300,8 @@ typedef struct {
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
+    
+    
     // Setup default shader
     NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
     NSError *error = nil;
@@ -511,20 +513,23 @@ typedef struct {
     [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
         GLKProgram *program = [self.programs objectAtIndex:pass];
         
-        if (pass == self.programs.count - 1) { // Last pass
-            [self.glkView bindDrawable];
-        }
-        else if (pass%2 == 0) {
-            glViewport(0, 0, self.textureWidth, self.textureHeight);
-            glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
-        }
-        else {
-            glViewport(0, 0, self.textureWidth, self.textureHeight);
-            glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+        if (self.programs.count > 1) {
+            if (pass == self.programs.count - 1) { // Last pass
+                [self.glkView bindDrawable];
+            }
+            else if (pass%2 == 0) {
+                glViewport(0, 0, self.textureWidth, self.textureHeight);
+                glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+            }
+            else {
+                glViewport(0, 0, self.textureWidth, self.textureHeight);
+                glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+            }
         }
         
         [program prepareToDraw];

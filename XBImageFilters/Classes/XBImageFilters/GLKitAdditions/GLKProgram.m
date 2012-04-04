@@ -169,19 +169,21 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
     GLint maxLength;
     glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
-    GLchar *nameBuff = (GLchar *)malloc(maxLength * sizeof(GLchar));
+    GLchar *nameBuffer = (GLchar *)malloc(maxLength * sizeof(GLchar));
     NSMutableDictionary *uniforms = [[NSMutableDictionary alloc] initWithCapacity:count];
     
     for (int i = 0; i < count; ++i) {
         GLint size;
         GLenum type;
-        glGetActiveUniform(program, i, maxLength, NULL, &size, &type, nameBuff);
-        GLint location = glGetUniformLocation(program, nameBuff);
-        NSString *name = [[NSString alloc] initWithCString:nameBuff encoding:NSUTF8StringEncoding];
+        glGetActiveUniform(program, i, maxLength, NULL, &size, &type, nameBuffer);
+        GLint location = glGetUniformLocation(program, nameBuffer);
+        NSString *name = [[NSString alloc] initWithCString:nameBuffer encoding:NSUTF8StringEncoding];
         GLKUniform *uniform = [[GLKUniform alloc] initWithName:name location:location size:size type:type];
         [uniforms setObject:uniform forKey:name];
     }
-    free(nameBuff);
+    
+    free(nameBuffer);
+    
     return uniforms;
 }
 
@@ -191,19 +193,21 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &count);
     GLint maxLength;
     glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxLength);
-    GLchar *nameBuff = (GLchar *)malloc(maxLength * sizeof(GLchar));
+    GLchar *nameBuffer = (GLchar *)malloc(maxLength * sizeof(GLchar));
     NSMutableDictionary *attributes = [[NSMutableDictionary alloc] initWithCapacity:count];
     
     for (int i = 0; i < count; ++i) {
         GLint size;
         GLenum type;
-        glGetActiveAttrib(program, i, maxLength, NULL, &size, &type, nameBuff);
-        GLint location = glGetAttribLocation(program, nameBuff);
-        NSString *name = [[NSString alloc] initWithCString:nameBuff encoding:NSUTF8StringEncoding];
+        glGetActiveAttrib(program, i, maxLength, NULL, &size, &type, nameBuffer);
+        GLint location = glGetAttribLocation(program, nameBuffer);
+        NSString *name = [[NSString alloc] initWithCString:nameBuffer encoding:NSUTF8StringEncoding];
         GLKAttribute *attribute = [[GLKAttribute alloc] initWithName:name location:location size:size type:type];
         [attributes setObject:attribute forKey:name];
     }
-    free(nameBuff);    
+    
+    free(nameBuffer);
+    
     return attributes;
 }
 

@@ -8,9 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIImage (UIImagePlusXBImageFilters) {
-}
+@interface UIImage (UIImagePlusXBImageFilters)
 
--(UIImage *)imageByApplyingShaders:(NSArray *)paths;
--(UIImage *)imageByApplyingShaders:(NSArray *)paths error:(NSError **)errorPtr;
+- (UIImage *)imageByApplyingShaders:(NSArray *)paths;
+- (UIImage *)imageByApplyingShaders:(NSArray *)paths error:(NSError **)error;
+
 @end

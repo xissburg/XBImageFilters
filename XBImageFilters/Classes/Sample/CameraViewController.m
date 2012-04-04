@@ -70,7 +70,7 @@
     imageView.layer.shadowColor = [UIColor blackColor].CGColor;
     imageView.layer.shadowOpacity = 0.6;
     imageView.layer.shadowOffset = CGSizeMake(0, 3);
-    imageView.layer.shadowPath = CGPathCreateWithRect(imageView.bounds, &CGAffineTransformIdentity);
+    imageView.layer.shadowPath = [UIBezierPath bezierPathWithRect:imageView.bounds].CGPath;
     
     imageView.transform = CGAffineTransformMakeScale(0.01, 0.01);
     imageView.alpha = 0.5;

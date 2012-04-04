@@ -230,9 +230,9 @@
 		1BE16EE514EB4CE400570A64 /* XBImageFilters */ = {
 			isa = PBXGroup;
 			children = (
+				1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */,
 				3295F23E1522FE4D00C27406 /* UIImage+XBImageFilters.h */,
 				3295F23F1522FE4D00C27406 /* UIImage+XBImageFilters.m */,
-				1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */,
 				1BE37E311500FA5C0074D29C /* XBFilteredView.h */,
 				1BE37E321500FA5C0074D29C /* XBFilteredView.m */,
 				1BE16EE914EB4DD000570A64 /* XBFilteredImageView.h */,

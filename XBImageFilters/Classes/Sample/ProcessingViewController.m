@@ -16,15 +16,6 @@
 @implementation ProcessingViewController
 @synthesize ctrl, imageView;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -47,7 +38,7 @@
               @"basn4a16.png",@"16 bit grayscale + 16 bit alpha",
               @"basn6a08.png",@"3x8 bits rgb color + 8 bit alpha",
               @"basn6a16.png",@"3x16 bits rgb color + 16 bit alpha",
-              @"russian-ball.jpeg",@"Russion ball",
+              @"russian-ball.jpeg",@"Russian ball",
               nil];
     
     labels = [[images allKeys] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -62,28 +53,33 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+
+#pragma mark - UIPickerViewDataSource
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView 
+{
     return 1;
 }
 
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component 
+{
     return [labels count];
 }
 
-- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+#pragma mark - UIPickerViewDelegate
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component 
+{
     return [labels objectAtIndex:row];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
-
 {
     // We first assume it is a local image - and then try to fetch it as a
     // URL if it looks like one.

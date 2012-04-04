@@ -13,32 +13,35 @@
 
 @implementation UIImage (UIImagePlusXBImageFilters)
 
--(UIImage *)imageByApplyingShaders:(NSArray *)paths
+- (UIImage *)imageByApplyingShaders:(NSArray *)paths
 {
-    NSError * error;
-    UIImage * img = [self imageByApplyingShaders:paths error:&error];
+    NSError *error;
+    UIImage *image = [self imageByApplyingShaders:paths error:&error];
     
     if (error) {
         NSLog(@"Shader compile of %@ failed with error: %@", paths, error);
         return nil;
-    };
+    }
     
-    return img;
+    return image;
 }
 
--(UIImage *)imageByApplyingShaders:(NSArray *)paths error:(NSError **)errorPtr
+- (UIImage *)imageByApplyingShaders:(NSArray *)paths error:(NSError **)error
 {
     int pixelsWide = self.size.width;
 	int pixelsHigh = self.size.height;
 
-    XBFilteredImageView *filteredImageView = [[XBFilteredImageView alloc] initWithFrame:CGRectMake(0,0,pixelsWide, pixelsHigh)];
+    XBFilteredImageView *filteredImageView = [[XBFilteredImageView alloc] initWithFrame:CGRectMake(0, 0, pixelsWide, pixelsHigh)];
     [filteredImageView setContentSize:CGSizeMake(pixelsWide, pixelsHigh)];
     
-    [filteredImageView setFilterFragmentShadersFromFiles:paths error:errorPtr];
+    if (![filteredImageView setFilterFragmentShadersFromFiles:paths error:error]) {
+        return nil;
+    }
     
     filteredImageView.image = self;
     [filteredImageView forceDisplay];
 
-    return [filteredImageView takeScreenshotWithImageOrientation:UIImageOrientationDownMirrored];
+    return [filteredImageView takeScreenshot];
 }
+
 @end

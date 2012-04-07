@@ -15,5 +15,5 @@
 
 - (IBAction)takeAPictureButtonTouchUpInside:(id)sender;
 - (IBAction)changeFilterButtonTouchUpInside:(id)sender;
-
+- (IBAction)flashLightButtonTouchUpInside:(id)sender;
 @end

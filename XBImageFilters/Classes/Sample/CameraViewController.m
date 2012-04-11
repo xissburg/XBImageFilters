@@ -59,9 +59,11 @@
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
     NSString *defaultPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
     NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"DiscretizeShader" ofType:@"glsl"];
+    NSString *pixelatePath = [[NSBundle mainBundle] pathForResource:@"PixelateShader" ofType:@"glsl"];
     
     // Setup a combination of these filters
     paths = [[NSArray alloc] initWithObjects:
+             [[NSArray alloc] initWithObjects:pixelatePath, nil],
              [[NSArray alloc] initWithObjects:discretizePath, nil],
              [[NSArray alloc] initWithObjects:luminancePath, nil], 
              [[NSArray alloc] initWithObjects:hBlurPath, nil],

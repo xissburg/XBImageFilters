@@ -29,6 +29,7 @@
 		1BE16EF614EB56EB00570A64 /* LucasCorrea.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF414EB56EB00570A64 /* LucasCorrea.png */; };
 		1BE16EF714EB56EB00570A64 /* LucasCorrea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */; };
 		1BE20C621535BBCC00E9D595 /* DiscretizeShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE20C611535BBCC00E9D595 /* DiscretizeShader.glsl */; };
+		1BE20C641535C33900E9D595 /* PixelateShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE20C631535C33900E9D595 /* PixelateShader.glsl */; };
 		1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE37E321500FA5C0074D29C /* XBFilteredView.m */; };
 		1BE4179014F92E1600EB0ADD /* HGaussianBlur.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */; };
 		1BE4179214F92E5E00EB0ADD /* VGaussianBlur.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4179114F92E5E00EB0ADD /* VGaussianBlur.glsl */; };
@@ -89,6 +90,7 @@
 		1BE16EF414EB56EB00570A64 /* LucasCorrea.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LucasCorrea.png; sourceTree = "<group>"; };
 		1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LucasCorrea@2x.png"; sourceTree = "<group>"; };
 		1BE20C611535BBCC00E9D595 /* DiscretizeShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DiscretizeShader.glsl; path = Shaders/DiscretizeShader.glsl; sourceTree = "<group>"; };
+		1BE20C631535C33900E9D595 /* PixelateShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = PixelateShader.glsl; path = Shaders/PixelateShader.glsl; sourceTree = "<group>"; };
 		1BE37E311500FA5C0074D29C /* XBFilteredView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredView.h; path = Classes/XBImageFilters/XBFilteredView.h; sourceTree = "<group>"; };
 		1BE37E321500FA5C0074D29C /* XBFilteredView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredView.m; path = Classes/XBImageFilters/XBFilteredView.m; sourceTree = "<group>"; };
 		1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = HGaussianBlur.glsl; path = Shaders/HGaussianBlur.glsl; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
 				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
 				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
+				1BE20C631535C33900E9D595 /* PixelateShader.glsl */,
 				1BE20C611535BBCC00E9D595 /* DiscretizeShader.glsl */,
 			);
 			name = Shaders;
@@ -383,6 +386,7 @@
 				3295F2421522FFDB00C27406 /* marvin.png in Resources */,
 				3295F27E1523116700C27406 /* russian-ball.jpeg in Resources */,
 				1BE20C621535BBCC00E9D595 /* DiscretizeShader.glsl in Resources */,
+				1BE20C641535C33900E9D595 /* PixelateShader.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

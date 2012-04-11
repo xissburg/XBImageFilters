@@ -31,7 +31,11 @@
     filterIndex = 1;
     NSArray *files =  [paths objectAtIndex:0];
 
-    [self.cameraView setFilterFragmentShadersFromFiles:files error:NULL];
+    NSError *error = nil;
+    if (![self.cameraView setFilterFragmentShadersFromFiles:files error:&error]) {
+        NSLog(@"Error setting shader: %@", [error localizedDescription]);
+    }
+    
     [self.cameraView startCapturing];
 }
 
@@ -54,7 +58,11 @@
     NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
     NSString *defaultPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
+    NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"DiscretizeShader" ofType:@"glsl"];
+    
+    // Setup a combination of these filters
     paths = [[NSArray alloc] initWithObjects:
+             [[NSArray alloc] initWithObjects:discretizePath, nil],
              [[NSArray alloc] initWithObjects:luminancePath, nil], 
              [[NSArray alloc] initWithObjects:hBlurPath, nil],
              [[NSArray alloc] initWithObjects:vBlurPath, nil],
@@ -109,7 +117,10 @@
 {
     NSArray *files = [paths objectAtIndex:filterIndex];
 
-    [self.cameraView setFilterFragmentShadersFromFiles:files error:NULL];
+    NSError *error = nil;
+    if (![self.cameraView setFilterFragmentShadersFromFiles:files error:&error]) {
+        NSLog(@"Error setting shader: %@", [error localizedDescription]);
+    }
     
     filterIndex++;
     if (filterIndex > paths.count - 1) {

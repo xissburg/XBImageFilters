@@ -63,6 +63,12 @@
     [self _XBFilteredCameraViewInit];
 }
 
+- (void)dealloc
+{
+    [self stopCapturing];
+    [self removeObservers];
+}
+
 #pragma - Properties
 
 - (void)setCameraPosition:(XBCameraPosition)cameraPosition
@@ -91,18 +97,22 @@
     [self.captureSession removeInput:self.input];
     
     NSError *error = nil;    
-    AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:self.device error:&error];
+    self.input = [AVCaptureDeviceInput deviceInputWithDevice:self.device error:&error];
     
-    if (input) {
-        [self.captureSession addInput:input];
+    if (self.input) {
+        [self.captureSession addInput:self.input];
     }
     else {
         NSLog(@"XBFilteredCameraView: Failed to create device input: %@", [error localizedDescription]);
     }
     
     [self.captureSession commitConfiguration];
-    
-    // Setup observers for focus, white balance and exposure
+}
+
+- (void)setDevice:(AVCaptureDevice *)device
+{
+    [self removeObservers];
+    _device = device;
     [self.device addObserver:self forKeyPath:@"adjustingFocus" options:0 context:NULL];
     [self.device addObserver:self forKeyPath:@"adjustingExposure" options:0 context:NULL];
     [self.device addObserver:self forKeyPath:@"adjustingWhiteBalance" options:0 context:NULL];
@@ -149,11 +159,13 @@
 
 - (void)startCapturing
 {
+    [self.videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
     [self.captureSession startRunning];
 }
 
 - (void)stopCapturing
 {
+    [self.videoDataOutput setSampleBufferDelegate:nil queue:NULL];
     [self.captureSession stopRunning];
 }
 
@@ -169,9 +181,15 @@
     self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
     [self.captureSession addOutput:self.videoDataOutput];
     self.videoDataOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-    [self.videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
     
     [self.captureSession commitConfiguration];
+}
+
+- (void)removeObservers
+{
+    [self.device removeObserver:self forKeyPath:@"adjustingFocus"];
+    [self.device removeObserver:self forKeyPath:@"adjustingExposure"];
+    [self.device removeObserver:self forKeyPath:@"adjustingWhiteBalance"];
 }
 
 #pragma mark - Key-Value Observing

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "XBFilteredCameraView.h"
 
-@interface CameraViewController : UIViewController
+@interface CameraViewController : UIViewController <XBFilteredCameraViewDelegate>
 
 @property (weak, nonatomic) IBOutlet XBFilteredCameraView *cameraView;
 

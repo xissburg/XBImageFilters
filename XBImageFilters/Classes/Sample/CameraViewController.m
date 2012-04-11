@@ -24,6 +24,9 @@
 {
     [super viewDidLoad];
     
+    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
+    [self.cameraView addGestureRecognizer:tgr];
+    
     [self loadFilters];
     filterIndex = 1;
     NSArray *files =  [paths objectAtIndex:0];
@@ -112,6 +115,28 @@
     if (filterIndex > paths.count - 1) {
         filterIndex = 0;
     }
+}
+
+#pragma mark - Gesture recognition
+
+- (void)cameraViewTapAction:(UITapGestureRecognizer *)tgr
+{
+    if (tgr.state == UIGestureRecognizerStateRecognized) {
+        CGPoint location = [tgr locationInView:self.cameraView];
+        self.cameraView.focusPoint = location;
+    }
+}
+
+#pragma mark - XBFilteredCameraViewDelegate
+
+- (void)filteredCameraViewDidBeginAdjustingFocus:(XBFilteredCameraView *)filteredCameraView
+{
+    NSLog(@"Focus point: %f, %f", self.cameraView.focusPoint.x, self.cameraView.focusPoint.y);
+}
+
+- (void)filteredCameraViewDidFinishAdjustingFocus:(XBFilteredCameraView *)filteredCameraView
+{
+    NSLog(@"Focus point: %f, %f", self.cameraView.focusPoint.x, self.cameraView.focusPoint.y);
 }
 
 @end

@@ -149,6 +149,9 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.084568886861313863" green="0.078096486628055573" blue="0.10666628649635036" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <outlet property="delegate" destination="EdN-G9-MgA" id="7ad-kJ-koD"/>
+                                </connections>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="2dN-Rh-XCj">
                                 <rect key="frame" x="96" y="367" width="128" height="37"/>
@@ -230,39 +233,6 @@
     <resources>
         <image name="LucasCorrea.png" width="320" height="416"/>
     </resources>
-    <classes>
-        <class className="CameraViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/CameraViewController.h"/>
-            <relationships>
-                <relationship kind="action" name="changeFilterButtonTouchUpInside:"/>
-                <relationship kind="action" name="takeAPictureButtonTouchUpInside:"/>
-                <relationship kind="outlet" name="cameraView" candidateClass="XBFilteredCameraView"/>
-            </relationships>
-        </class>
-        <class className="ImageViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ImageViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="filteredImageView" candidateClass="XBFilteredImageView"/>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
-            </relationships>
-        </class>
-        <class className="ProcessingViewController" superclassName="UIViewController">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/ProcessingViewController.h"/>
-            <relationships>
-                <relationship kind="outlet" name="ctrl" candidateClass="UIPickerView"/>
-                <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
-            </relationships>
-        </class>
-        <class className="XBFilteredCameraView" superclassName="XBFilteredView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredCameraView.h"/>
-        </class>
-        <class className="XBFilteredImageView" superclassName="XBFilteredView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredImageView.h"/>
-        </class>
-        <class className="XBFilteredView" superclassName="UIView">
-            <source key="sourceIdentifier" type="project" relativePath="./Classes/XBFilteredView.h"/>
-        </class>
-    </classes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

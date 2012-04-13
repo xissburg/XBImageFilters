@@ -179,9 +179,14 @@
     [self.captureSession removeOutput:self.stillImageOutput];
     
     self.videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
-    [self.captureSession addOutput:self.videoDataOutput];
     self.videoDataOutput.videoSettings = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+    [self.videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+    [self.captureSession addOutput:self.videoDataOutput];
     
+    self.stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+    self.stillImageOutput.outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:AVVideoCodecJPEG, AVVideoCodecKey, [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], kCVPixelBufferPixelFormatTypeKey, nil];
+    [self.captureSession addOutput:self.stillImageOutput];
+
     [self.captureSession commitConfiguration];
 }
 
@@ -220,6 +225,9 @@
             else if (!self.device.adjustingWhiteBalance && [self.delegate respondsToSelector:@selector(filteredCameraViewDidFinishAdjustingWhiteBalance:)]) {
                 [self.delegate filteredCameraViewDidFinishAdjustingWhiteBalance:self];
             }
+        }
+        else {
+            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     }
     else {

@@ -17,6 +17,10 @@
 
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
+
+/* 
+ * Returns an image with the contents of the framebuffer. 
+ */
 - (UIImage *)takeScreenshot;
 - (UIImage *)takeScreenshotWithImageOrientation:(UIImageOrientation)orientation;
 

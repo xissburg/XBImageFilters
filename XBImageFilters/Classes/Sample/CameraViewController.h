@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "XBFilteredCameraView.h"
+#import "CameraTargetView.h"
 
 @interface CameraViewController : UIViewController <XBFilteredCameraViewDelegate>
 
 @property (weak, nonatomic) IBOutlet XBFilteredCameraView *cameraView;
+@property (weak, nonatomic) IBOutlet CameraTargetView *cameraTargetView;
 
 - (IBAction)takeAPictureButtonTouchUpInside:(id)sender;
 - (IBAction)changeFilterButtonTouchUpInside:(id)sender;

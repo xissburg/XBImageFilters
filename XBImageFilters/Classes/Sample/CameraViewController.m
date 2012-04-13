@@ -16,7 +16,9 @@
 @end
 
 @implementation CameraViewController
-@synthesize cameraView;
+
+@synthesize cameraView = _cameraView;
+@synthesize cameraTargetView = _cameraTargetView;
 
 #pragma mark - View lifecycle
 
@@ -26,6 +28,8 @@
     
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
     [self.cameraView addGestureRecognizer:tgr];
+    
+    [self.cameraTargetView hideAnimated:NO];
     
     [self loadFilters];
     filterIndex = 1;
@@ -59,9 +63,11 @@
     NSString *defaultPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
     NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"DiscretizeShader" ofType:@"glsl"];
     NSString *pixelatePath = [[NSBundle mainBundle] pathForResource:@"PixelateShader" ofType:@"glsl"];
+    NSString *suckPath = [[NSBundle mainBundle] pathForResource:@"SuckShader" ofType:@"glsl"];
     
     // Setup a combination of these filters
     paths = [[NSArray alloc] initWithObjects:
+             [[NSArray alloc] initWithObjects:suckPath, nil],
              [[NSArray alloc] initWithObjects:pixelatePath, nil],
              [[NSArray alloc] initWithObjects:discretizePath, nil],
              [[NSArray alloc] initWithObjects:luminancePath, nil], 
@@ -136,6 +142,8 @@
     if (tgr.state == UIGestureRecognizerStateRecognized) {
         CGPoint location = [tgr locationInView:self.cameraView];
         self.cameraView.focusPoint = location;
+        self.cameraTargetView.center = self.cameraView.focusPoint;
+        [self.cameraTargetView showAnimated:YES];
     }
 }
 
@@ -149,6 +157,7 @@
 - (void)filteredCameraViewDidFinishAdjustingFocus:(XBFilteredCameraView *)filteredCameraView
 {
     // NSLog(@"Focus point: %f, %f", self.cameraView.focusPoint.x, self.cameraView.focusPoint.y);
+    [self.cameraTargetView hideAnimated:YES];
 }
 
 @end

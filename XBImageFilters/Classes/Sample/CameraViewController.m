@@ -67,6 +67,7 @@
     
     // Setup a combination of these filters
     paths = [[NSArray alloc] initWithObjects:
+             [[NSArray alloc] initWithObjects:defaultPath, nil],
              [[NSArray alloc] initWithObjects:suckPath, nil],
              [[NSArray alloc] initWithObjects:pixelatePath, nil],
              [[NSArray alloc] initWithObjects:discretizePath, nil],
@@ -74,8 +75,7 @@
              [[NSArray alloc] initWithObjects:hBlurPath, nil],
              [[NSArray alloc] initWithObjects:vBlurPath, nil],
              [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, nil],
-             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, luminancePath, nil],
-             [[NSArray alloc] initWithObjects:defaultPath, nil], nil];
+             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, luminancePath, nil], nil];
 }
 
 #pragma mark - Button Actions
@@ -120,7 +120,7 @@
     }];
 }
 
-- (IBAction)changeFilterButtonTouchUpInside:(id)sender 
+- (IBAction)changeFilterButtonTouchUpInside:(id)sender
 {
     NSArray *files = [paths objectAtIndex:filterIndex];
 

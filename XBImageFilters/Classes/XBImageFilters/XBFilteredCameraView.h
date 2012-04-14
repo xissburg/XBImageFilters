@@ -15,6 +15,16 @@ typedef enum {
     XBCameraPositionFront = 2
 } XBCameraPosition;
 
+extern NSString *const XBCaptureQualityPhoto;
+extern NSString *const XBCaptureQualityHigh;
+extern NSString *const XBCaptureQualityMedium;
+extern NSString *const XBCaptureQualityLow;
+extern NSString *const XBCaptureQuality1280x720;
+extern NSString *const XBCaptureQualityiFrame1280x720;
+extern NSString *const XBCaptureQualityiFrame960x540;
+extern NSString *const XBCaptureQuality640x480;
+extern NSString *const XBCaptureQuality352x288;
+
 @class XBFilteredCameraView;
 
 @protocol XBFilteredCameraViewDelegate <NSObject>
@@ -36,7 +46,12 @@ typedef enum {
 @property (assign, nonatomic) CGPoint focusPoint;
 @property (assign, nonatomic) CGPoint exposurePoint;
 
+/*
+ * Starts/stops capturing and rendering the camera image with filters applied in realtime.
+ */
 - (void)startCapturing;
 - (void)stopCapturing;
+
+- (void)takeAPhotoWithCompletion:(void (^)(UIImage *image))completion;
 
 @end

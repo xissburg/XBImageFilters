@@ -35,12 +35,12 @@
 - (void)_XBFilteredCameraViewInit
 {
     self.contentMode = UIViewContentModeScaleAspectFill;
-    self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1)); // Compensate for weird camera rotation
+    self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI, 0, 0, 1)); // Compensate for weird camera rotation
     
     self.videoHeight = self.videoWidth = 0;
     
     self.captureSession = [[AVCaptureSession alloc] init];
-    self.captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    self.captureSession.sessionPreset = AVCaptureSessionPresetiFrame960x540;
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
@@ -120,7 +120,7 @@
 
 - (CGPoint)focusPoint
 {
-    return CGPointMake(self.device.focusPointOfInterest.x*self.bounds.size.width, self.device.focusPointOfInterest.y*self.bounds.size.height);
+    return CGPointMake((1 - self.device.focusPointOfInterest.y)*self.bounds.size.width, self.device.focusPointOfInterest.x*self.bounds.size.height);
 }
 
 - (void)setFocusPoint:(CGPoint)focusPoint
@@ -131,7 +131,7 @@
         return;
     }
     
-    self.device.focusPointOfInterest = CGPointMake(focusPoint.x/self.bounds.size.width, focusPoint.y/self.bounds.size.height);
+    self.device.focusPointOfInterest = CGPointMake(focusPoint.y/self.bounds.size.height, 1 - focusPoint.x/self.bounds.size.width);
     self.device.focusMode = AVCaptureFocusModeAutoFocus;
     self.device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
     [self.device unlockForConfiguration];
@@ -139,7 +139,7 @@
 
 - (CGPoint)exposurePoint
 {
-    return CGPointMake(self.device.exposurePointOfInterest.x*self.bounds.size.width, self.device.exposurePointOfInterest.y*self.bounds.size.height);
+    return CGPointMake((1 - self.device.exposurePointOfInterest.y)*self.bounds.size.width, self.device.exposurePointOfInterest.x*self.bounds.size.height);
 }
 
 - (void)setExposurePoint:(CGPoint)exposurePoint
@@ -150,7 +150,7 @@
         return;
     }
     
-    self.device.exposurePointOfInterest = CGPointMake(exposurePoint.x/self.bounds.size.width, exposurePoint.y/self.bounds.size.height);
+    self.device.exposurePointOfInterest = CGPointMake(exposurePoint.y/self.bounds.size.height, 1 - exposurePoint.x/self.bounds.size.width);
     self.device.exposureMode = AVCaptureExposureModeAutoExpose;
     [self.device unlockForConfiguration];
 }
@@ -167,6 +167,11 @@
 {
     [self.videoDataOutput setSampleBufferDelegate:nil queue:NULL];
     [self.captureSession stopRunning];
+}
+
+- (void)takeAPhotoWithCompletion:(void (^)(UIImage *))completion
+{
+    
 }
 
 #pragma mark - Private Methods
@@ -188,6 +193,10 @@
     [self.captureSession addOutput:self.stillImageOutput];
 
     [self.captureSession commitConfiguration];
+    
+    AVCaptureConnection *connection = [self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
+    connection.videoOrientation = AVCaptureVideoOrientationPortrait;
+    connection.videoMirrored = YES;
 }
 
 - (void)removeObservers
@@ -242,13 +251,14 @@
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
     void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
-    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    // Compensate for padding. A small black line will be visible on the right. Adjust vertex texture coordinates to fix this. Lazy to do it now.
+    size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t height = CVPixelBufferGetHeight(imageBuffer);
     
     if (width != self.videoWidth || height != self.videoHeight) {
         self.videoWidth = width;
         self.videoHeight = height;
-        self.contentSize = CGSizeMake(height, width);
+        self.contentSize = CGSizeMake(width, height);
         [self _setTextureData:baseAddress width:self.videoWidth height:self.videoHeight];
     }
     else {

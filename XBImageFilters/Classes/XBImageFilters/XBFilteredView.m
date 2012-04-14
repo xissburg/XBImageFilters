@@ -300,8 +300,6 @@ typedef struct {
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     
-    
-    
     // Setup default shader
     NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
     NSError *error = nil;

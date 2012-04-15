@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
 
-@interface XBFilteredView : UIView <GLKViewDelegate>
+@interface XBFilteredView : UIView
 
 @property (strong, nonatomic) NSArray *programs;
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
@@ -28,7 +28,7 @@
 /*
  * Draws the OpenGL contents immediately.
  */
-- (void)forceDisplay;
+- (void)display;
 
 /* These methods are conceptually protected and should not be called directly. They are intended to be called by subclasses. */
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height;

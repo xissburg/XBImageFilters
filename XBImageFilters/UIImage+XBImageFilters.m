@@ -38,7 +38,7 @@
     }
     
     filteredImageView.image = self;
-    [filteredImageView forceDisplay];
+    [filteredImageView display];
 
     return [filteredImageView takeScreenshot];
 }

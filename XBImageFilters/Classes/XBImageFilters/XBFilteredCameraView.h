@@ -15,6 +15,18 @@ typedef enum {
     XBCameraPositionFront = 2
 } XBCameraPosition;
 
+typedef enum {
+    XBFlashModeOff = 0,
+    XBFlashModeOn = 1,
+    XBFlashModeAuto = 2
+} XBFlashMode;
+
+typedef enum {
+    XBTorchModeOff = 0,
+    XBTorchModeOn = 1,
+    XBTorchModeAuto = 2
+} XBTorchMode;
+
 extern NSString *const XBCaptureQualityPhoto;
 extern NSString *const XBCaptureQualityHigh;
 extern NSString *const XBCaptureQualityMedium;
@@ -45,6 +57,10 @@ extern NSString *const XBCaptureQuality352x288;
 @property (assign, nonatomic) XBCameraPosition cameraPosition;
 @property (assign, nonatomic) CGPoint focusPoint; // Only supported if cameraPosition is XBCameraPositionBack
 @property (assign, nonatomic) CGPoint exposurePoint;
+@property (copy, nonatomic) NSString *videoCaptureQuality;
+@property (copy, nonatomic) NSString *imageCaptureQuality;
+@property (assign, nonatomic) XBFlashMode flashMode;
+@property (assign, nonatomic) XBTorchMode torchMode;
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.

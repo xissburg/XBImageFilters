@@ -8,6 +8,7 @@
 
 #import "XBFilteredView.h"
 #import "GLKProgram.h"
+#import <QuartzCore/QuartzCore.h>
 
 const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
 
@@ -19,7 +20,13 @@ typedef struct {
 @interface XBFilteredView ()
 
 @property (strong, nonatomic) EAGLContext *context;
-@property (strong, nonatomic) GLKView *glkView;
+@property (assign, nonatomic) GLuint framebuffer;
+@property (assign, nonatomic) GLuint colorRenderbuffer;
+@property (assign, nonatomic) GLuint depthRenderbuffer;
+@property (assign, nonatomic) GLint viewportWidth;
+@property (assign, nonatomic) GLint viewportHeight;
+
+@property (assign, nonatomic) CGRect previousBounds; //used in layoutSubviews to determine whether the framebuffer should be recreated
 
 @property (assign, nonatomic) GLuint imageQuadVertexBuffer;
 @property (assign, nonatomic) GLuint mainTexture;
@@ -53,7 +60,12 @@ typedef struct {
 @implementation XBFilteredView
 
 @synthesize context = _context;
-@synthesize glkView = _glkView;
+@synthesize framebuffer = _framebuffer;
+@synthesize colorRenderbuffer = _colorRenderbuffer;
+@synthesize depthRenderbuffer = _depthRenderbuffer;
+@synthesize viewportWidth = _viewportWidth;
+@synthesize viewportHeight = _viewportHeight;
+@synthesize previousBounds = _previousBounds;
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
 @synthesize mainTexture = _mainTexture;
 @synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
@@ -74,14 +86,16 @@ typedef struct {
 - (void)_XBFilteredViewInit //Use a weird name to avoid being overidden
 {
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
-    
+    self.layer.opaque = YES;
+
     self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
-    self.glkView = [[GLKView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) context:self.context];
-    self.glkView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.glkView.delegate = self;
-    self.glkView.enableSetNeedsDisplay = YES;
-    [self addSubview:self.glkView];
+    self.previousBounds = CGRectZero;
+    
+    if ([self needsToCreateFramebuffer]) {
+        [self createFramebuffer];
+        self.previousBounds = self.bounds;
+    }
     
     [self setupGL];
 }
@@ -102,8 +116,59 @@ typedef struct {
 
 - (void)dealloc
 {
+    [EAGLContext setCurrentContext:self.context];
     [self destroyGL];
+    self.context = nil;
     [EAGLContext setCurrentContext:nil];
+}
+
+#pragma mark - Overrides
+
++ (Class)layerClass
+{
+    return [CAEAGLLayer class];
+}
+
+- (void)layoutSubviews
+{
+    if ([self needsToCreateFramebuffer]) {
+        [self createFramebuffer];
+    }
+    
+    switch (self.contentMode) {
+        case UIViewContentModeScaleToFill:
+            self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+            break;
+            
+        case UIViewContentModeScaleAspectFit:
+            self.contentModeTransform = [self transformForAspectFitOrFill:YES];
+            break;
+            
+        case UIViewContentModeScaleAspectFill:
+            self.contentModeTransform = [self transformForAspectFitOrFill:NO];
+            break;
+            
+        case UIViewContentModeCenter:
+        case UIViewContentModeBottom:
+        case UIViewContentModeTop:
+        case UIViewContentModeLeft:
+        case UIViewContentModeRight:
+        case UIViewContentModeBottomLeft:
+        case UIViewContentModeBottomRight:
+        case UIViewContentModeTopLeft:
+        case UIViewContentModeTopRight:
+            self.contentModeTransform = [self transformForPositionalContentMode:self.contentMode];
+            break;
+            
+        case UIViewContentModeRedraw:
+            break;
+            
+        default:
+            break;
+    }
+    
+    self.previousBounds = self.bounds;
+    [self display];
 }
 
 #pragma mark - Properties
@@ -167,8 +232,6 @@ typedef struct {
     
     // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
     [self setNeedsLayout];
-    
-    [self.glkView setNeedsDisplay];
 }
 
 - (void)_updateTextureWithData:(GLvoid *)textureData
@@ -179,7 +242,7 @@ typedef struct {
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.textureWidth, self.textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
     
-    [self.glkView setNeedsDisplay];
+    [self display];
 }
 
 - (void)_deleteMainTexture
@@ -254,7 +317,6 @@ typedef struct {
     self.programs = [programs copy];
     
     [self setNeedsLayout];
-    [self setNeedsDisplay];
     
     return YES;
 }
@@ -290,9 +352,57 @@ typedef struct {
     return image;
 }
 
-- (void)forceDisplay
+- (void)display
 {
-    [self.glkView display];
+    [EAGLContext setCurrentContext:self.context];
+    
+    CGFloat r, g, b, a;
+    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
+    glClearColor(r, g, b, a);
+    glDisable(GL_DEPTH_TEST);
+    
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        
+        if (pass == self.programs.count - 1) { // Last pass, bind framebuffer
+            glViewport(0, 0, self.viewportWidth, self.viewportHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+        }
+        else if (pass%2 == 0) {
+            glViewport(0, 0, self.textureWidth, self.textureHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+        }
+        else {
+            glViewport(0, 0, self.textureWidth, self.textureHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+        }
+            
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        [program prepareToDraw];
+        
+        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
+        
+        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
+        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+        glEnableVertexAttribArray(positionAttribute.location);
+        
+        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
+        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
+        glEnableVertexAttribArray(texCoordAttribute.location);
+        
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    
+    glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
+    [self.context presentRenderbuffer:GL_RENDERBUFFER];
+    
+#ifdef DEBUG
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        NSLog(@"%d", error);
+    }
+#endif
 }
 
 #pragma mark - Private Methods
@@ -323,7 +433,7 @@ typedef struct {
         NSLog(@"%@", [error localizedDescription]);
     }
     
-    // Initialize transform to the most basic projection
+    // Initialize transform to the most basic projection, and set others to identity
     self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
     self.contentTransform = GLKMatrix4Identity;
     self.texCoordTransform = GLKMatrix2Identity;
@@ -342,6 +452,8 @@ typedef struct {
     
     glDeleteFramebuffers(1, &_evenPassFrambuffer);
     glDeleteFramebuffers(1, &_oddPassFramebuffer);
+    
+    [self destroyFramebuffer];
 }
 
 - (GLuint)generateDefaultTextureWithWidth:(GLint)width height:(GLint)height data:(GLvoid *)data
@@ -404,54 +516,6 @@ typedef struct {
     // purpose is to adjust the final image on the framebuffer/screen. That is why it is applied only in the end.
     GLKProgram *lastProgram = [self.programs lastObject];
     [lastProgram setValue:composedTransform.m forUniformNamed:@"u_contentTransform"];
-}
-
-- (void)setContentMode:(UIViewContentMode)contentMode
-{
-    [super setContentMode:contentMode];
-}
-
-- (void)setNeedsDisplay
-{
-    [super setNeedsDisplay];
-    [self.glkView setNeedsDisplay];
-}
-
-- (void)layoutSubviews
-{
-    switch (self.contentMode) {
-        case UIViewContentModeScaleToFill:
-            self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
-            break;
-            
-        case UIViewContentModeScaleAspectFit:
-            self.contentModeTransform = [self transformForAspectFitOrFill:YES];
-            break;
-            
-        case UIViewContentModeScaleAspectFill:
-            self.contentModeTransform = [self transformForAspectFitOrFill:NO];
-            break;
-            
-        case UIViewContentModeCenter:
-        case UIViewContentModeBottom:
-        case UIViewContentModeTop:
-        case UIViewContentModeLeft:
-        case UIViewContentModeRight:
-        case UIViewContentModeBottomLeft:
-        case UIViewContentModeBottomRight:
-        case UIViewContentModeTopLeft:
-        case UIViewContentModeTopRight:
-            self.contentModeTransform = [self transformForPositionalContentMode:self.contentMode];
-            break;
-            
-        case UIViewContentModeRedraw:
-            break;
-            
-        default:
-            break;
-    }
-    
-    [self.glkView setNeedsDisplay];
 }
 
 - (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit
@@ -521,54 +585,53 @@ typedef struct {
     return transform;
 }
 
-#pragma mark - GLKViewDelegate
-
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+- (BOOL)needsToCreateFramebuffer
 {
-    CGFloat r, g, b, a;
-    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
-    glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDisable(GL_DEPTH_TEST);
+    return !CGSizeEqualToSize(self.previousBounds.size, self.bounds.size);
+}
+
+- (BOOL)createFramebuffer
+{
+    [EAGLContext setCurrentContext:self.context];
     
-    for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
-        
-        if (self.programs.count > 1) {
-            if (pass == self.programs.count - 1) { // Last pass
-                [self.glkView bindDrawable];
-            }
-            else if (pass%2 == 0) {
-                glViewport(0, 0, self.textureWidth, self.textureHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
-            }
-            else {
-                glViewport(0, 0, self.textureWidth, self.textureHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
-            }
-        }
-        
-        [program prepareToDraw];
-        
-        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
-        
-        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
-        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
-        glEnableVertexAttribArray(positionAttribute.location);
-        
-        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
-        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
-        glEnableVertexAttribArray(texCoordAttribute.location);
-        
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    [self destroyFramebuffer];
+    
+    glGenFramebuffers(1, &_framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+    
+    glGenRenderbuffers(1, &_colorRenderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
+    [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, self.colorRenderbuffer);
+    
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_viewportWidth);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_viewportHeight);
+    
+    glGenRenderbuffers(1, &_depthRenderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, self.depthRenderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, self.viewportWidth, self.viewportHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, self.depthRenderbuffer);
+    
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        NSLog(@"Failed to create framebuffer: %x", status);
+        return NO;
     }
     
-#ifdef DEBUG
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        NSLog(@"%d", error);
-    }
-#endif
+    return YES;
+}
+
+- (void)destroyFramebuffer
+{
+    glDeleteFramebuffers(1, &_framebuffer);
+    self.framebuffer = 0;
+    
+    glDeleteRenderbuffers(1, &_colorRenderbuffer);
+    self.colorRenderbuffer = 0;
+    
+    glDeleteRenderbuffers(1, &_depthRenderbuffer);
+    self.depthRenderbuffer = 0;
 }
 
 @end

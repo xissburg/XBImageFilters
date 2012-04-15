@@ -8,6 +8,16 @@
 
 #import "XBFilteredCameraView.h"
 
+NSString *const XBCaptureQualityPhoto = @"XBCaptureQualityPhoto";
+NSString *const XBCaptureQualityHigh = @"XBCaptureQualityHigh";
+NSString *const XBCaptureQualityMedium = @"XBCaptureQualityMedium";
+NSString *const XBCaptureQualityLow = @"XBCaptureQualityLow";
+NSString *const XBCaptureQuality1280x720 = @"XBCaptureQuality1280x720";
+NSString *const XBCaptureQualityiFrame1280x720 = @"XBCaptureQualityiFrame1280x720";
+NSString *const XBCaptureQualityiFrame960x540 = @"XBCaptureQualityiFrame960x540";
+NSString *const XBCaptureQuality640x480 = @"XBCaptureQuality640x480";
+NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
+
 @interface XBFilteredCameraView ()
 
 @property (strong, nonatomic) AVCaptureSession *captureSession;
@@ -31,6 +41,10 @@
 @synthesize videoWidth = _videoWidth, videoHeight = _videoHeight;
 @synthesize delegate = _delegate;
 @synthesize cameraPosition = _cameraPosition;
+@synthesize videoCaptureQuality = _videoCaptureQuality;
+@synthesize imageCaptureQuality = _imageCaptureQuality;
+@synthesize flashMode = _flashMode;
+@synthesize torchMode = _torchMode;
 
 - (void)_XBFilteredCameraViewInit
 {
@@ -39,7 +53,8 @@
     self.videoHeight = self.videoWidth = 0;
     
     self.captureSession = [[AVCaptureSession alloc] init];
-    self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+    self.videoCaptureQuality = XBCaptureQualityPhoto;
+    self.imageCaptureQuality = XBCaptureQualityPhoto;
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
@@ -68,7 +83,7 @@
     [self removeObservers];
 }
 
-#pragma - Properties
+#pragma mark - Properties
 
 - (void)setCameraPosition:(XBCameraPosition)cameraPosition
 {
@@ -167,6 +182,66 @@
     [self.device unlockForConfiguration];
 }
 
+- (void)setVideoCaptureQuality:(NSString *)videoCaptureQuality
+{
+    _videoCaptureQuality = [videoCaptureQuality copy];
+    self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:_videoCaptureQuality];
+}
+
+- (void)setFlashMode:(XBFlashMode)flashMode
+{
+    NSError *error = nil;
+    if (![self.device lockForConfiguration:&error]) {
+        NSLog(@"XBFilteredCameraView: Failed to set flash mode: %@", [error localizedDescription]);
+        return;
+    }
+    
+    _flashMode = flashMode;
+    
+    switch (_flashMode) {
+        case XBFlashModeOff:
+            self.device.flashMode = AVCaptureFlashModeOff;
+            break;
+        
+        case XBFlashModeOn:
+            self.device.flashMode = AVCaptureFlashModeOn;
+            break;
+            
+        case XBFlashModeAuto:
+            self.device.flashMode = AVCaptureFlashModeAuto;
+            break;
+    }
+    
+    [self.device unlockForConfiguration];
+}
+
+- (void)setTorchMode:(XBTorchMode)torchMode
+{
+    NSError *error = nil;
+    if (![self.device lockForConfiguration:&error]) {
+        NSLog(@"XBFilteredCameraView: Failed to set torch mode: %@", [error localizedDescription]);
+        return;
+    }
+    
+    _torchMode = torchMode;
+    
+    switch (_torchMode) {
+        case XBTorchModeOff:
+            self.device.torchMode = AVCaptureTorchModeOff;
+            break;
+
+        case XBTorchModeOn:
+            self.device.torchMode = AVCaptureTorchModeOn;
+            break;
+            
+        case XBTorchModeAuto:
+            self.device.torchMode = AVCaptureTorchModeAuto;
+            break;
+    }
+    
+    [self.device unlockForConfiguration];
+}
+
 #pragma mark - Methods
 
 - (void)startCapturing
@@ -183,7 +258,33 @@
 
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *))completion
 {
+    // Disable the video connection to avoid a crash if the imageCaptureQuality is unsupported for video output
+    AVCaptureConnection *videoConnection = [self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
+    videoConnection.enabled = NO;
     
+    self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.imageCaptureQuality];
+    
+    AVCaptureConnection *imageConnection = nil;
+    for (AVCaptureConnection *connection in self.stillImageOutput.connections) {
+        for (AVCaptureInputPort *port in connection.inputPorts) {
+            if ([port.mediaType isEqualToString:AVMediaTypeVideo]) {
+                imageConnection = connection;
+                break;
+            }
+        }
+        
+        if (imageConnection != nil) {
+            break;
+        }
+    }
+    
+    [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+        self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
+        videoConnection.enabled = YES;
+        
+        
+        completion([UIImage imageNamed:@"LucasCorrea"]);
+    }];
 }
 
 #pragma mark - Private Methods
@@ -216,6 +317,40 @@
     [self.device removeObserver:self forKeyPath:@"adjustingFocus"];
     [self.device removeObserver:self forKeyPath:@"adjustingExposure"];
     [self.device removeObserver:self forKeyPath:@"adjustingWhiteBalance"];
+}
+
+- (NSString *)captureSessionPresetFromCaptureQuality:(NSString *)captureQuality
+{
+    if ([captureQuality isEqualToString:XBCaptureQualityPhoto]) {
+        return AVCaptureSessionPresetPhoto;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQualityHigh]) {
+        return AVCaptureSessionPresetHigh;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQualityMedium]) {
+        return AVCaptureSessionPresetMedium;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQualityLow]) {
+        return AVCaptureSessionPresetLow;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQuality1280x720]) {
+        return AVCaptureSessionPreset1280x720;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQualityiFrame1280x720]) {
+        return AVCaptureSessionPresetiFrame1280x720;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQualityiFrame960x540]) {
+        return AVCaptureSessionPresetiFrame960x540;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQuality640x480]) {
+        return AVCaptureSessionPreset640x480;
+    }
+    else if ([captureQuality isEqualToString:XBCaptureQuality352x288]) {
+        return AVCaptureSessionPreset352x288;
+    }
+    else {
+        return nil;
+    }
 }
 
 #pragma mark - Key-Value Observing

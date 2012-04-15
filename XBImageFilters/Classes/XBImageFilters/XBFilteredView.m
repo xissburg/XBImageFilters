@@ -9,6 +9,8 @@
 #import "XBFilteredView.h"
 #import "GLKProgram.h"
 
+const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
+
 typedef struct {
     GLKVector3 position;
     GLKVector2 texCoord;
@@ -58,6 +60,7 @@ typedef struct {
 @synthesize contentTransform = _contentTransform;
 @synthesize contentModeTransform = _contentModeTransform;
 @synthesize contentSize = _contentSize;
+@synthesize texCoordTransform = _texCoordTransform;
 @synthesize programs = _programs;
 @synthesize oddPassTexture = _oddPassTexture;
 @synthesize evenPassTexture = _evenPassTexture;
@@ -121,6 +124,16 @@ typedef struct {
 {
     _contentSize = contentSize;
     [self refreshContentTransform];
+}
+
+- (void)setTexCoordTransform:(GLKMatrix2)texCoordTransform
+{
+    _texCoordTransform = texCoordTransform;
+    
+    // The transform is applied only on the first program, because the next ones will already receive and image with the transform applied.
+    // The transform would be applied again on each filter otherwise.
+    GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+    [firstProgram setValue:&texCoordTransform forUniformNamed:@"u_texCoordTransform"];
 }
 
 #pragma mark - Protected Methods
@@ -217,8 +230,9 @@ typedef struct {
         if (program == nil) {
             return NO;
         }
-        
-        [program setValue:(void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
+
+        [program setValue:i == paths.count - 1?&_contentTransform: (void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
+        [program setValue:i == 0?&_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
         
         GLuint sourceTexture = 0;
         
@@ -312,6 +326,7 @@ typedef struct {
     // Initialize transform to the most basic projection
     self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
     self.contentTransform = GLKMatrix4Identity;
+    self.texCoordTransform = GLKMatrix2Identity;
 }
 
 - (void)destroyGL
@@ -384,6 +399,9 @@ typedef struct {
 - (void)refreshContentTransform
 {
     GLKMatrix4 composedTransform = GLKMatrix4Multiply(self.contentTransform, self.contentModeTransform);
+    
+    // The contentTransform is only applied on the last program otherwise it would be reapplied in each filter. Also, the contentTransform's
+    // purpose is to adjust the final image on the framebuffer/screen. That is why it is applied only in the end.
     GLKProgram *lastProgram = [self.programs lastObject];
     [lastProgram setValue:composedTransform.m forUniformNamed:@"u_contentTransform"];
 }

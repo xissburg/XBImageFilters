@@ -14,6 +14,7 @@
 @property (strong, nonatomic) NSArray *programs;
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
 @property (assign, nonatomic) CGSize contentSize; // Content size used to compute the contentMode transform. By default it can be the texture size.
+@property (assign, nonatomic) GLKMatrix2 texCoordTransform;
 
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
@@ -35,3 +36,5 @@
 - (void)_deleteMainTexture;
 
 @end
+
+extern const GLKMatrix2 GLKMatrix2Identity;

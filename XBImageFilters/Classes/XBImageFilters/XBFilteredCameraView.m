@@ -263,7 +263,7 @@
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
     void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
-    // Compensate for padding. A small black line will be visible on the right. Adjust vertex texture coordinates to fix this. Lazy to do it now.
+    // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
     size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t height = CVPixelBufferGetHeight(imageBuffer);
     
@@ -271,6 +271,8 @@
         self.videoWidth = width;
         self.videoHeight = height;
         self.contentSize = CGSizeMake(width, height);
+        float ratio = (float)CVPixelBufferGetWidth(imageBuffer)/width;
+        self.texCoordTransform = (GLKMatrix2){ratio, 0, 0, 1}; // Apply a horizontal stretch to hide the row padding
         [self _setTextureData:baseAddress width:self.videoWidth height:self.videoHeight];
     }
     else {

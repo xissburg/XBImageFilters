@@ -154,10 +154,25 @@
                                 </connections>
                             </view>
                             <view contentMode="scaleToFill" id="04v-z8-DsY" customClass="CameraTargetView">
-                                <rect key="frame" x="127.5" y="167.5" width="65" height="65"/>
+                                <rect key="frame" x="128" y="167" width="65" height="65"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="pso-f2-KHN">
+                                <rect key="frame" x="247" y="10" width="53" height="37"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="Cam">
+                                    <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <state key="highlighted">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="cameraButtonTouchUpInside:" destination="EdN-G9-MgA" eventType="touchUpInside" id="ABb-gW-E4Y"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="2dN-Rh-XCj">
                                 <rect key="frame" x="96" y="367" width="128" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -246,6 +261,7 @@
         <class className="CameraViewController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/CameraViewController.h"/>
             <relationships>
+                <relationship kind="action" name="cameraButtonTouchUpInside:"/>
                 <relationship kind="action" name="changeFilterButtonTouchUpInside:"/>
                 <relationship kind="action" name="takeAPictureButtonTouchUpInside:"/>
                 <relationship kind="outlet" name="cameraTargetView" candidateClass="CameraTargetView"/>

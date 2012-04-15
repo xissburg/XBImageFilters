@@ -135,14 +135,23 @@
     }
 }
 
+- (IBAction)cameraButtonTouchUpInside:(id)sender 
+{
+    self.cameraView.cameraPosition = self.cameraView.cameraPosition == XBCameraPositionBack? XBCameraPositionFront: XBCameraPositionBack;
+}
+
 #pragma mark - Gesture recognition
 
 - (void)cameraViewTapAction:(UITapGestureRecognizer *)tgr
 {
     if (tgr.state == UIGestureRecognizerStateRecognized) {
         CGPoint location = [tgr locationInView:self.cameraView];
-        self.cameraView.focusPoint = location;
-        self.cameraTargetView.center = self.cameraView.focusPoint;
+        if (self.cameraView.cameraPosition == XBCameraPositionBack) {
+            self.cameraView.focusPoint = location;
+        }
+        
+        self.cameraView.exposurePoint = location;
+        self.cameraTargetView.center = self.cameraView.exposurePoint;
         [self.cameraTargetView showAnimated:YES];
     }
 }
@@ -157,6 +166,11 @@
 - (void)filteredCameraViewDidFinishAdjustingFocus:(XBFilteredCameraView *)filteredCameraView
 {
     // NSLog(@"Focus point: %f, %f", self.cameraView.focusPoint.x, self.cameraView.focusPoint.y);
+    [self.cameraTargetView hideAnimated:YES];
+}
+
+- (void)filteredCameraViewDidFinishAdjustingExposure:(XBFilteredCameraView *)filteredCameraView
+{
     [self.cameraTargetView hideAnimated:YES];
 }
 

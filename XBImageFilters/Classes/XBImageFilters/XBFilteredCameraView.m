@@ -35,12 +35,11 @@
 - (void)_XBFilteredCameraViewInit
 {
     self.contentMode = UIViewContentModeScaleAspectFill;
-    self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI, 0, 0, 1)); // Compensate for weird camera rotation
     
     self.videoHeight = self.videoWidth = 0;
     
     self.captureSession = [[AVCaptureSession alloc] init];
-    self.captureSession.sessionPreset = AVCaptureSessionPresetiFrame960x540;
+    self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
@@ -107,6 +106,19 @@
     }
     
     [self.captureSession commitConfiguration];
+    
+    // refresh orientation
+    AVCaptureConnection *connection = [self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
+    connection.videoOrientation = AVCaptureVideoOrientationPortrait;
+    connection.videoMirrored = YES;
+    
+    // And the contentTransform
+    if (_cameraPosition == XBCameraPositionBack) {
+        self.contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI, 0, 0, 1)); // Compensate for weird camera rotation
+    }
+    else if (_cameraPosition == XBCameraPositionFront) {
+        self.contentTransform = GLKMatrix4MakeRotation(-M_PI, 0, 0, 1);
+    }
 }
 
 - (void)setDevice:(AVCaptureDevice *)device
@@ -149,9 +161,9 @@
         NSLog(@"XBFilteredCameraView: Failed to set exposure point: %@", [error localizedDescription]);
         return;
     }
-    
+    self.device.exposureMode = AVCaptureExposureModeLocked;
     self.device.exposurePointOfInterest = CGPointMake(exposurePoint.y/self.bounds.size.height, 1 - exposurePoint.x/self.bounds.size.width);
-    self.device.exposureMode = AVCaptureExposureModeAutoExpose;
+    self.device.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
     [self.device unlockForConfiguration];
 }
 

@@ -43,7 +43,7 @@ extern NSString *const XBCaptureQuality352x288;
 
 @property (weak, nonatomic) IBOutlet id<XBFilteredCameraViewDelegate> delegate;
 @property (assign, nonatomic) XBCameraPosition cameraPosition;
-@property (assign, nonatomic) CGPoint focusPoint;
+@property (assign, nonatomic) CGPoint focusPoint; // Only supported if cameraPosition is XBCameraPositionBack
 @property (assign, nonatomic) CGPoint exposurePoint;
 
 /*

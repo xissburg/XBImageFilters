@@ -257,11 +257,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 }
 
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *))completion
-{
-    // Disable the video connection to avoid a crash if the imageCaptureQuality is unsupported for video output
-    AVCaptureConnection *videoConnection = [self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
-    videoConnection.enabled = NO;
-    
+{    
     self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.imageCaptureQuality];
     
     AVCaptureConnection *imageConnection = nil;
@@ -280,7 +276,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
-        videoConnection.enabled = YES;
         
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
         CVPixelBufferLockBaseAddress(imageBuffer, 0);

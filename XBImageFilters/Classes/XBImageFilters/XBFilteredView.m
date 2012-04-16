@@ -22,7 +22,6 @@ typedef struct {
 @property (strong, nonatomic) EAGLContext *context;
 @property (assign, nonatomic) GLuint framebuffer;
 @property (assign, nonatomic) GLuint colorRenderbuffer;
-@property (assign, nonatomic) GLuint depthRenderbuffer;
 @property (assign, nonatomic) GLint viewportWidth;
 @property (assign, nonatomic) GLint viewportHeight;
 
@@ -62,7 +61,6 @@ typedef struct {
 @synthesize context = _context;
 @synthesize framebuffer = _framebuffer;
 @synthesize colorRenderbuffer = _colorRenderbuffer;
-@synthesize depthRenderbuffer = _depthRenderbuffer;
 @synthesize viewportWidth = _viewportWidth;
 @synthesize viewportHeight = _viewportHeight;
 @synthesize previousBounds = _previousBounds;
@@ -199,6 +197,15 @@ typedef struct {
     // The transform would be applied again on each filter otherwise.
     GLKProgram *firstProgram = [self.programs objectAtIndex:0];
     [firstProgram setValue:&texCoordTransform forUniformNamed:@"u_texCoordTransform"];
+}
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor
+{
+    [super setBackgroundColor:backgroundColor];
+    [EAGLContext setCurrentContext:self.context];
+    CGFloat r, g, b, a;
+    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
+    glClearColor(r, g, b, a);
 }
 
 #pragma mark - Protected Methods
@@ -359,9 +366,6 @@ typedef struct {
     
     GLuint lastFramebuffer = 0;
     
-    CGFloat r, g, b, a;
-    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
-    glClearColor(r, g, b, a);
     glViewport(0, 0, width, height);
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
@@ -395,11 +399,20 @@ typedef struct {
         
         [program prepareToDraw];
         
-        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        
+        // If it is not the last pass, discard the framebuffer contents
+        if (pass != self.programs.count - 1) {
+            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+        }
     }
     
     UIImage *image = [self imageFromFramebuffer:lastFramebuffer width:width height:height orientation:UIImageOrientationDownMirrored];
+    
+    // Now discard the lastFramebuffer
+    const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
     
     // Reset texture bindings
     for (int pass = 0; pass < self.programs.count; ++pass) {
@@ -439,10 +452,6 @@ typedef struct {
 {
     [EAGLContext setCurrentContext:self.context];
     
-    CGFloat r, g, b, a;
-    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
-    glClearColor(r, g, b, a);
-    
     for (int pass = 0; pass < self.programs.count; ++pass) {
         GLKProgram *program = [self.programs objectAtIndex:pass];
         
@@ -463,11 +472,15 @@ typedef struct {
         
         [program prepareToDraw];
         
-        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        
+        // If it is not the last pass, discard the framebuffer contents
+        if (pass != self.programs.count - 1) {
+            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+        }
     }
     
-    glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
     
 #ifdef DEBUG
@@ -484,7 +497,8 @@ typedef struct {
 {
     [EAGLContext setCurrentContext:self.context];
     
-    
+    // Make sure the background color is set
+    self.backgroundColor = self.backgroundColor;
     
     // Make sure depth testing will be kept disabled
     glDisable(GL_DEPTH_TEST);
@@ -501,6 +515,7 @@ typedef struct {
     glGenBuffers(1, &_imageQuadVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     
     // Setup default shader
     NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
@@ -685,17 +700,14 @@ typedef struct {
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_viewportWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_viewportHeight);
     
-    glGenRenderbuffers(1, &_depthRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, self.depthRenderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, self.viewportWidth, self.viewportHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, self.depthRenderbuffer);
-    
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         NSLog(@"Failed to create framebuffer: %x", status);
         return NO;
     }
+    
+    glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
     
     return YES;
 }
@@ -707,9 +719,6 @@ typedef struct {
     
     glDeleteRenderbuffers(1, &_colorRenderbuffer);
     self.colorRenderbuffer = 0;
-    
-    glDeleteRenderbuffers(1, &_depthRenderbuffer);
-    self.depthRenderbuffer = 0;
 }
 
 - (UIImage *)imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation

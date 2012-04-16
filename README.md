@@ -14,6 +14,10 @@ Convoluted Gaussian Blur, an example of a multi-pass filter. It uses two fragmen
 
 Real time camera filter. It also allows you to take pictures in `UIImage`s with the filter applied with the `-[XBFilteredView takeScreenshot]` method.
 
+![High Resolution Photo](http://xissburg.com/images/IMG_0296.JPG)
+
+You can also take high resolution photos with filters. Isn't that awesome?
+
 ## Architecture
 
 XBImageFilters uses OpenGL to draw something applying any custom OpenGL ES 2 fragment shader on it, which gives a lot of freedom on what can be done since we have to write the algorithm that computes the final color for each pixel. It simply builds a rectangle (with 2 triangles) and applies the image or data supplied as a texture on this rectangle. Then, it sets some custom transforms on this rectangle that you can provide, sets the custom fragment shader and draws the result to the screen. Whenever you want to you can change some parameter (like the radius of the blur in a blur filter) and redraw.

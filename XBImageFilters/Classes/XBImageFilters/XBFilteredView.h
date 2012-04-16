@@ -30,6 +30,8 @@
  */
 - (void)display;
 
+- (UIImage *)filteredImageWithData:(GLvoid *)data  width:(GLint)width height:(GLint)height;
+
 /* These methods are conceptually protected and should not be called directly. They are intended to be called by subclasses. */
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height;
 - (void)_updateTextureWithData:(GLvoid *)textureData;

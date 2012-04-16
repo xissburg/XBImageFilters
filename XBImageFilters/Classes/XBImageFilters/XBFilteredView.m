@@ -311,6 +311,15 @@ typedef struct {
         
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
         
+        // Enable vertex position and texCoord attributes
+        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
+        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+        glEnableVertexAttribArray(positionAttribute.location);
+        
+        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
+        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
+        glEnableVertexAttribArray(texCoordAttribute.location);
+        
         [programs addObject:program];
     }
     
@@ -328,26 +337,100 @@ typedef struct {
 
 - (UIImage *)takeScreenshotWithImageOrientation:(UIImageOrientation)orientation
 {
-    [EAGLContext setCurrentContext:self.context];
-    
     int width = (int)(self.bounds.size.width * self.contentScaleFactor);
     int height = (int)(self.bounds.size.height * self.contentScaleFactor);
-    size_t size = width * height * 4;
-    GLvoid *pixels = malloc(size);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    return [self imageFromFramebuffer:self.framebuffer width:width height:height orientation:orientation];
+}
+
+- (UIImage *)filteredImageWithData:(GLvoid *)data width:(GLint)width height:(GLint)height
+{
+    [EAGLContext setCurrentContext:self.context];
     
-    size_t bitsPerComponent = 8;
-    size_t bitsPerPixel = 32;
-    size_t bytesPerRow = width * bitsPerPixel / bitsPerComponent;
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, NULL);
-    CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
-    CGDataProviderRelease(provider);
+    GLuint mainTexture = [self generateDefaultTextureWithWidth:width height:height data:data];
+    GLuint evenPassTexture = [self generateDefaultTextureWithWidth:width height:height data:NULL];
+    GLuint evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:evenPassTexture];
+    GLuint oddPassTexture = 0;
+    GLuint oddPassFramebuffer = 0;
     
-    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:orientation];
-    CGImageRelease(cgImage);
-    CGColorSpaceRelease(colorSpace);
+    if (self.programs.count > 1) {
+        oddPassTexture = [self generateDefaultTextureWithWidth:width height:height data:NULL];
+        oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:oddPassTexture];
+    }
+    
+    GLuint lastFramebuffer = 0;
+    
+    CGFloat r, g, b, a;
+    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
+    glClearColor(r, g, b, a);
+    glViewport(0, 0, width, height);
+    
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        
+        if (pass%2 == 0) {
+            glBindFramebuffer(GL_FRAMEBUFFER, evenPassFrambuffer);
+            lastFramebuffer = evenPassFrambuffer;
+        }
+        else {
+            glBindFramebuffer(GL_FRAMEBUFFER, oddPassFramebuffer);
+            lastFramebuffer = oddPassFramebuffer;
+        }
+        
+        // Change the source texture for each pass
+        GLuint sourceTexture = 0;
+        
+        if (pass == 0) { // First pass always uses the original image
+            sourceTexture = mainTexture;
+        }
+        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        [program prepareToDraw];
+        
+        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    
+    UIImage *image = [self imageFromFramebuffer:lastFramebuffer width:width height:height orientation:UIImageOrientationDownMirrored];
+    
+    // Reset texture bindings
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        GLuint sourceTexture = 0;
+        
+        if (pass == 0) { // First pass always uses the original image
+            sourceTexture = self.mainTexture;
+        }
+        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = self.evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = self.oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+    }
+    
+    glDeleteTextures(1, &mainTexture);
+    glDeleteTextures(1, &evenPassTexture);
+    glDeleteFramebuffers(1, &evenPassFrambuffer);
+    glDeleteTextures(1, &oddPassTexture);
+    glDeleteFramebuffers(1, &oddPassFramebuffer);
+    
+#ifdef DEBUG
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        NSLog(@"%d", error);
+    }
+#endif
     
     return image;
 }
@@ -359,7 +442,6 @@ typedef struct {
     CGFloat r, g, b, a;
     [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
-    glDisable(GL_DEPTH_TEST);
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
         GLKProgram *program = [self.programs objectAtIndex:pass];
@@ -376,21 +458,12 @@ typedef struct {
             glViewport(0, 0, self.textureWidth, self.textureHeight);
             glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
         }
-            
+        
         glClear(GL_COLOR_BUFFER_BIT);
         
         [program prepareToDraw];
         
         glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
-        
-        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
-        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
-        glEnableVertexAttribArray(positionAttribute.location);
-        
-        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
-        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
-        glEnableVertexAttribArray(texCoordAttribute.location);
-        
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
@@ -410,6 +483,11 @@ typedef struct {
 - (void)setupGL
 {
     [EAGLContext setCurrentContext:self.context];
+    
+    
+    
+    // Make sure depth testing will be kept disabled
+    glDisable(GL_DEPTH_TEST);
     
     // Create vertices
     Vertex vertices[] = {
@@ -632,6 +710,31 @@ typedef struct {
     
     glDeleteRenderbuffers(1, &_depthRenderbuffer);
     self.depthRenderbuffer = 0;
+}
+
+- (UIImage *)imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    size_t size = width * height * 4;
+    GLvoid *pixels = malloc(size);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    
+    size_t bitsPerComponent = 8;
+    size_t bitsPerPixel = 32;
+    size_t bytesPerRow = width * bitsPerPixel / bitsPerComponent;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, NULL);
+    CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
+    CGDataProviderRelease(provider);
+    
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:orientation];
+    CGImageRelease(cgImage);
+    CGColorSpaceRelease(colorSpace);
+    
+    return image;
 }
 
 @end

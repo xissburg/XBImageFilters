@@ -282,8 +282,16 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
         videoConnection.enabled = YES;
         
+        CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
+        CVPixelBufferLockBaseAddress(imageBuffer, 0);
+        void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+        // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
+        size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+        size_t height = CVPixelBufferGetHeight(imageBuffer);
         
-        completion([UIImage imageNamed:@"LucasCorrea"]);
+        UIImage *filteredImage = [self filteredImageWithData:baseAddress width:width height:height];
+        
+        completion(filteredImage);
     }];
 }
 

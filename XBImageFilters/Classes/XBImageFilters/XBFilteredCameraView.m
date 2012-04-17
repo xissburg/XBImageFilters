@@ -316,7 +316,18 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         
         GLint targetWidth = portrait? height: width;
         GLint targetHeight = portrait? width: height;
-        GLKMatrix4 contentTransform = portrait? GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1): GLKMatrix4Identity;
+        GLKMatrix4 contentTransform = GLKMatrix4Identity;
+        
+        if (self.cameraPosition == XBCameraPositionBack) {
+            contentTransform = portrait? GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1): GLKMatrix4Identity;
+        }
+        else if (self.cameraPosition == XBCameraPositionFront) {
+            if (portrait) {
+                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1));
+            }
+            else {
+                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI, 0, 0, 1));            }
+        }
         
         UIImage *filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
         

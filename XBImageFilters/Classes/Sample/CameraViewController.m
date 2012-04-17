@@ -40,7 +40,7 @@
         NSLog(@"Error setting shader: %@", [error localizedDescription]);
     }
     
-    self.cameraView.flashMode = XBFlashModeOn;
+    //self.cameraView.flashMode = XBFlashModeOn;
     [self.cameraView startCapturing];
 }
 

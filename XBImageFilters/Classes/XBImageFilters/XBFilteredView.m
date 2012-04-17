@@ -259,6 +259,113 @@ typedef struct {
     _mainTexture = 0;
 }
 
+- (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    GLKMatrix4 oldContentTransform = self.contentTransform;
+    self.contentTransform = contentTransform;
+    UIViewContentMode oldContentMode = self.contentMode;
+    self.contentMode = UIViewContentModeScaleToFill;
+    
+    GLuint mainTexture = [self generateDefaultTextureWithWidth:textureWidth height:textureHeight data:data];
+    GLuint evenPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
+    GLuint evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:evenPassTexture];
+    GLuint oddPassTexture = 0;
+    GLuint oddPassFramebuffer = 0;
+    
+    if (self.programs.count > 1) {
+        oddPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
+        oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:oddPassTexture];
+    }
+    
+    GLuint lastFramebuffer = 0;
+    
+    glViewport(0, 0, targetWidth, targetHeight);
+    
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        
+        if (pass%2 == 0) {
+            glBindFramebuffer(GL_FRAMEBUFFER, evenPassFrambuffer);
+            lastFramebuffer = evenPassFrambuffer;
+        }
+        else {
+            glBindFramebuffer(GL_FRAMEBUFFER, oddPassFramebuffer);
+            lastFramebuffer = oddPassFramebuffer;
+        }
+        
+        // Change the source texture for each pass
+        GLuint sourceTexture = 0;
+        
+        if (pass == 0) { // First pass always uses the original image
+            sourceTexture = mainTexture;
+        }
+        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        [program prepareToDraw];
+        
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        
+        // If it is not the last pass, discard the framebuffer contents
+        if (pass != self.programs.count - 1) {
+            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+        }
+    }
+    
+    UIImage *image = [self imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
+    
+    // Now discard the lastFramebuffer
+    const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+    
+    // Reset texture bindings
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        GLuint sourceTexture = 0;
+        
+        if (pass == 0) { // First pass always uses the original image
+            sourceTexture = self.mainTexture;
+        }
+        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = self.evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = self.oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+    }
+    
+    glDeleteTextures(1, &mainTexture);
+    glDeleteTextures(1, &evenPassTexture);
+    glDeleteFramebuffers(1, &evenPassFrambuffer);
+    glDeleteTextures(1, &oddPassTexture);
+    glDeleteFramebuffers(1, &oddPassFramebuffer);
+    
+    self.contentTransform = oldContentTransform;
+    self.contentMode = oldContentMode;
+    
+#ifdef DEBUG
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        NSLog(@"%d", error);
+    }
+#endif
+    
+    return image;
+}
+
 #pragma mark - Public Methods
 
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error
@@ -347,105 +454,6 @@ typedef struct {
     int width = (int)(self.bounds.size.width * self.contentScaleFactor);
     int height = (int)(self.bounds.size.height * self.contentScaleFactor);
     return [self imageFromFramebuffer:self.framebuffer width:width height:height orientation:orientation];
-}
-
-- (UIImage *)filteredImageWithData:(GLvoid *)data width:(GLint)width height:(GLint)height
-{
-    [EAGLContext setCurrentContext:self.context];
-    
-    GLuint mainTexture = [self generateDefaultTextureWithWidth:width height:height data:data];
-    GLuint evenPassTexture = [self generateDefaultTextureWithWidth:width height:height data:NULL];
-    GLuint evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:evenPassTexture];
-    GLuint oddPassTexture = 0;
-    GLuint oddPassFramebuffer = 0;
-    
-    if (self.programs.count > 1) {
-        oddPassTexture = [self generateDefaultTextureWithWidth:width height:height data:NULL];
-        oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:oddPassTexture];
-    }
-    
-    GLuint lastFramebuffer = 0;
-    
-    glViewport(0, 0, width, height);
-    
-    for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
-        
-        if (pass%2 == 0) {
-            glBindFramebuffer(GL_FRAMEBUFFER, evenPassFrambuffer);
-            lastFramebuffer = evenPassFrambuffer;
-        }
-        else {
-            glBindFramebuffer(GL_FRAMEBUFFER, oddPassFramebuffer);
-            lastFramebuffer = oddPassFramebuffer;
-        }
-        
-        // Change the source texture for each pass
-        GLuint sourceTexture = 0;
-        
-        if (pass == 0) { // First pass always uses the original image
-            sourceTexture = mainTexture;
-        }
-        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
-            sourceTexture = evenPassTexture;
-        }
-        else { // Third pass uses the result of the second, which is number 1, then it's odd
-            sourceTexture = oddPassTexture;
-        }
-        
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
-        
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        [program prepareToDraw];
-        
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        
-        // If it is not the last pass, discard the framebuffer contents
-        if (pass != self.programs.count - 1) {
-            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
-            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
-        }
-    }
-    
-    UIImage *image = [self imageFromFramebuffer:lastFramebuffer width:width height:height orientation:UIImageOrientationDownMirrored];
-    
-    // Now discard the lastFramebuffer
-    const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
-    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
-    
-    // Reset texture bindings
-    for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
-        GLuint sourceTexture = 0;
-        
-        if (pass == 0) { // First pass always uses the original image
-            sourceTexture = self.mainTexture;
-        }
-        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
-            sourceTexture = self.evenPassTexture;
-        }
-        else { // Third pass uses the result of the second, which is number 1, then it's odd
-            sourceTexture = self.oddPassTexture;
-        }
-        
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
-    }
-    
-    glDeleteTextures(1, &mainTexture);
-    glDeleteTextures(1, &evenPassTexture);
-    glDeleteFramebuffers(1, &evenPassFrambuffer);
-    glDeleteTextures(1, &oddPassTexture);
-    glDeleteFramebuffers(1, &oddPassFramebuffer);
-    
-#ifdef DEBUG
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        NSLog(@"%d", error);
-    }
-#endif
-    
-    return image;
 }
 
 - (void)display

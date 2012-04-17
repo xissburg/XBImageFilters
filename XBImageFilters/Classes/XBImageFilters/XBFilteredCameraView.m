@@ -45,6 +45,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @synthesize imageCaptureQuality = _imageCaptureQuality;
 @synthesize flashMode = _flashMode;
 @synthesize torchMode = _torchMode;
+@synthesize photoOrientation = _photoOrientation;
 
 - (void)_XBFilteredCameraViewInit
 {
@@ -55,6 +56,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     self.captureSession = [[AVCaptureSession alloc] init];
     self.videoCaptureQuality = XBCaptureQualityPhoto;
     self.imageCaptureQuality = XBCaptureQualityPhoto;
+    self.photoOrientation = XBPhotoOrientationAuto;
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
@@ -274,6 +276,9 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         }
     }
     
+    imageConnection.videoOrientation = AVCaptureVideoOrientationPortrait;
+    imageConnection.videoMirrored = YES;
+    
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
         
@@ -284,7 +289,36 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
         size_t height = CVPixelBufferGetHeight(imageBuffer);
         
-        UIImage *filteredImage = [self filteredImageWithData:baseAddress width:width height:height];
+        BOOL portrait;
+        
+        if (self.photoOrientation == XBPhotoOrientationPortrait) {
+            portrait = YES;
+        }
+        else if (self.photoOrientation == XBPhotoOrientationLandscape) {
+            portrait = NO;
+        }
+        else if (self.photoOrientation == XBPhotoOrientationAuto) {
+            switch ([[UIDevice currentDevice] orientation]) {
+                case UIDeviceOrientationLandscapeLeft:
+                case UIDeviceOrientationLandscapeRight:
+                case UIDeviceOrientationFaceUp:
+                    portrait = NO;
+                    break;
+                    
+                case UIDeviceOrientationPortrait:
+                case UIDeviceOrientationPortraitUpsideDown:
+                case UIDeviceOrientationFaceDown:
+                case UIDeviceOrientationUnknown:
+                    portrait = YES;
+                    break;
+            }
+        }
+        
+        GLint targetWidth = portrait? height: width;
+        GLint targetHeight = portrait? width: height;
+        GLKMatrix4 contentTransform = portrait? GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1): GLKMatrix4Identity;
+        
+        UIImage *filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
         
         completion(filteredImage);
     }];

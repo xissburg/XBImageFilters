@@ -27,6 +27,12 @@ typedef enum {
     XBTorchModeAuto = 2
 } XBTorchMode;
 
+typedef enum {
+    XBPhotoOrientationAuto = 0, // Determines photo orientation from [UIDevice currentDevice]'s orientation
+    XBPhotoOrientationPortrait = 1,
+    XBPhotoOrientationLandscape = 2
+} XBPhotoOrientation;
+
 extern NSString *const XBCaptureQualityPhoto;
 extern NSString *const XBCaptureQualityHigh;
 extern NSString *const XBCaptureQualityMedium;
@@ -61,6 +67,7 @@ extern NSString *const XBCaptureQuality352x288;
 @property (copy, nonatomic) NSString *imageCaptureQuality;
 @property (assign, nonatomic) XBFlashMode flashMode;
 @property (assign, nonatomic) XBTorchMode torchMode;
+@property (assign, nonatomic) XBPhotoOrientation photoOrientation;
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.

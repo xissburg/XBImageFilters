@@ -14,7 +14,7 @@ Convoluted Gaussian Blur, an example of a multi-pass filter. It uses two fragmen
 
 Real time camera filter. It also allows you to take pictures in `UIImage`s with the filter applied with the `-[XBFilteredView takeScreenshot]` method.
 
-![High Resolution Photo](http://xissburg.com/images/IMG_0296.JPG)
+![High Resolution Photo](http://xissburg.com/images/IMG_0328.JPG)
 
 You can also take high resolution photos with filters. Isn't that awesome?
 

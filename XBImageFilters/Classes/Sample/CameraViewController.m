@@ -84,37 +84,6 @@
 - (IBAction)takeAPictureButtonTouchUpInside:(id)sender 
 {
     [self.cameraView takeAPhotoWithCompletion:^(UIImage *image) {
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-        [self.view addSubview:imageView];
-        imageView.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
-        imageView.contentMode = UIViewContentModeScaleAspectFit;
-        
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, imageView.frame.size.width, 40)];
-        label.textAlignment = UITextAlignmentCenter;
-        label.backgroundColor = [UIColor clearColor];
-        label.textColor = [UIColor whiteColor];
-        label.font = [UIFont systemFontOfSize:18];
-        label.text = @"This is an UIImageView";
-        [imageView addSubview:label];
-        
-        imageView.layer.borderColor = [UIColor darkGrayColor].CGColor;
-        imageView.layer.borderWidth = 2;
-        
-        imageView.transform = CGAffineTransformMakeScale(0.01, 0.01);
-        imageView.alpha = 0.5;
-        
-        [UIView animateWithDuration:0.3 delay:0 options:0 animations:^{
-            imageView.transform = CGAffineTransformMakeScale(1, 1);
-            imageView.alpha = 1;
-        } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.3 delay:4 options:0 animations:^{
-                imageView.transform = CGAffineTransformMakeScale(1.1, 1.1);
-                imageView.alpha = 0;
-            } completion:^(BOOL finished) {
-                [imageView removeFromSuperview];
-            }];
-        }];
-        
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, NULL);
     }];
 }

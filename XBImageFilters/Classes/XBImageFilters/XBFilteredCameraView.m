@@ -289,7 +289,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
         size_t height = CVPixelBufferGetHeight(imageBuffer);
         
-        BOOL portrait;
+        BOOL portrait = YES;
         
         if (self.photoOrientation == XBPhotoOrientationPortrait) {
             portrait = YES;
@@ -330,6 +330,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         }
         
         UIImage *filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+        CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
         
         completion(filteredImage);
     }];

@@ -17,6 +17,8 @@ typedef struct {
     GLKVector2 texCoord;
 } Vertex;
 
+void ImageProviderReleaseData(void *info, const void *data, size_t size);
+
 @interface XBFilteredView ()
 
 @property (strong, nonatomic) EAGLContext *context;
@@ -743,7 +745,7 @@ typedef struct {
     size_t bytesPerRow = width * bitsPerPixel / bitsPerComponent;
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, NULL);
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, ImageProviderReleaseData);
     CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
     CGDataProviderRelease(provider);
     
@@ -755,3 +757,8 @@ typedef struct {
 }
 
 @end
+
+void ImageProviderReleaseData(void *info, const void *data, size_t size)
+{
+    free((void *)data);
+}

@@ -78,6 +78,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 @synthesize evenPassTexture = _evenPassTexture;
 @synthesize oddPassFramebuffer = _oddPassFramebuffer;
 @synthesize evenPassFrambuffer = _evenPassFrambuffer;
+@synthesize maxTextureSize = _maxTextureSize;
 
 /**
  * Actual initializer. Called both in initWithFrame: when creating an instance programatically and in awakeFromNib when creating an instance
@@ -325,7 +326,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         }
     }
     
-    UIImage *image = [self imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
+    UIImage *image = [self _imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
     
     // Now discard the lastFramebuffer
     const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
@@ -364,6 +365,37 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         NSLog(@"%d", error);
     }
 #endif
+    
+    return image;
+}
+
+- (UIImage *)_imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    size_t size = width * height * 4;
+    GLvoid *pixels = malloc(size);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    
+    return [self _imageWithData:pixels width:width height:height orientation:orientation ownsData:YES];
+}
+
+- (UIImage *)_imageWithData:(void *)data width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation ownsData:(BOOL)ownsData
+{
+    size_t size = width * height * 4;
+    size_t bitsPerComponent = 8;
+    size_t bitsPerPixel = 32;
+    size_t bytesPerRow = width * bitsPerPixel / bitsPerComponent;
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, data, size, ownsData? ImageProviderReleaseData: NULL);
+    CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
+    CGDataProviderRelease(provider);
+    
+    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:orientation];
+    CGImageRelease(cgImage);
+    CGColorSpaceRelease(colorSpace);
     
     return image;
 }
@@ -455,7 +487,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     int width = (int)(self.bounds.size.width * self.contentScaleFactor);
     int height = (int)(self.bounds.size.height * self.contentScaleFactor);
-    return [self imageFromFramebuffer:self.framebuffer width:width height:height orientation:orientation];
+    return [self _imageFromFramebuffer:self.framebuffer width:width height:height orientation:orientation];
 }
 
 - (void)display
@@ -465,7 +497,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     for (int pass = 0; pass < self.programs.count; ++pass) {
         GLKProgram *program = [self.programs objectAtIndex:pass];
         
-        if (pass == self.programs.count - 1) { // Last pass, bind framebuffer
+        if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
             glViewport(0, 0, self.viewportWidth, self.viewportHeight);
             glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
         }
@@ -540,6 +572,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
     self.contentTransform = GLKMatrix4Identity;
     self.texCoordTransform = GLKMatrix2Identity;
+    
+    // Get max tex size
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
 }
 
 - (void)destroyGL
@@ -729,31 +764,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     glDeleteRenderbuffers(1, &_colorRenderbuffer);
     self.colorRenderbuffer = 0;
-}
-
-- (UIImage *)imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation
-{
-    [EAGLContext setCurrentContext:self.context];
-    
-    size_t size = width * height * 4;
-    GLvoid *pixels = malloc(size);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-    
-    size_t bitsPerComponent = 8;
-    size_t bitsPerPixel = 32;
-    size_t bytesPerRow = width * bitsPerPixel / bitsPerComponent;
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, pixels, size, ImageProviderReleaseData);
-    CGImageRef cgImage = CGImageCreate(width, height, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpace, bitmapInfo, provider, NULL, FALSE, kCGRenderingIntentDefault);
-    CGDataProviderRelease(provider);
-    
-    UIImage *image = [UIImage imageWithCGImage:cgImage scale:self.contentScaleFactor orientation:orientation];
-    CGImageRelease(cgImage);
-    CGColorSpaceRelease(colorSpace);
-    
-    return image;
 }
 
 @end

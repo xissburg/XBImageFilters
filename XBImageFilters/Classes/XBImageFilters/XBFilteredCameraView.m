@@ -285,7 +285,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
         CVPixelBufferLockBaseAddress(imageBuffer, 0);
         void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
-        // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
+        // Compensate for padding. A small black line will be visible on the right. Adjust the texture coordinate transform to fix this.
         size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
         size_t height = CVPixelBufferGetHeight(imageBuffer);
         
@@ -299,8 +299,44 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         GLint targetWidth = portrait? height: width;
         GLint targetHeight = portrait? width: height;
         GLKMatrix4 contentTransform = [self contentTransformForPhotoOrientation:orientation cameraPosition:self.cameraPosition];
+        UIImage *filteredImage = nil;
         
-        UIImage *filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+        // Resize image if it is above the maximum texture size
+        if (width > self.maxTextureSize || height > self.maxTextureSize) {
+            UIImage *image = [self _imageWithData:baseAddress width:width height:height orientation:UIImageOrientationUp ownsData:NO];
+            
+            size_t newWidth = 0, newHeight = 0;
+            
+            if (width > height) {
+                newWidth = self.maxTextureSize;
+                newHeight = height * self.maxTextureSize / width;
+            }
+            else {
+                newWidth = width * self.maxTextureSize / height;
+                newHeight = self.maxTextureSize;
+            }
+            
+            targetWidth = portrait? newHeight: newWidth;
+            targetHeight = portrait? newWidth: newHeight;
+            
+            CGImageRef CGImage = image.CGImage;
+            size_t bitsPerComponent = 8;
+            size_t bytesPerRow = newWidth * 4;
+            CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+            CGContextRef context = CGBitmapContextCreate(NULL, newWidth, newHeight, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+            CGColorSpaceRelease(colorSpace);
+            // Invert vertically for OpenGL
+            CGContextDrawImage(context, CGRectMake(0, 0, newWidth, newHeight), CGImage);
+            GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
+            
+            filteredImage = [self _filteredImageWithData:textureData textureWidth:newWidth textureHeight:newHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+            
+            CGContextRelease(context);
+        }
+        else {
+            filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+        }
+        
         CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
         
         completion(filteredImage);

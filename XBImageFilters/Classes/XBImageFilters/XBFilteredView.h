@@ -15,6 +15,7 @@
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
 @property (assign, nonatomic) CGSize contentSize; // Content size used to compute the contentMode transform. By default it can be the texture size.
 @property (assign, nonatomic) GLKMatrix2 texCoordTransform;
+@property (readonly, nonatomic) GLint maxTextureSize; // Maximum texture width and height
 
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
@@ -35,6 +36,8 @@
 - (void)_updateTextureWithData:(GLvoid *)textureData;
 - (void)_deleteMainTexture;
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform;
+- (UIImage *)_imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation;
+- (UIImage *)_imageWithData:(void *)data width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation ownsData:(BOOL)ownsData; // ownsData YES means the data buffer will be free()'d when the image is freed.
 
 @end
 

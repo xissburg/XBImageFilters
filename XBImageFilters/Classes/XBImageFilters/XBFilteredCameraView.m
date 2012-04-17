@@ -289,51 +289,105 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
         size_t height = CVPixelBufferGetHeight(imageBuffer);
         
-        BOOL portrait = YES;
+        XBPhotoOrientation orientation = self.photoOrientation;
         
-        if (self.photoOrientation == XBPhotoOrientationPortrait) {
-            portrait = YES;
-        }
-        else if (self.photoOrientation == XBPhotoOrientationLandscape) {
-            portrait = NO;
-        }
-        else if (self.photoOrientation == XBPhotoOrientationAuto) {
-            switch ([[UIDevice currentDevice] orientation]) {
-                case UIDeviceOrientationLandscapeLeft:
-                case UIDeviceOrientationLandscapeRight:
-                case UIDeviceOrientationFaceUp:
-                    portrait = NO;
-                    break;
-                    
-                case UIDeviceOrientationPortrait:
-                case UIDeviceOrientationPortraitUpsideDown:
-                case UIDeviceOrientationFaceDown:
-                case UIDeviceOrientationUnknown:
-                    portrait = YES;
-                    break;
-            }
+        if (orientation == XBPhotoOrientationAuto) {
+            orientation = [self photoOrientationForDeviceOrientation];
         }
         
+        BOOL portrait = orientation == XBPhotoOrientationPortrait || orientation == XBPhotoOrientationPortraitUpsideDown;
         GLint targetWidth = portrait? height: width;
         GLint targetHeight = portrait? width: height;
-        GLKMatrix4 contentTransform = GLKMatrix4Identity;
-        
-        if (self.cameraPosition == XBCameraPositionBack) {
-            contentTransform = portrait? GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1): GLKMatrix4Identity;
-        }
-        else if (self.cameraPosition == XBCameraPositionFront) {
-            if (portrait) {
-                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1));
-            }
-            else {
-                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI, 0, 0, 1));            }
-        }
+        GLKMatrix4 contentTransform = [self contentTransformForPhotoOrientation:orientation cameraPosition:self.cameraPosition];
         
         UIImage *filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
         CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
         
         completion(filteredImage);
     }];
+}
+
+- (XBPhotoOrientation)photoOrientationForDeviceOrientation
+{
+    XBPhotoOrientation orientation = XBPhotoOrientationPortrait;
+    
+    switch ([[UIDevice currentDevice] orientation]) {
+        case UIDeviceOrientationLandscapeLeft:
+            orientation = XBPhotoOrientationLandscapeLeft;
+            break;
+            
+        case UIDeviceOrientationLandscapeRight:
+            orientation = XBPhotoOrientationLandscapeRight;
+            break;
+            
+        case UIDeviceOrientationPortrait:
+            orientation = XBPhotoOrientationPortrait;
+            break;
+            
+        case UIDeviceOrientationPortraitUpsideDown:
+            orientation = XBPhotoOrientationPortraitUpsideDown;
+            break;
+            
+        case UIDeviceOrientationFaceDown:
+        case UIDeviceOrientationFaceUp:
+        case UIDeviceOrientationUnknown:
+            orientation = XBPhotoOrientationPortrait;
+            break;
+    }
+    
+    return orientation;
+}
+
+- (GLKMatrix4)contentTransformForPhotoOrientation:(XBPhotoOrientation)photoOrientation cameraPosition:(XBCameraPosition)cameraPosition
+{
+     GLKMatrix4 contentTransform = GLKMatrix4Identity;
+    
+    if (self.cameraPosition == XBCameraPositionBack) {
+        switch (photoOrientation) {
+            case XBPhotoOrientationPortrait:
+                contentTransform = GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1);
+                break;
+                
+            case XBPhotoOrientationPortraitUpsideDown:
+                contentTransform = GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1);
+                break;
+                
+            case XBPhotoOrientationLandscapeLeft:
+                contentTransform = GLKMatrix4Identity;
+                break;
+                
+            case XBPhotoOrientationLandscapeRight:
+                contentTransform = GLKMatrix4MakeRotation(M_PI, 0, 0, 1);
+                break;
+                
+            default:
+                break;
+        }
+    }
+    else if (self.cameraPosition == XBCameraPositionFront) {
+        switch (photoOrientation) {
+            case XBPhotoOrientationPortrait:
+                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1));
+                break;
+                
+            case XBPhotoOrientationPortraitUpsideDown:
+                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1));
+                break;
+                
+            case XBPhotoOrientationLandscapeLeft:
+                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI, 0, 0, 1));
+                break;
+                
+            case XBPhotoOrientationLandscapeRight:
+                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI, 0, 0, 1));;
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+    return contentTransform;
 }
 
 #pragma mark - Private Methods

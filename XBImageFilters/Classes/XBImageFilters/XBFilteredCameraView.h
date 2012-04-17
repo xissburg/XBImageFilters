@@ -30,7 +30,9 @@ typedef enum {
 typedef enum {
     XBPhotoOrientationAuto = 0, // Determines photo orientation from [UIDevice currentDevice]'s orientation
     XBPhotoOrientationPortrait = 1,
-    XBPhotoOrientationLandscape = 2
+    XBPhotoOrientationPortraitUpsideDown = 2,
+    XBPhotoOrientationLandscapeLeft = 3,
+    XBPhotoOrientationLandscapeRight = 4,
 } XBPhotoOrientation;
 
 extern NSString *const XBCaptureQualityPhoto;

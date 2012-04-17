@@ -146,6 +146,9 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
     
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    
     GLint linked = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &linked);
     if (linked == 0) {

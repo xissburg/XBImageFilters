@@ -379,7 +379,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
                 break;
                 
             case XBPhotoOrientationLandscapeRight:
-                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI, 0, 0, 1));;
+                contentTransform = GLKMatrix4MakeScale(-1, 1, 1);
                 break;
                 
             default:

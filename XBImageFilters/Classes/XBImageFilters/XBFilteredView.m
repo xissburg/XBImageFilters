@@ -136,37 +136,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         [self createFramebuffer];
     }
     
-    switch (self.contentMode) {
-        case UIViewContentModeScaleToFill:
-            self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
-            break;
-            
-        case UIViewContentModeScaleAspectFit:
-            self.contentModeTransform = [self transformForAspectFitOrFill:YES];
-            break;
-            
-        case UIViewContentModeScaleAspectFill:
-            self.contentModeTransform = [self transformForAspectFitOrFill:NO];
-            break;
-            
-        case UIViewContentModeCenter:
-        case UIViewContentModeBottom:
-        case UIViewContentModeTop:
-        case UIViewContentModeLeft:
-        case UIViewContentModeRight:
-        case UIViewContentModeBottomLeft:
-        case UIViewContentModeBottomRight:
-        case UIViewContentModeTopLeft:
-        case UIViewContentModeTopRight:
-            self.contentModeTransform = [self transformForPositionalContentMode:self.contentMode];
-            break;
-            
-        case UIViewContentModeRedraw:
-            break;
-            
-        default:
-            break;
-    }
+    [self refreshContentModeTransform];
     
     self.previousBounds = self.bounds;
     [self display];
@@ -209,6 +179,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     CGFloat r, g, b, a;
     [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
+}
+
+- (void)setContentMode:(UIViewContentMode)contentMode
+{
+    [super setContentMode:contentMode];
+    [self refreshContentModeTransform];
 }
 
 #pragma mark - Protected Methods
@@ -764,6 +740,41 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     glDeleteRenderbuffers(1, &_colorRenderbuffer);
     self.colorRenderbuffer = 0;
+}
+
+- (void)refreshContentModeTransform
+{
+    switch (self.contentMode) {
+        case UIViewContentModeScaleToFill:
+            self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
+            break;
+            
+        case UIViewContentModeScaleAspectFit:
+            self.contentModeTransform = [self transformForAspectFitOrFill:YES];
+            break;
+            
+        case UIViewContentModeScaleAspectFill:
+            self.contentModeTransform = [self transformForAspectFitOrFill:NO];
+            break;
+            
+        case UIViewContentModeCenter:
+        case UIViewContentModeBottom:
+        case UIViewContentModeTop:
+        case UIViewContentModeLeft:
+        case UIViewContentModeRight:
+        case UIViewContentModeBottomLeft:
+        case UIViewContentModeBottomRight:
+        case UIViewContentModeTopLeft:
+        case UIViewContentModeTopRight:
+            self.contentModeTransform = [self transformForPositionalContentMode:self.contentMode];
+            break;
+            
+        case UIViewContentModeRedraw:
+            break;
+            
+        default:
+            break;
+    }
 }
 
 @end

@@ -76,7 +76,8 @@
              [[NSArray alloc] initWithObjects:hBlurPath, nil],
              [[NSArray alloc] initWithObjects:vBlurPath, nil],
              [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, nil],
-             [[NSArray alloc] initWithObjects:luminancePath, hBlurPath, vBlurPath, nil], nil];
+             [[NSArray alloc] initWithObjects:luminancePath, hBlurPath, vBlurPath, nil],
+             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, discretizePath, nil], nil];
 }
 
 #pragma mark - Button Actions

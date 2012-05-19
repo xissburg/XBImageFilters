@@ -26,6 +26,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (strong, nonatomic) AVCaptureVideoDataOutput *videoDataOutput;
 @property (strong, nonatomic) AVCaptureStillImageOutput *stillImageOutput;
 @property (assign, nonatomic) size_t videoWidth, videoHeight;
+@property (assign, nonatomic) BOOL shouldStartCapturingWhenBecomesActive;
 
 - (void)setupOutputs;
 
@@ -46,12 +47,14 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @synthesize flashMode = _flashMode;
 @synthesize torchMode = _torchMode;
 @synthesize photoOrientation = _photoOrientation;
+@synthesize shouldStartCapturingWhenBecomesActive = _shouldStartCapturingWhenBecomesActive;
 
 - (void)_XBFilteredCameraViewInit
 {
     self.contentMode = UIViewContentModeScaleAspectFill;
     
     self.videoHeight = self.videoWidth = 0;
+    self.shouldStartCapturingWhenBecomesActive = NO;
     
     self.captureSession = [[AVCaptureSession alloc] init];
     self.videoCaptureQuality = XBCaptureQualityPhoto;
@@ -62,6 +65,9 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     self.cameraPosition = XBCameraPositionBack;
     
     [self setupOutputs];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:[UIApplication sharedApplication]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:[UIApplication sharedApplication]];
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -81,6 +87,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self stopCapturing];
     [self removeObservers];
 }
@@ -554,6 +561,22 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     }
     
     CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+}
+
+#pragma mark - Notifications
+
+- (void)applicationDidEnterBackgroundNotification:(NSNotification *)notification
+{
+    self.shouldStartCapturingWhenBecomesActive = self.captureSession.running;
+    [self stopCapturing];
+    glFinish();
+}
+
+- (void)applicationDidBecomeActiveNotification:(NSNotification *)notification
+{
+    if (self.shouldStartCapturingWhenBecomesActive) {
+        [self startCapturing];
+    }
 }
 
 @end

@@ -70,12 +70,16 @@ extern NSString *const XBCaptureQuality352x288;
 @property (assign, nonatomic) XBFlashMode flashMode;
 @property (assign, nonatomic) XBTorchMode torchMode;
 @property (assign, nonatomic) XBPhotoOrientation photoOrientation;
+@property (nonatomic, readonly) BOOL hasTorch;
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.
  */
 - (void)startCapturing;
 - (void)stopCapturing;
+
+- (BOOL)hasCameraAtPosition:(XBCameraPosition)cameraPosition;
+- (void)toggleTorch;
 
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *image))completion;
 

@@ -251,6 +251,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self.device unlockForConfiguration];
 }
 
+- (BOOL)hasTorch
+{
+    return [self.device hasTorch];
+}
+
 #pragma mark - Methods
 
 - (void)startCapturing
@@ -263,6 +268,25 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 {
     [self.videoDataOutput setSampleBufferDelegate:nil queue:NULL];
     [self.captureSession stopRunning];
+}
+
+- (BOOL)hasCameraAtPosition:(XBCameraPosition)cameraPosition
+{
+    NSArray *devices = [AVCaptureDevice devices];
+    for (AVCaptureDevice *device in devices) {
+        if ([device hasMediaType:AVMediaTypeVideo] && 
+            ((device.position == AVCaptureDevicePositionBack && cameraPosition == XBCameraPositionBack) || 
+             (device.position == AVCaptureDevicePositionFront && cameraPosition == XBCameraPositionFront))) {
+                return YES;
+        }
+    }
+    
+    return NO;
+}
+
+- (void)toggleTorch
+{
+    self.torchMode = self.torchMode == XBTorchModeOff? XBTorchModeOn: XBTorchModeOff;
 }
 
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *))completion

@@ -154,6 +154,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self.device addObserver:self forKeyPath:@"adjustingWhiteBalance" options:0 context:NULL];
 }
 
+- (BOOL)focusPointSupported
+{
+    return self.device.focusPointOfInterestSupported;
+}
+
 - (CGPoint)focusPoint
 {
     return CGPointMake((1 - self.device.focusPointOfInterest.y)*self.bounds.size.width, self.device.focusPointOfInterest.x*self.bounds.size.height);
@@ -161,6 +166,10 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)setFocusPoint:(CGPoint)focusPoint
 {
+    if (!self.focusPointSupported) {
+        return;
+    }
+    
     NSError *error = nil;
     if (![self.device lockForConfiguration:&error]) {
         NSLog(@"XBFilteredCameraView: Failed to set focus point: %@", [error localizedDescription]);
@@ -173,6 +182,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self.device unlockForConfiguration];
 }
 
+- (BOOL)exposurePointSupported
+{
+    return self.device.exposurePointOfInterestSupported;
+}
+
 - (CGPoint)exposurePoint
 {
     return CGPointMake((1 - self.device.exposurePointOfInterest.y)*self.bounds.size.width, self.device.exposurePointOfInterest.x*self.bounds.size.height);
@@ -180,6 +194,10 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)setExposurePoint:(CGPoint)exposurePoint
 {
+    if (!self.exposurePointSupported) {
+        return;
+    }
+    
     NSError *error = nil;
     if (![self.device lockForConfiguration:&error]) {
         NSLog(@"XBFilteredCameraView: Failed to set exposure point: %@", [error localizedDescription]);

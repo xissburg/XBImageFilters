@@ -143,13 +143,13 @@
 {
     if (tgr.state == UIGestureRecognizerStateRecognized) {
         CGPoint location = [tgr locationInView:self.cameraView];
-        if (self.cameraView.cameraPosition == XBCameraPositionBack) {
-            self.cameraView.focusPoint = location;
-        }
-        
+        self.cameraView.focusPoint = location;
         self.cameraView.exposurePoint = location;
-        self.cameraTargetView.center = self.cameraView.exposurePoint;
-        [self.cameraTargetView showAnimated:YES];
+        
+        if (self.cameraView.exposurePointSupported || self.cameraView.focusPointSupported) {
+            self.cameraTargetView.center = self.cameraView.exposurePoint;
+            [self.cameraTargetView showAnimated:YES];
+        }
     }
 }
 

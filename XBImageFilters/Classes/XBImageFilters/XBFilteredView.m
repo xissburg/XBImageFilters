@@ -21,7 +21,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 @interface XBFilteredView ()
 
-@property (strong, nonatomic) EAGLContext *context;
 @property (assign, nonatomic) GLuint framebuffer;
 @property (assign, nonatomic) GLuint colorRenderbuffer;
 @property (assign, nonatomic) GLint viewportWidth;
@@ -89,7 +88,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
     self.layer.opaque = YES;
 
-    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
     self.previousBounds = CGRectZero;
     
@@ -119,7 +118,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     [EAGLContext setCurrentContext:self.context];
     [self destroyGL];
-    self.context = nil;
+    _context = nil;
     [EAGLContext setCurrentContext:nil];
 }
 
@@ -229,6 +228,53 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glBindTexture(GL_TEXTURE_2D, 0);
     
     [self display];
+}
+
+- (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
+    size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    glActiveTexture(GL_TEXTURE0);
+    CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0, texture);
+    if (ret != kCVReturnSuccess) {
+        NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
+    }
+    
+    self.mainTexture = CVOpenGLESTextureGetName(*texture);
+    
+    if (width != self.textureWidth || height != self.textureHeight) {
+        [self destroyEvenPass];
+        [self destroyOddPass];
+        
+        self.textureWidth = width;
+        self.textureHeight = height;
+        
+        // Resize the even and odd textures because their size have to match that of the mainTexture
+        if (self.programs.count >= 2) {
+            [self setupEvenPass];
+        }
+        
+        if (self.programs.count > 2) {
+            [self setupOddPass];
+        }
+    }
+    
+    glBindTexture(CVOpenGLESTextureGetTarget(*texture), CVOpenGLESTextureGetName(*texture));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    // Update the texture in the first shader
+    if (self.programs.count > 0) {
+        GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+        [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
+    }
+    
+    // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
+    [self setNeedsLayout];
 }
 
 - (void)_deleteMainTexture
@@ -349,6 +395,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     [EAGLContext setCurrentContext:self.context];
     
+    glFlush();
     size_t size = width * height * 4;
     GLvoid *pixels = malloc(size);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);

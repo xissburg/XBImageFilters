@@ -25,6 +25,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (strong, nonatomic) AVCaptureDeviceInput *input;
 @property (strong, nonatomic) AVCaptureVideoDataOutput *videoDataOutput;
 @property (strong, nonatomic) AVCaptureStillImageOutput *stillImageOutput;
+@property (assign, nonatomic) CVOpenGLESTextureCacheRef videoTextureCache;
+@property (assign, nonatomic) CVOpenGLESTextureRef videoMainTexture;
 @property (assign, nonatomic) size_t videoWidth, videoHeight;
 @property (assign, nonatomic) BOOL shouldStartCapturingWhenBecomesActive;
 
@@ -39,6 +41,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @synthesize input = _input;
 @synthesize videoDataOutput = _videoDataOutput;
 @synthesize stillImageOutput = _stillImageOutput;
+@synthesize videoTextureCache = _videoTextureCache;
+@synthesize videoMainTexture = _videoMainTexture;
 @synthesize videoWidth = _videoWidth, videoHeight = _videoHeight;
 @synthesize delegate = _delegate;
 @synthesize cameraPosition = _cameraPosition;
@@ -51,6 +55,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)_XBFilteredCameraViewInit
 {
+    [EAGLContext setCurrentContext:self.context];
     self.contentMode = UIViewContentModeScaleAspectFill;
     
     self.videoHeight = self.videoWidth = 0;
@@ -65,6 +70,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     self.cameraPosition = XBCameraPositionBack;
     
     [self setupOutputs];
+    
+    CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)self.context, NULL, &_videoTextureCache);
+    if (ret != kCVReturnSuccess) {
+        NSLog(@"Error at CVOpenGLESTextureCacheCreate: %d", ret);
+    }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:[UIApplication sharedApplication]];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification:) name:UIApplicationDidBecomeActiveNotification object:[UIApplication sharedApplication]];
@@ -90,6 +100,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self stopCapturing];
     [self removeObservers];
+    [self cleanUpTextures];
+    CFRelease(self.videoTextureCache);
 }
 
 #pragma mark - Properties
@@ -295,7 +307,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         if ([device hasMediaType:AVMediaTypeVideo] && 
             ((device.position == AVCaptureDevicePositionBack && cameraPosition == XBCameraPositionBack) || 
              (device.position == AVCaptureDevicePositionFront && cameraPosition == XBCameraPositionFront))) {
-                return YES;
+            return YES;
         }
     }
     
@@ -475,6 +487,16 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     return contentTransform;
 }
 
+- (void)cleanUpTextures
+{
+    if (self.videoMainTexture != NULL) {
+        CFRelease(self.videoMainTexture);
+        self.videoMainTexture = NULL;
+    }
+    
+    CVOpenGLESTextureCacheFlush(self.videoTextureCache, 0);
+}
+
 #pragma mark - Private Methods
 
 - (void)setupOutputs
@@ -583,9 +605,10 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    [EAGLContext setCurrentContext:self.context];
+    
+    [self cleanUpTextures];
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-    CVPixelBufferLockBaseAddress(imageBuffer, 0);
-    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
     // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
     size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t height = CVPixelBufferGetHeight(imageBuffer);
@@ -596,13 +619,9 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         self.contentSize = CGSizeMake(width, height);
         float ratio = (float)CVPixelBufferGetWidth(imageBuffer)/width;
         self.texCoordTransform = (GLKMatrix2){ratio, 0, 0, 1}; // Apply a horizontal stretch to hide the row padding
-        [self _setTextureData:baseAddress width:self.videoWidth height:self.videoHeight];
-    }
-    else {
-        [self _updateTextureWithData:baseAddress];
     }
     
-    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    [self _setTextureDataWithTextureCache:self.videoTextureCache texture:&_videoMainTexture imageBuffer:imageBuffer];
 }
 
 #pragma mark - Notifications

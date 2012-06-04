@@ -9,6 +9,8 @@
 #import "XBFilteredView.h"
 #import "GLKProgram.h"
 #import <QuartzCore/QuartzCore.h>
+#import <mach/host_info.h>
+#import <mach/mach.h>
 
 const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
 
@@ -18,6 +20,7 @@ typedef struct {
 } Vertex;
 
 void ImageProviderReleaseData(void *info, const void *data, size_t size);
+float pagesToMB(int pages);
 
 @interface XBFilteredView ()
 
@@ -284,6 +287,127 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     _mainTexture = 0;
 }
 
+- (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    size_t textureWidth = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    size_t textureHeight = CVPixelBufferGetHeight(imageBuffer);
+    CVOpenGLESTextureRef texture;
+    
+    GLKMatrix4 oldContentTransform = self.contentTransform;
+    self.contentTransform = contentTransform;
+    UIViewContentMode oldContentMode = self.contentMode;
+    self.contentMode = UIViewContentModeScaleToFill;
+    
+    glActiveTexture(GL_TEXTURE0);
+    CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, textureWidth, textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
+    if (ret != kCVReturnSuccess) {
+        NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
+    }
+    
+    GLuint mainTexture = CVOpenGLESTextureGetName(texture);
+    GLuint evenPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
+    GLuint evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:evenPassTexture];
+    GLuint oddPassTexture = 0;
+    GLuint oddPassFramebuffer = 0;
+    
+    if (self.programs.count > 1) {
+        oddPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
+        oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:oddPassTexture];
+    }
+    
+    GLuint lastFramebuffer = 0;
+    
+    glViewport(0, 0, targetWidth, targetHeight);
+    
+    glBindTexture(CVOpenGLESTextureGetTarget(texture), CVOpenGLESTextureGetName(texture));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        
+        if (pass%2 == 0) {
+            glBindFramebuffer(GL_FRAMEBUFFER, evenPassFrambuffer);
+            lastFramebuffer = evenPassFrambuffer;
+        }
+        else {
+            glBindFramebuffer(GL_FRAMEBUFFER, oddPassFramebuffer);
+            lastFramebuffer = oddPassFramebuffer;
+        }
+        
+        // Change the source texture for each pass
+        GLuint sourceTexture = 0;
+        
+        if (pass == 0) { // First pass always uses the original image
+            sourceTexture = mainTexture;
+        }
+        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        [program prepareToDraw];
+        
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        
+        // If it is not the last pass, discard the framebuffer contents
+        if (pass != self.programs.count - 1) {
+            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+        }
+    }
+    
+    glFlush();
+    
+    CFRelease(texture);
+    CVOpenGLESTextureCacheFlush(textureCache, 0);
+    
+    UIImage *image = [self _imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
+    
+    glDeleteTextures(1, &evenPassTexture);
+    glDeleteFramebuffers(1, &evenPassFrambuffer);
+    glDeleteTextures(1, &oddPassTexture);
+    glDeleteFramebuffers(1, &oddPassFramebuffer);
+    
+    // Reset texture bindings
+    for (int pass = 0; pass < self.programs.count; ++pass) {
+        GLKProgram *program = [self.programs objectAtIndex:pass];
+        GLuint sourceTexture = 0;
+        
+        if (pass == 0) { // First pass always uses the original image
+            sourceTexture = self.mainTexture;
+        }
+        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
+            sourceTexture = self.evenPassTexture;
+        }
+        else { // Third pass uses the result of the second, which is number 1, then it's odd
+            sourceTexture = self.oddPassTexture;
+        }
+        
+        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+    }
+    
+    self.contentTransform = oldContentTransform;
+    self.contentMode = oldContentMode;
+    
+#ifdef DEBUG
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        NSLog(@"%d", error);
+    }
+#endif
+    
+    return image;
+}
+
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
     [EAGLContext setCurrentContext:self.context];
@@ -348,11 +472,16 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         }
     }
     
+    glFlush();
+    
+    glDeleteTextures(1, &mainTexture);
+    
     UIImage *image = [self _imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
     
-    // Now discard the lastFramebuffer
-    const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
-    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+    glDeleteTextures(1, &evenPassTexture);
+    glDeleteFramebuffers(1, &evenPassFrambuffer);
+    glDeleteTextures(1, &oddPassTexture);
+    glDeleteFramebuffers(1, &oddPassFramebuffer);
     
     // Reset texture bindings
     for (int pass = 0; pass < self.programs.count; ++pass) {
@@ -372,12 +501,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
     }
     
-    glDeleteTextures(1, &mainTexture);
-    glDeleteTextures(1, &evenPassTexture);
-    glDeleteFramebuffers(1, &evenPassFrambuffer);
-    glDeleteTextures(1, &oddPassTexture);
-    glDeleteFramebuffers(1, &oddPassFramebuffer);
-    
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
     
@@ -395,7 +518,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     [EAGLContext setCurrentContext:self.context];
     
-    glFlush();
     size_t size = width * height * 4;
     GLvoid *pixels = malloc(size);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -554,6 +676,29 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         NSLog(@"%d", error);
     }
 #endif
+}
+
+- (NSString *)memoryStatus
+{
+    // Code by Noel Llopis
+	vm_statistics_data_t vmStats;
+	mach_msg_type_number_t infoCount = HOST_VM_INFO_COUNT;
+	host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vmStats, &infoCount);
+    
+	const int totalPages = vmStats.wire_count + vmStats.active_count + vmStats.inactive_count + vmStats.free_count;
+	const int availablePages = vmStats.free_count;
+	const int activePages = vmStats.active_count;
+	const int wiredPages = vmStats.wire_count;
+	const int purgeablePages = vmStats.purgeable_count;
+    
+	NSMutableString *txt = [[NSMutableString alloc] initWithCapacity:512];
+	[txt appendFormat:@"\nTotal: %d (%.2fMB)", totalPages, pagesToMB(totalPages)];
+	[txt appendFormat:@"\nAvailable: %d (%.2fMB)", availablePages, pagesToMB(availablePages)];
+	[txt appendFormat:@"\nActive: %d (%.2fMB)", activePages, pagesToMB(activePages)];
+	[txt appendFormat:@"\nWired: %d (%.2fMB)", wiredPages, pagesToMB(wiredPages)];
+	[txt appendFormat:@"\nPurgeable: %d (%.2fMB)", purgeablePages, pagesToMB(purgeablePages)];
+    
+    return txt;
 }
 
 #pragma mark - Private Methods
@@ -826,7 +971,14 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 @end
 
+#pragma mark - Functions
+
 void ImageProviderReleaseData(void *info, const void *data, size_t size)
 {
     free((void *)data);
+}
+
+float pagesToMB(int pages)
+{
+    return pages*VM_PAGE_SIZE/1024.f/1024.f;
 }

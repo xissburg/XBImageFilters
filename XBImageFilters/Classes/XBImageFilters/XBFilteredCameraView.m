@@ -344,8 +344,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
         
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
-        CVPixelBufferLockBaseAddress(imageBuffer, 0);
-        void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+        
         // Compensate for padding. A small black line will be visible on the right. Adjust the texture coordinate transform to fix this.
         size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
         size_t height = CVPixelBufferGetHeight(imageBuffer);
@@ -364,7 +363,9 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         
         // Resize image if it is above the maximum texture size
         if (width > self.maxTextureSize || height > self.maxTextureSize) {
+            void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
             UIImage *image = [self _imageWithData:baseAddress width:width height:height orientation:UIImageOrientationUp ownsData:NO];
+            CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
             
             size_t newWidth = 0, newHeight = 0;
             
@@ -395,10 +396,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             CGContextRelease(context);
         }
         else {
-            filteredImage = [self _filteredImageWithData:baseAddress textureWidth:width textureHeight:height targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+            filteredImage = [self _filteredImageWithTextureCache:self.videoTextureCache imageBuffer:imageBuffer targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
         }
-        
-        CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
         
         completion(filteredImage);
     }];

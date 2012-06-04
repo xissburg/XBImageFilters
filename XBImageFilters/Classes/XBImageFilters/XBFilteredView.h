@@ -32,12 +32,18 @@
  */
 - (void)display;
 
+/*
+ * Returns an string containing memory usage information.
+ */
+- (NSString *)memoryStatus;
+
 /* These methods are conceptually protected and should not be called directly. They are intended to be called by subclasses. */
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height;
 - (void)_updateTextureWithData:(GLvoid *)textureData;
 - (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer;
 - (void)_deleteMainTexture;
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform;
+- (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform;
 - (UIImage *)_imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation;
 - (UIImage *)_imageWithData:(void *)data width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation ownsData:(BOOL)ownsData; // ownsData YES means the data buffer will be free()'d when the image is freed.
 

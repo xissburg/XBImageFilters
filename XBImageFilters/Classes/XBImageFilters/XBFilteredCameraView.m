@@ -363,6 +363,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         
         // Resize image if it is above the maximum texture size
         if (width > self.maxTextureSize || height > self.maxTextureSize) {
+            CVPixelBufferLockBaseAddress(imageBuffer, 0);
             void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
             UIImage *image = [self _imageWithData:baseAddress width:width height:height orientation:UIImageOrientationUp ownsData:NO];
             CVPixelBufferUnlockBaseAddress(imageBuffer, 0);

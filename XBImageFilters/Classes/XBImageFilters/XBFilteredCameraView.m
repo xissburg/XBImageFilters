@@ -622,6 +622,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     }
     
     [self _setTextureDataWithTextureCache:self.videoTextureCache texture:&_videoMainTexture imageBuffer:imageBuffer];
+    [self display];
 }
 
 #pragma mark - Notifications

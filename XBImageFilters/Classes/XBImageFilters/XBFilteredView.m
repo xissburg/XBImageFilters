@@ -161,7 +161,7 @@ float pagesToMB(int pages);
 - (void)setContentSize:(CGSize)contentSize
 {
     _contentSize = contentSize;
-    [self refreshContentTransform];
+    [self refreshContentModeTransform];
 }
 
 - (void)setTexCoordTransform:(GLKMatrix2)texCoordTransform
@@ -196,20 +196,30 @@ float pagesToMB(int pages);
     [EAGLContext setCurrentContext:self.context];
     
     glDeleteTextures(1, &_mainTexture);
-    [self destroyEvenPass];
-    [self destroyOddPass];
     
-    self.textureWidth = width;
-    self.textureHeight = height;
-    self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
-    
-    // Resize the even and odd textures because their size have to match that of the mainTexture
-    if (self.programs.count >= 2) {
-        [self setupEvenPass];
+    if (width != self.textureWidth || height != self.textureHeight) {
+        [self destroyEvenPass];
+        [self destroyOddPass];
+        
+        self.textureWidth = width;
+        self.textureHeight = height;
+        
+        self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
+        
+        // Resize the even and odd textures because their size have to match that of the mainTexture
+        if (self.programs.count >= 2) {
+            [self setupEvenPass];
+        }
+        
+        if (self.programs.count > 2) {
+            [self setupOddPass];
+        }
+        
+        // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
+        [self refreshContentTransform];
     }
-    
-    if (self.programs.count > 2) {
-        [self setupOddPass];
+    else {
+        [self _updateTextureWithData:textureData];
     }
     
     // Update the texture in the first shader
@@ -217,9 +227,6 @@ float pagesToMB(int pages);
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
     }
-    
-    // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
-    [self setNeedsLayout];
 }
 
 - (void)_updateTextureWithData:(GLvoid *)textureData
@@ -229,8 +236,6 @@ float pagesToMB(int pages);
     glBindTexture(GL_TEXTURE_2D, self.mainTexture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.textureWidth, self.textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
     glBindTexture(GL_TEXTURE_2D, 0);
-    
-    [self display];
 }
 
 - (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer
@@ -241,13 +246,10 @@ float pagesToMB(int pages);
     size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t height = CVPixelBufferGetHeight(imageBuffer);
     
-    glActiveTexture(GL_TEXTURE0);
     CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0, texture);
     if (ret != kCVReturnSuccess) {
         NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
     }
-    
-    self.mainTexture = CVOpenGLESTextureGetName(*texture);
     
     if (width != self.textureWidth || height != self.textureHeight) {
         [self destroyEvenPass];
@@ -264,6 +266,9 @@ float pagesToMB(int pages);
         if (self.programs.count > 2) {
             [self setupOddPass];
         }
+        
+        // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
+        [self refreshContentTransform];
     }
     
     glBindTexture(CVOpenGLESTextureGetTarget(*texture), CVOpenGLESTextureGetName(*texture));
@@ -271,13 +276,11 @@ float pagesToMB(int pages);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     // Update the texture in the first shader
-    if (self.programs.count > 0) {
+    if (self.programs.count > 0 && CVOpenGLESTextureGetName(*texture) != self.mainTexture) {
+        self.mainTexture = CVOpenGLESTextureGetName(*texture);
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
     }
-    
-    // Force an update on the contentTransform since it depends on the textureWidth and textureHeight
-    [self setNeedsLayout];
 }
 
 - (void)_deleteMainTexture
@@ -300,7 +303,6 @@ float pagesToMB(int pages);
     UIViewContentMode oldContentMode = self.contentMode;
     self.contentMode = UIViewContentModeScaleToFill;
     
-    glActiveTexture(GL_TEXTURE0);
     CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, textureWidth, textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
     if (ret != kCVReturnSuccess) {
         NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
@@ -395,6 +397,8 @@ float pagesToMB(int pages);
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
     }
     
+    glViewport(0, 0, self.viewportWidth, self.viewportHeight);
+    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
     
@@ -501,6 +505,8 @@ float pagesToMB(int pages);
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
     }
     
+    glViewport(0, 0, self.viewportWidth, self.viewportHeight);
+    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
     
@@ -618,8 +624,6 @@ float pagesToMB(int pages);
     
     self.programs = [programs copy];
     
-    [self setNeedsLayout];
-    
     return YES;
 }
 
@@ -642,17 +646,19 @@ float pagesToMB(int pages);
     for (int pass = 0; pass < self.programs.count; ++pass) {
         GLKProgram *program = [self.programs objectAtIndex:pass];
         
-        if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
-            glViewport(0, 0, self.viewportWidth, self.viewportHeight);
-            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
-        }
-        else if (pass%2 == 0) {
-            glViewport(0, 0, self.textureWidth, self.textureHeight);
-            glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
-        }
-        else {
-            glViewport(0, 0, self.textureWidth, self.textureHeight);
-            glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+        if (self.programs.count > 1) {
+            if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
+                glViewport(0, 0, self.viewportWidth, self.viewportHeight);
+                glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+            }
+            else if (pass%2 == 0) {
+                glViewport(0, 0, self.textureWidth, self.textureHeight);
+                glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+            }
+            else {
+                glViewport(0, 0, self.textureWidth, self.textureHeight);
+                glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+            }
         }
         
         glClear(GL_COLOR_BUFFER_BIT);
@@ -743,6 +749,8 @@ float pagesToMB(int pages);
     
     // Get max tex size
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
+    
+    glActiveTexture(GL_TEXTURE0);
 }
 
 - (void)destroyGL
@@ -921,6 +929,7 @@ float pagesToMB(int pages);
     }
     
     glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
+    glViewport(0, 0, self.viewportWidth, self.viewportHeight);
     
     return YES;
 }

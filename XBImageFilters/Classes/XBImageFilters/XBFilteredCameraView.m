@@ -71,6 +71,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     self.videoHeight = self.videoWidth = 0;
     self.shouldStartCapturingWhenBecomesActive = NO;
+    self.rendering = YES;
     
     self.captureSession = [[AVCaptureSession alloc] init];
     self.videoCaptureQuality = XBCaptureQualityPhoto;

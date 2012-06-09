@@ -61,6 +61,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @synthesize secondsPerFrameArray = _secondsPerFrameArray;
 @synthesize secondsPerFrameArrayDirty = _secondsPerFrameArrayDirty;
 @synthesize updateSecondsPerFrame = _updateSecondsPerFrame;
+@synthesize rendering = _rendering;
+@synthesize capturing = _capturing;
 
 - (void)_XBFilteredCameraViewInit
 {
@@ -311,6 +313,16 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     }
     
     return _secondsPerFrame;
+}
+
+- (BOOL)isCapturing
+{
+    return self.captureSession.isRunning;
+}
+
+- (void)setCapturing:(BOOL)capturing
+{
+    capturing? [self startCapturing]: [self stopCapturing];
 }
 
 #pragma mark - Methods
@@ -632,6 +644,10 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    if (!self.isRendering) {
+        return;
+    }
+    
     NSTimeInterval t0, t1;
     
     if (self.updateSecondsPerFrame) {

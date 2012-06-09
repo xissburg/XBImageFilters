@@ -75,6 +75,8 @@ extern NSString *const XBCaptureQuality352x288;
 @property (nonatomic, readonly) BOOL exposurePointSupported;
 @property (nonatomic, readonly) NSTimeInterval secondsPerFrame;
 @property (nonatomic, assign) BOOL updateSecondsPerFrame;
+@property (nonatomic, assign, getter = isRendering) BOOL rendering;
+@property (nonatomic, assign, getter = isCapturing) BOOL capturing;
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.

@@ -7,6 +7,9 @@
 //
 
 #import "XBFilteredCameraView.h"
+#import <sys/time.h>
+
+#define kMaxTimeSamples 10
 
 NSString *const XBCaptureQualityPhoto = @"XBCaptureQualityPhoto";
 NSString *const XBCaptureQualityHigh = @"XBCaptureQualityHigh";
@@ -29,6 +32,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (assign, nonatomic) CVOpenGLESTextureRef videoMainTexture;
 @property (assign, nonatomic) size_t videoWidth, videoHeight;
 @property (assign, nonatomic) BOOL shouldStartCapturingWhenBecomesActive;
+@property (strong, nonatomic) NSMutableArray *secondsPerFrameArray;
+@property (assign, nonatomic) BOOL secondsPerFrameArrayDirty;
 
 - (void)setupOutputs;
 
@@ -52,6 +57,10 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @synthesize torchMode = _torchMode;
 @synthesize photoOrientation = _photoOrientation;
 @synthesize shouldStartCapturingWhenBecomesActive = _shouldStartCapturingWhenBecomesActive;
+@synthesize secondsPerFrame = _secondsPerFrame;
+@synthesize secondsPerFrameArray = _secondsPerFrameArray;
+@synthesize secondsPerFrameArrayDirty = _secondsPerFrameArrayDirty;
+@synthesize updateSecondsPerFrame = _updateSecondsPerFrame;
 
 - (void)_XBFilteredCameraViewInit
 {
@@ -65,6 +74,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     self.videoCaptureQuality = XBCaptureQualityPhoto;
     self.imageCaptureQuality = XBCaptureQualityPhoto;
     self.photoOrientation = XBPhotoOrientationAuto;
+    
+    self.secondsPerFrameArray = [[NSMutableArray alloc] init];
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
@@ -284,6 +295,22 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 - (BOOL)hasTorch
 {
     return [self.device hasTorch];
+}
+
+- (NSTimeInterval)secondsPerFrame
+{
+    if (!self.updateSecondsPerFrame) {
+        _secondsPerFrame = 0;
+    }
+    else if (self.secondsPerFrameArrayDirty) {
+        _secondsPerFrame = 0;
+        for (NSNumber *n in self.secondsPerFrameArray) {
+            _secondsPerFrame += n.doubleValue;
+        }
+        _secondsPerFrame /= self.secondsPerFrameArray.count;
+    }
+    
+    return _secondsPerFrame;
 }
 
 #pragma mark - Methods
@@ -605,6 +632,14 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    NSTimeInterval t0, t1;
+    
+    if (self.updateSecondsPerFrame) {
+        struct timeval t;
+        gettimeofday(&t, NULL);
+        t0 = t.tv_sec + t.tv_usec*1.0e-6;
+    }
+    
     [EAGLContext setCurrentContext:self.context];
     
     [self cleanUpTextures];
@@ -623,6 +658,18 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     [self _setTextureDataWithTextureCache:self.videoTextureCache texture:&_videoMainTexture imageBuffer:imageBuffer];
     [self display];
+    
+    if (self.updateSecondsPerFrame) {
+        struct timeval t;
+        gettimeofday(&t, NULL);
+        t1 = t.tv_sec + t.tv_usec*1.0e-6;
+        CFTimeInterval dt = t1 - t0;
+        [self.secondsPerFrameArray addObject:[NSNumber numberWithDouble:dt]];
+        if (self.secondsPerFrameArray.count > kMaxTimeSamples) {
+            [self.secondsPerFrameArray removeObjectAtIndex:0];
+        }
+        self.secondsPerFrameArrayDirty = YES;
+    }
 }
 
 #pragma mark - Notifications

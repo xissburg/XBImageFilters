@@ -73,6 +73,8 @@ extern NSString *const XBCaptureQuality352x288;
 @property (nonatomic, readonly) BOOL hasTorch;
 @property (nonatomic, readonly) BOOL focusPointSupported;
 @property (nonatomic, readonly) BOOL exposurePointSupported;
+@property (nonatomic, readonly) NSTimeInterval secondsPerFrame;
+@property (nonatomic, assign) BOOL updateSecondsPerFrame;
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.

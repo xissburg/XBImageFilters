@@ -989,5 +989,5 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size)
 
 float pagesToMB(int pages)
 {
-    return pages*VM_PAGE_SIZE/1024.f/1024.f;
+    return pages*PAGE_SIZE/1024.f/1024.f;
 }

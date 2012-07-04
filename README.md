@@ -60,7 +60,7 @@ NSString *shaderPath = [[NSBundle mainBundle] pathForResource:@"SomeFilterFragme
 [filteredCameraView startCapturing];
 ```
 
-While capturing you can grab a photo through the `takeScreenshot`, which returns an UIImage ready to use.
+While capturing you can grab a photo through the `takeAPhotoWithCompletion:`, which gives you a high resolution UIImage with filter applied in the completion block.
 
 ## License
 

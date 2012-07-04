@@ -62,10 +62,6 @@ NSString *shaderPath = [[NSBundle mainBundle] pathForResource:@"SomeFilterFragme
 
 While capturing you can grab a photo through the `takeScreenshot`, which returns an UIImage ready to use.
 
-## Project Status
-
-This project is in an early stage of development so not all features advertised are totally functional and performant yet.
-
 ## License
 
 This project is under the MIT license (details in COPYRIGHT.txt). Do whatever you want with it and contributions of any form are very welcome.

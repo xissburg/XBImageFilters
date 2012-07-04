@@ -75,6 +75,7 @@ float pagesToMB(int pages);
 @synthesize contentModeTransform = _contentModeTransform;
 @synthesize contentSize = _contentSize;
 @synthesize texCoordTransform = _texCoordTransform;
+@synthesize rawTexCoordTransform = _rawTexCoordTransform;
 @synthesize programs = _programs;
 @synthesize oddPassTexture = _oddPassTexture;
 @synthesize evenPassTexture = _evenPassTexture;
@@ -168,10 +169,17 @@ float pagesToMB(int pages);
 {
     _texCoordTransform = texCoordTransform;
     
-    // The transform is applied only on the first program, because the next ones will already receive and image with the transform applied.
+    // The transform is applied only on the first program, because the next ones will already receive the image with the transform applied.
     // The transform would be applied again on each filter otherwise.
     GLKProgram *firstProgram = [self.programs objectAtIndex:0];
-    [firstProgram setValue:&texCoordTransform forUniformNamed:@"u_texCoordTransform"];
+    [firstProgram setValue:&_texCoordTransform forUniformNamed:@"u_texCoordTransform"];
+}
+
+- (void)setRawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform
+{
+    _rawTexCoordTransform = rawTexCoordTransform;
+    GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+    [firstProgram setValue:&_rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor
@@ -292,136 +300,66 @@ float pagesToMB(int pages);
 
 - (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
+    return [self _filteredImageWithTextureCache:textureCache imageBuffer:imageBuffer targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform rawTexCoordTransform:self.rawTexCoordTransform];
+}
+
+- (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform rawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform
+{
     [EAGLContext setCurrentContext:self.context];
     
     size_t textureWidth = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t textureHeight = CVPixelBufferGetHeight(imageBuffer);
+    
+    float ratio = (float)CVPixelBufferGetWidth(imageBuffer)/textureWidth;
+    GLKMatrix2 texCoordTransform = (GLKMatrix2){ratio, 0, 0, 1};
+    
     CVOpenGLESTextureRef texture;
-    
-    GLKMatrix4 oldContentTransform = self.contentTransform;
-    self.contentTransform = contentTransform;
-    UIViewContentMode oldContentMode = self.contentMode;
-    self.contentMode = UIViewContentModeScaleToFill;
-    
     CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, textureWidth, textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0, &texture);
     if (ret != kCVReturnSuccess) {
         NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
     }
     
-    GLuint mainTexture = CVOpenGLESTextureGetName(texture);
-    GLuint evenPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
-    GLuint evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:evenPassTexture];
-    GLuint oddPassTexture = 0;
-    GLuint oddPassFramebuffer = 0;
-    
-    if (self.programs.count > 1) {
-        oddPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
-        oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:oddPassTexture];
-    }
-    
-    GLuint lastFramebuffer = 0;
-    
-    glViewport(0, 0, targetWidth, targetHeight);
-    
     glBindTexture(CVOpenGLESTextureGetTarget(texture), CVOpenGLESTextureGetName(texture));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
-        
-        if (pass%2 == 0) {
-            glBindFramebuffer(GL_FRAMEBUFFER, evenPassFrambuffer);
-            lastFramebuffer = evenPassFrambuffer;
-        }
-        else {
-            glBindFramebuffer(GL_FRAMEBUFFER, oddPassFramebuffer);
-            lastFramebuffer = oddPassFramebuffer;
-        }
-        
-        // Change the source texture for each pass
-        GLuint sourceTexture = 0;
-        
-        if (pass == 0) { // First pass always uses the original image
-            sourceTexture = mainTexture;
-        }
-        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
-            sourceTexture = evenPassTexture;
-        }
-        else { // Third pass uses the result of the second, which is number 1, then it's odd
-            sourceTexture = oddPassTexture;
-        }
-        
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
-        
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        [program prepareToDraw];
-        
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        
-        // If it is not the last pass, discard the framebuffer contents
-        if (pass != self.programs.count - 1) {
-            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
-            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
-        }
-    }
+    GLuint mainTexture = CVOpenGLESTextureGetName(texture);
     
-    glFlush();
-    
-    CFRelease(texture);
-    CVOpenGLESTextureCacheFlush(textureCache, 0);
-    
-    UIImage *image = [self _imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
-    
-    glDeleteTextures(1, &evenPassTexture);
-    glDeleteFramebuffers(1, &evenPassFrambuffer);
-    glDeleteTextures(1, &oddPassTexture);
-    glDeleteFramebuffers(1, &oddPassFramebuffer);
-    
-    // Reset texture bindings
-    for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
-        GLuint sourceTexture = 0;
-        
-        if (pass == 0) { // First pass always uses the original image
-            sourceTexture = self.mainTexture;
-        }
-        else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
-            sourceTexture = self.evenPassTexture;
-        }
-        else { // Third pass uses the result of the second, which is number 1, then it's odd
-            sourceTexture = self.oddPassTexture;
-        }
-        
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
-    }
-    
-    glViewport(0, 0, self.viewportWidth, self.viewportHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
-    self.contentTransform = oldContentTransform;
-    self.contentMode = oldContentMode;
-    
-#ifdef DEBUG
-    GLenum error = glGetError();
-    if (error != GL_NO_ERROR) {
-        NSLog(@"%d", error);
-    }
-#endif
-    
-    return image;
+    return [self _filteredImageWithTexture:mainTexture textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform texCoordTransform:texCoordTransform rawTexCoordTransform:rawTexCoordTransform textureReleaseBlock:^{
+        CFRelease(texture);
+        CVOpenGLESTextureCacheFlush(textureCache, 0);
+    }];
 }
 
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
+    return [self _filteredImageWithData:data textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform rawTexCoordTransform:self.rawTexCoordTransform];
+}
+
+- (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform rawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform
+{
     [EAGLContext setCurrentContext:self.context];
     
+    GLuint mainTexture = [self generateDefaultTextureWithWidth:textureWidth height:textureHeight data:data];
+    
+    return [self _filteredImageWithTexture:mainTexture textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform texCoordTransform:GLKMatrix2Identity rawTexCoordTransform:rawTexCoordTransform textureReleaseBlock:^{
+        glDeleteTextures(1, &mainTexture);
+    }];
+}
+
+- (UIImage *)_filteredImageWithTexture:(GLuint)texture textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform texCoordTransform:(GLKMatrix2)texCoordTransform rawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform textureReleaseBlock:(void (^)(void))textureRelease
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    GLKMatrix2 oldTexCoordTransform = self.texCoordTransform;
+    self.texCoordTransform = texCoordTransform;
+    GLKMatrix2 oldRawTexCoordTransform = self.rawTexCoordTransform;
+    self.rawTexCoordTransform = rawTexCoordTransform;
     GLKMatrix4 oldContentTransform = self.contentTransform;
     self.contentTransform = contentTransform;
     UIViewContentMode oldContentMode = self.contentMode;
     self.contentMode = UIViewContentModeScaleToFill;
     
-    GLuint mainTexture = [self generateDefaultTextureWithWidth:textureWidth height:textureHeight data:data];
     GLuint evenPassTexture = [self generateDefaultTextureWithWidth:targetWidth height:targetHeight data:NULL];
     GLuint evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:evenPassTexture];
     GLuint oddPassTexture = 0;
@@ -452,7 +390,7 @@ float pagesToMB(int pages);
         GLuint sourceTexture = 0;
         
         if (pass == 0) { // First pass always uses the original image
-            sourceTexture = mainTexture;
+            sourceTexture = texture;
         }
         else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
             sourceTexture = evenPassTexture;
@@ -478,7 +416,21 @@ float pagesToMB(int pages);
     
     glFlush();
     
-    glDeleteTextures(1, &mainTexture);
+    // Delete all this unnecessary stuff before _imageFromFramebuffer which is resource hungry.
+    if (textureRelease != nil) {
+        textureRelease();
+    }
+    
+    if (lastFramebuffer == evenPassFrambuffer) {
+        glDeleteTextures(1, &oddPassTexture);
+        glDeleteFramebuffers(1, &oddPassFramebuffer);
+        oddPassTexture = oddPassFramebuffer = 0;
+    }
+    else if (lastFramebuffer == oddPassFramebuffer) {
+        glDeleteTextures(1, &evenPassTexture);
+        glDeleteFramebuffers(1, &evenPassFrambuffer);
+        evenPassTexture = evenPassFrambuffer = 0;
+    }
     
     UIImage *image = [self _imageFromFramebuffer:lastFramebuffer width:targetWidth height:targetHeight orientation:UIImageOrientationUp];
     
@@ -507,6 +459,8 @@ float pagesToMB(int pages);
     
     glViewport(0, 0, self.viewportWidth, self.viewportHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+    self.texCoordTransform = oldTexCoordTransform;
+    self.rawTexCoordTransform = oldRawTexCoordTransform;
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
     
@@ -595,6 +549,7 @@ float pagesToMB(int pages);
 
         [program setValue:i == paths.count - 1?&_contentTransform: (void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
         [program setValue:i == 0?&_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
+        [program setValue:i == 0?&_rawTexCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
         
         GLuint sourceTexture = 0;
         
@@ -746,6 +701,7 @@ float pagesToMB(int pages);
     self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
     self.contentTransform = GLKMatrix4Identity;
     self.texCoordTransform = GLKMatrix2Identity;
+    self.rawTexCoordTransform = GLKMatrix2Identity;
     
     // Get max tex size
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B36A52D15A3C4AC00D297B1 /* OverlayFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */; };
 		1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D529A1501A188007D743A /* XBFilteredCameraView.m */; };
 		1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D52A41501A6AA007D743A /* CameraViewController.m */; };
 		1B675E7114EE5DF300ED8402 /* DefaultVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */; };
@@ -62,6 +63,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = OverlayFragmentShader.glsl; path = Shaders/OverlayFragmentShader.glsl; sourceTree = "<group>"; };
 		1B4D52991501A188007D743A /* XBFilteredCameraView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredCameraView.h; path = Classes/XBImageFilters/XBFilteredCameraView.h; sourceTree = "<group>"; };
 		1B4D529A1501A188007D743A /* XBFilteredCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredCameraView.m; path = Classes/XBImageFilters/XBFilteredCameraView.m; sourceTree = "<group>"; };
 		1B4D52A31501A6AA007D743A /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraViewController.h; path = Classes/Sample/CameraViewController.h; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */,
 				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
 				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
+				1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */,
 				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
 				1BE20C651535C54F00E9D595 /* SuckShader.glsl */,
 				1BE20C631535C33900E9D595 /* PixelateShader.glsl */,
@@ -396,6 +399,7 @@
 				1BE20C621535BBCC00E9D595 /* DiscretizeShader.glsl in Resources */,
 				1BE20C641535C33900E9D595 /* PixelateShader.glsl in Resources */,
 				1BE20C661535C54F00E9D595 /* SuckShader.glsl in Resources */,
+				1B36A52D15A3C4AC00D297B1 /* OverlayFragmentShader.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

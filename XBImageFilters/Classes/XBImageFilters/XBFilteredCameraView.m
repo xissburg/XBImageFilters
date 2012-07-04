@@ -399,6 +399,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         GLint targetWidth = portrait? height: width;
         GLint targetHeight = portrait? width: height;
         GLKMatrix4 contentTransform = [self contentTransformForPhotoOrientation:orientation cameraPosition:self.cameraPosition];
+        GLKMatrix2 rawTexCoordTransform = [self rawTexCoordTransformForPhotoOrientation:orientation cameraPosition:self.cameraPosition];
         UIImage *filteredImage = nil;
         
         // Resize image if it is above the maximum texture size
@@ -432,12 +433,12 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             CGContextDrawImage(context, CGRectMake(0, 0, newWidth, newHeight), CGImage);
             GLubyte *textureData = (GLubyte *)CGBitmapContextGetData(context);
             
-            filteredImage = [self _filteredImageWithData:textureData textureWidth:newWidth textureHeight:newHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+            filteredImage = [self _filteredImageWithData:textureData textureWidth:newWidth textureHeight:newHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform rawTexCoordTransform:rawTexCoordTransform];
             
             CGContextRelease(context);
         }
         else {
-            filteredImage = [self _filteredImageWithTextureCache:self.videoTextureCache imageBuffer:imageBuffer targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
+            filteredImage = [self _filteredImageWithTextureCache:self.videoTextureCache imageBuffer:imageBuffer targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform rawTexCoordTransform:rawTexCoordTransform];
         }
         
         completion(filteredImage);
@@ -477,7 +478,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (GLKMatrix4)contentTransformForPhotoOrientation:(XBPhotoOrientation)photoOrientation cameraPosition:(XBCameraPosition)cameraPosition
 {
-     GLKMatrix4 contentTransform = GLKMatrix4Identity;
+    GLKMatrix4 contentTransform = GLKMatrix4Identity;
     
     if (self.cameraPosition == XBCameraPositionBack) {
         switch (photoOrientation) {
@@ -504,19 +505,19 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     else if (self.cameraPosition == XBCameraPositionFront) {
         switch (photoOrientation) {
             case XBPhotoOrientationPortrait:
-                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1));
+                contentTransform = GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1);
                 break;
                 
             case XBPhotoOrientationPortraitUpsideDown:
-                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1));
+                contentTransform = GLKMatrix4MakeRotation(-M_PI_2, 0, 0, 1);
                 break;
                 
             case XBPhotoOrientationLandscapeLeft:
-                contentTransform = GLKMatrix4Multiply(GLKMatrix4MakeScale(-1, 1, 1), GLKMatrix4MakeRotation(M_PI, 0, 0, 1));
+                contentTransform = GLKMatrix4MakeRotation(M_PI, 0, 0, 1);
                 break;
                 
             case XBPhotoOrientationLandscapeRight:
-                contentTransform = GLKMatrix4MakeScale(-1, 1, 1);
+                contentTransform = GLKMatrix4Identity;
                 break;
                 
             default:
@@ -525,6 +526,58 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     }
     
     return contentTransform;
+}
+
+- (GLKMatrix2)rawTexCoordTransformForPhotoOrientation:(XBPhotoOrientation)photoOrientation cameraPosition:(XBCameraPosition)cameraPosition
+{
+    GLKMatrix2 m = GLKMatrix2Identity;
+    
+    if (self.cameraPosition == XBCameraPositionBack) {
+        switch (photoOrientation) {
+            case XBPhotoOrientationPortrait:
+                m = (GLKMatrix2){1, 0, 0, -1};
+                break;
+                
+            case XBPhotoOrientationPortraitUpsideDown:
+                m = (GLKMatrix2){-1, 0, 0, 1};
+                break;
+                
+            case XBPhotoOrientationLandscapeLeft:
+                m = (GLKMatrix2){0, -1, -1, 0};
+                break;
+                
+            case XBPhotoOrientationLandscapeRight:
+                m = (GLKMatrix2){0, 1, 1, 0};
+                break;
+                
+            default:
+                break;
+        }
+    }
+    else if (self.cameraPosition == XBCameraPositionFront) {
+        switch (photoOrientation) {
+            case XBPhotoOrientationPortrait:
+                m = (GLKMatrix2){-1, 0, 0, -1};
+                break;
+                
+            case XBPhotoOrientationPortraitUpsideDown:
+                m = (GLKMatrix2){1, 0, 0, 1};
+                break;
+                
+            case XBPhotoOrientationLandscapeLeft:
+                m = (GLKMatrix2){0, 1, -1, 0};
+                break;
+                
+            case XBPhotoOrientationLandscapeRight:
+                m = (GLKMatrix2){0, -1, 1, 0};
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+    return m;
 }
 
 - (void)cleanUpTextures

@@ -12,6 +12,7 @@
 {
     NSArray *paths;
     int filterIndex;
+    NSArray *textures;
 }
 @end
 
@@ -58,6 +59,7 @@
 
 - (void)loadFilters
 {
+    NSString *overlayPath = [[NSBundle mainBundle] pathForResource:@"OverlayFragmentShader" ofType:@"glsl"];
     NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
     NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
@@ -69,6 +71,7 @@
     // Setup a combination of these filters
     paths = [[NSArray alloc] initWithObjects:
              [[NSArray alloc] initWithObjects:defaultPath, nil],
+             [[NSArray alloc] initWithObjects:overlayPath, nil],
              [[NSArray alloc] initWithObjects:suckPath, nil],
              [[NSArray alloc] initWithObjects:pixelatePath, nil],
              [[NSArray alloc] initWithObjects:discretizePath, nil],
@@ -119,11 +122,26 @@
 
 - (IBAction)changeFilterButtonTouchUpInside:(id)sender
 {
+    for (NSNumber *textureNumber in textures) {
+        GLuint texture = textureNumber.unsignedIntValue;
+        glDeleteTextures(1, &texture);
+    }
+    textures = nil;
+    
+    
     NSArray *files = [paths objectAtIndex:filterIndex];
 
     NSError *error = nil;
     if (![self.cameraView setFilterFragmentShadersFromFiles:files error:&error]) {
         NSLog(@"Error setting shader: %@", [error localizedDescription]);
+    }
+    
+    if (filterIndex == 1) {
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"LucasCorrea" ofType:@"png"];
+        GLKTextureInfo *textureInfo = [GLKTextureLoader textureWithContentsOfFile:path options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], GLKTextureLoaderOriginBottomLeft, nil] error:NULL];
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+        [program bindSamplerNamed:@"s_overlay" toTexture:textureInfo.name unit:1];
+        textures = [[NSArray alloc] initWithObjects:[NSNumber numberWithUnsignedInt:textureInfo.name], nil];
     }
     
     filterIndex++;

@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "GLKUniform.h"
 #import "GLKAttribute.h"
+#import "XBTexture.h"
 
 /**
  * Error domain.
@@ -36,7 +37,8 @@ enum {
 
 - (id)initWithVertexShaderFromFile:(NSString *)vertexShaderPath fragmentShaderFromFile:(NSString *)fragmentShaderPath error:(NSError *__autoreleasing *)error;
 - (id)initWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error;
-- (void)setValue:(void *)value forUniformNamed:(NSString *)uniformName;
+- (void)setValue:(void *)value forUniformNamed:(NSString *)uniform;
+- (void)bindSamplerNamed:(NSString *)samplerName toXBTexture:(XBTexture *)texture unit:(GLint)unit;
 - (void)bindSamplerNamed:(NSString *)samplerName toTexture:(GLuint)texture unit:(GLint)unit;
 - (void)prepareToDraw;
 

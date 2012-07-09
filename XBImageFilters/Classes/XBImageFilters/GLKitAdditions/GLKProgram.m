@@ -15,6 +15,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 @property (readonly, copy, nonatomic) NSDictionary *uniforms;
 @property (strong, nonatomic) NSMutableDictionary *dirtyUniforms;
 @property (strong, nonatomic) NSMutableDictionary *samplerBindings;
+@property (strong, nonatomic) NSMutableDictionary *samplerXBBindings;
 
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error;
 - (GLuint)createProgramWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error;
@@ -32,6 +33,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 @synthesize dirtyUniforms = _dirtyUniforms;
 @synthesize program = _program;
 @synthesize samplerBindings = _samplerBindings;
+@synthesize samplerXBBindings = _samplerXBBindings;
 
 - (id)initWithVertexShaderFromFile:(NSString *)vertexShaderPath fragmentShaderFromFile:(NSString *)fragmentShaderPath error:(NSError *__autoreleasing *)error
 {
@@ -63,6 +65,7 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
         _uniforms = [[self uniformsForProgram:self.program] copy];
         _attributes = [[self attributesForProgram:self.program] copy];
         self.samplerBindings = [[NSMutableDictionary alloc] init];
+        self.samplerXBBindings = [[NSMutableDictionary alloc] init];
         self.dirtyUniforms = [[NSMutableDictionary alloc] init];
     }
     return self;
@@ -82,6 +85,22 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     [self.dirtyUniforms setObject:uniform forKey:uniform.name];
 }
 
+- (void)bindSamplerNamed:(NSString *)samplerName toXBTexture:(XBTexture *)texture unit:(GLint)unit
+{
+    if ([self.uniforms objectForKey:samplerName] == nil) {
+        return;
+    }
+    
+    [self setValue:&unit forUniformNamed:samplerName];
+    
+    if (texture != nil) {
+        [self.samplerXBBindings setObject:texture forKey:samplerName];
+    }
+    else {
+        [self.samplerXBBindings removeObjectForKey:samplerName];
+    }
+}
+
 - (void)bindSamplerNamed:(NSString *)samplerName toTexture:(GLuint)texture unit:(GLint)unit
 {
     if ([self.uniforms objectForKey:samplerName] == nil) {
@@ -89,7 +108,13 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
     }
     
     [self setValue:&unit forUniformNamed:samplerName];
-    [self.samplerBindings setObject:[NSNumber numberWithUnsignedInt:texture] forKey:samplerName];
+    
+    if (texture != 0) {
+        [self.samplerBindings setObject:[NSNumber numberWithUnsignedInt:texture] forKey:samplerName];
+    }
+    else {
+        [self.samplerBindings removeObjectForKey:samplerName];
+    }
 }
 
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error
@@ -292,11 +317,18 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
         GLKUniform *uniform = [self.uniforms objectForKey:name];
         
         if (uniform.type == GL_SAMPLER_2D || uniform.type == GL_SAMPLER_CUBE) {
-            NSNumber *texture = [self.samplerBindings objectForKey:uniform.name];
+            XBTexture *texture = [self.samplerXBBindings objectForKey:uniform.name];
             
             if (texture != nil) {
                 glActiveTexture(GL_TEXTURE0 + *(GLint *)uniform.value);
-                glBindTexture(GL_TEXTURE_2D, texture.unsignedIntValue);
+                glBindTexture(GL_TEXTURE_2D, texture.textureInfo.name);
+            }
+            
+            NSNumber *textureNumber = [self.samplerBindings objectForKey:uniform.name];
+            
+            if (textureNumber != nil) {
+                glActiveTexture(GL_TEXTURE0 + *(GLint *)uniform.value);
+                glBindTexture(GL_TEXTURE_2D, textureNumber.unsignedIntValue);
             }
         }
     }

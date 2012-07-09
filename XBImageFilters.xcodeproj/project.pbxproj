@@ -41,6 +41,7 @@
 		1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */; };
 		1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */; };
 		1BE99D111538A071001C532F /* CameraTargetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE99D101538A071001C532F /* CameraTargetView.m */; };
+		1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEB76EA15A923CD000CEFEF /* XBTexture.m */; };
 		3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F2111522EEC500C27406 /* ProcessingViewController.m */; };
 		3295F22F1522FD3100C27406 /* basn0g01.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2201522FD3100C27406 /* basn0g01.png */; };
 		3295F2301522FD3100C27406 /* basn0g02.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2211522FD3100C27406 /* basn0g02.png */; };
@@ -111,6 +112,8 @@
 		1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultFragmentShader.glsl; path = Shaders/DefaultFragmentShader.glsl; sourceTree = "<group>"; };
 		1BE99D0F1538A071001C532F /* CameraTargetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraTargetView.h; path = Classes/XBImageFilters/CameraTargetView.h; sourceTree = "<group>"; };
 		1BE99D101538A071001C532F /* CameraTargetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraTargetView.m; path = Classes/XBImageFilters/CameraTargetView.m; sourceTree = "<group>"; };
+		1BEB76E915A923CD000CEFEF /* XBTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; path = XBTexture.h; sourceTree = "<group>"; };
+		1BEB76EA15A923CD000CEFEF /* XBTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTexture.m; sourceTree = "<group>"; };
 		3295F2101522EEC500C27406 /* ProcessingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessingViewController.h; path = Classes/Sample/ProcessingViewController.h; sourceTree = "<group>"; };
 		3295F2111522EEC500C27406 /* ProcessingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcessingViewController.m; path = Classes/Sample/ProcessingViewController.m; sourceTree = "<group>"; };
 		3295F2201522FD3100C27406 /* basn0g01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g01.png; sourceTree = "<group>"; };
@@ -291,6 +294,8 @@
 				1BE4DB2814F31488003EE965 /* GLKAttribute.m */,
 				1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */,
 				1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */,
+				1BEB76E915A923CD000CEFEF /* XBTexture.h */,
+				1BEB76EA15A923CD000CEFEF /* XBTexture.m */,
 			);
 			name = GLKitAdditions;
 			path = Classes/XBImageFilters/GLKitAdditions;
@@ -424,6 +429,7 @@
 				3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */,
 				3295F2401522FE4D00C27406 /* UIImage+XBImageFilters.m in Sources */,
 				1BE99D111538A071001C532F /* CameraTargetView.m in Sources */,
+				1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

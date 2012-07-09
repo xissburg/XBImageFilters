@@ -71,7 +71,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     self.videoHeight = self.videoWidth = 0;
     self.shouldStartCapturingWhenBecomesActive = NO;
-    self.rendering = YES;
     
     self.captureSession = [[AVCaptureSession alloc] init];
     self.videoCaptureQuality = XBCaptureQualityPhoto;
@@ -348,13 +347,13 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)startCapturing
 {
-    [self.videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+    self.rendering = YES;
     [self.captureSession startRunning];
 }
 
 - (void)stopCapturing
 {
-    [self.videoDataOutput setSampleBufferDelegate:nil queue:NULL];
+    self.rendering = NO;
     [self.captureSession stopRunning];
 }
 

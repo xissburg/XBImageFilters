@@ -85,29 +85,32 @@
 
 - (void)setupFilterPaths
 {
-    NSString *overlayPath = [[NSBundle mainBundle] pathForResource:@"OverlayFragmentShader" ofType:@"glsl"];
+    NSString *defaultVSPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    NSString *defaultFSPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
+    NSString *overlayFSPath = [[NSBundle mainBundle] pathForResource:@"OverlayFragmentShader" ofType:@"glsl"];
     NSString *overlayVSPath = [[NSBundle mainBundle] pathForResource:@"OverlayVertexShader" ofType:@"glsl"];
     NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
-    NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
-    NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
-    NSString *defaultPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
+    NSString *blurFSPath = [[NSBundle mainBundle] pathForResource:@"BlurFragmentShader" ofType:@"glsl"];
+    NSString *hBlurVSPath = [[NSBundle mainBundle] pathForResource:@"HBlurVertexShader" ofType:@"glsl"];
+    NSString *vBlurVSPath = [[NSBundle mainBundle] pathForResource:@"VBlurVertexShader" ofType:@"glsl"];
     NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"DiscretizeShader" ofType:@"glsl"];
     NSString *pixelatePath = [[NSBundle mainBundle] pathForResource:@"PixelateShader" ofType:@"glsl"];
     NSString *suckPath = [[NSBundle mainBundle] pathForResource:@"SuckShader" ofType:@"glsl"];
     
     // Setup a combination of these filters
     self.filterPathArray = [[NSArray alloc] initWithObjects:
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:defaultPath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:overlayPath], kFSPathsKey, [NSArray arrayWithObject:overlayVSPath], kVSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:defaultFSPath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:overlayFSPath], kFSPathsKey, [NSArray arrayWithObject:overlayVSPath], kVSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, luminancePath, luminancePath, nil], kFSPathsKey, [NSArray arrayWithObjects:defaultVSPath, defaultVSPath, defaultVSPath, nil], kVSPathsKey, nil],
              [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:suckPath], kFSPathsKey, nil],
              [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:pixelatePath], kFSPathsKey, nil],
              [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:discretizePath], kFSPathsKey, nil],
              [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:luminancePath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:hBlurPath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:vBlurPath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:hBlurPath, vBlurPath, nil], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, hBlurPath, vBlurPath, nil], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:hBlurPath, vBlurPath, discretizePath, nil], kFSPathsKey, nil], nil];
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:blurFSPath], kFSPathsKey, [NSArray arrayWithObject:hBlurVSPath], kVSPathsKey,nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:blurFSPath], kFSPathsKey, [NSArray arrayWithObject:vBlurVSPath], kVSPathsKey,nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, blurFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, blurFSPath, blurFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:defaultVSPath, vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, blurFSPath, discretizePath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, defaultVSPath, nil], kVSPathsKey, nil], nil];
 }
 
 #pragma mark - Button Actions

@@ -515,6 +515,83 @@ float pagesToMB(int pages);
 
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error
 {
+    return [self setFilterFragmentShaderPaths:paths error:error];
+}
+
+- (BOOL)setFilterFragmentShaderPath:(NSString *)fsPath error:(NSError *__autoreleasing *)error
+{
+    NSString *fsSource = [[NSString alloc] initWithContentsOfFile:fsPath encoding:NSUTF8StringEncoding error:error];
+    if (fsSource == nil) {
+        return NO;
+    }
+    
+    return [self setFilterFragmentShaderSource:fsSource error:error];
+}
+
+- (BOOL)setFilterFragmentShaderPaths:(NSArray *)fsPaths error:(NSError *__autoreleasing *)error
+{
+    NSMutableArray *fsSources = [[NSMutableArray alloc] initWithCapacity:fsPaths.count];
+    for (NSString *fsPath in fsPaths) {
+        NSString *fsSource = [[NSString alloc] initWithContentsOfFile:fsPath encoding:NSUTF8StringEncoding error:error];
+        if (fsSource == nil) {
+            return NO;
+        }
+        [fsSources addObject:fsSource];
+    }
+    
+    return [self setFilterFragmentShaderSources:fsSources error:error];
+}
+
+- (BOOL)setFilterFragmentShaderSource:(NSString *)fsSource error:(NSError *__autoreleasing *)error
+{
+    return [self setFilterFragmentShaderSources:[NSArray arrayWithObject:fsSource] error:error];
+}
+
+- (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources error:(NSError *__autoreleasing *)error
+{
+    NSString *defaultVertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    NSString *defaultVertexShaderSource = [[NSString alloc] initWithContentsOfFile:defaultVertexShaderPath encoding:NSUTF8StringEncoding error:error];
+    if (defaultVertexShaderSource == nil) {
+        return NO;
+    }
+    
+    NSMutableArray *vsSources = [[NSMutableArray alloc] initWithCapacity:fsSources.count];
+    for (int i = 0; i < fsSources.count; ++i) {
+        [vsSources addObject:defaultVertexShaderSource];
+    }
+    
+    return [self setFilterFragmentShaderSources:fsSources vertexShaderSources:vsSources error:error];
+}
+
+- (BOOL)setFilterFragmentShaderPath:(NSString *)fsPath vertexShaderPath:(NSString *)vsPath error:(NSError *__autoreleasing *)error
+{
+    return [self setFilterFragmentShaderPaths:[NSArray arrayWithObject:fsPath] vertexShaderPaths:[NSArray arrayWithObject:vsPath] error:error];
+}
+
+- (BOOL)setFilterFragmentShaderPaths:(NSArray *)fsPaths vertexShaderPaths:(NSArray *)vsPaths error:(NSError *__autoreleasing *)error
+{
+    NSMutableArray *fsSources = [[NSMutableArray alloc] initWithCapacity:fsPaths.count];
+    NSMutableArray *vsSources = [[NSMutableArray alloc] initWithCapacity:vsPaths.count];
+    for (int i = 0; i < fsSources.count; ++i) {
+        NSString *fsSource = [[NSString alloc] initWithContentsOfFile:[fsPaths objectAtIndex:i] encoding:NSUTF8StringEncoding error:error];
+        NSString *vsSource = [[NSString alloc] initWithContentsOfFile:[vsPaths objectAtIndex:i] encoding:NSUTF8StringEncoding error:error];
+        if (fsSource == nil || vsSource == nil) {
+            return NO;
+        }
+        [fsSources addObject:fsSource];
+        [vsSources addObject:vsSource];
+    }
+    
+    return [self setFilterFragmentShaderSources:fsSources vertexShaderSources:vsSources error:error];
+}
+
+- (BOOL)setFilterFragmentShaderSource:(NSString *)fsSource vertexShaderSource:(NSString *)vsSource error:(NSError *__autoreleasing *)error
+{
+    return [self setFilterFragmentShaderSources:[NSArray arrayWithObject:fsSource] vertexShaderSources:[NSArray arrayWithObject:vsSource] error:error];
+}
+
+- (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources vertexShaderSources:(NSArray *)vsSources error:(NSError *__autoreleasing *)error
+{
     [EAGLContext setCurrentContext:self.context];
     
     [self destroyEvenPass];
@@ -526,28 +603,27 @@ float pagesToMB(int pages);
      * filter will instead render to the oddPassFramebuffer and the third/last pass will render to the framebuffer using the oddPassTexture.
      * And so on... */
     
-    if (paths.count >= 2) {
+    if (fsSources.count >= 2) {
         // Two or more passes, create evenPass*
         [self setupEvenPass];
     }
     
-    if (paths.count > 2) {
+    if (fsSources.count > 2) {
         // More than two passes, create oddPass*
         [self setupOddPass];
     }
     
-    NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:paths.count];
-    NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:fsSources.count];
     
-    for (int i = 0; i < paths.count; ++i) {
-        NSString *fragmentShaderPath = [paths objectAtIndex:i];
-        GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:error];
-        
+    for (int i = 0; i < fsSources.count; ++i) {
+        NSString *fsSource = [fsSources objectAtIndex:i];
+        NSString *vsSource = [vsSources objectAtIndex:i];
+        GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderSource:vsSource fragmentShaderSource:fsSource error:error];
         if (program == nil) {
             return NO;
         }
-
-        [program setValue:i == paths.count - 1?&_contentTransform: (void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
+        
+        [program setValue:i == fsSources.count - 1?&_contentTransform: (void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
         [program setValue:i == 0?&_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
         [program setValue:i == 0?&_rawTexCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
         
@@ -577,7 +653,7 @@ float pagesToMB(int pages);
         [programs addObject:program];
     }
     
-    self.programs = [programs copy];
+    _programs = [programs copy];
     
     return YES;
 }
@@ -691,9 +767,7 @@ float pagesToMB(int pages);
     // Setup default shader
     NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
     NSError *error = nil;
-    [self setFilterFragmentShaderFromFile:fragmentShaderPath error:&error];
-    
-    if (error != nil) {
+    if (![self setFilterFragmentShaderPath:fragmentShaderPath error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
     }
     

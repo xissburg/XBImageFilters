@@ -33,7 +33,7 @@
 
     XBFilteredImageView *filteredImageView = [[XBFilteredImageView alloc] initWithFrame:CGRectMake(0, 0, pixelsWide, pixelsHigh)];
     
-    if (![filteredImageView setFilterFragmentShadersFromFiles:paths error:error]) {
+    if (![filteredImageView setFilterFragmentShaderPaths:paths error:error]) {
         return nil;
     }
     

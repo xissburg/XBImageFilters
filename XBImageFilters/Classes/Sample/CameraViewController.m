@@ -36,7 +36,7 @@
     NSArray *files =  [paths objectAtIndex:0];
 
     NSError *error = nil;
-    if (![self.cameraView setFilterFragmentShadersFromFiles:files error:&error]) {
+    if (![self.cameraView setFilterFragmentShaderPaths:files error:&error]) {
         NSLog(@"Error setting shader: %@", [error localizedDescription]);
     }
     
@@ -124,7 +124,7 @@
     NSArray *files = [paths objectAtIndex:filterIndex];
 
     NSError *error = nil;
-    if (![self.cameraView setFilterFragmentShadersFromFiles:files error:&error]) {
+    if (![self.cameraView setFilterFragmentShaderPaths:files error:&error]) {
         NSLog(@"Error setting shader: %@", [error localizedDescription]);
     }
     

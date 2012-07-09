@@ -12,7 +12,7 @@
 
 @interface XBFilteredView : UIView
 
-@property (strong, nonatomic) NSArray *programs;
+@property (readonly, nonatomic) NSArray *programs;
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
 @property (assign, nonatomic) CGSize contentSize; // Content size used to compute the contentMode transform. By default it can be the texture size.
 @property (assign, nonatomic) GLKMatrix2 texCoordTransform;
@@ -20,8 +20,18 @@
 @property (readonly, nonatomic) GLint maxTextureSize; // Maximum texture width and height
 @property (readonly, nonatomic) EAGLContext *context;
 
-- (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error;
-- (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error DEPRECATED_ATTRIBUTE;
+- (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error DEPRECATED_ATTRIBUTE;
+
+- (BOOL)setFilterFragmentShaderSource:(NSString *)fsSource error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderPath:(NSString *)fsPath error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderPaths:(NSArray *)fsPaths error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderSource:(NSString *)fsSource vertexShaderSource:(NSString *)vsSource error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources vertexShaderSources:(NSArray *)vsSources error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderPath:(NSString *)fsPath vertexShaderPath:(NSString *)vsPath error:(NSError *__autoreleasing *)error;
+- (BOOL)setFilterFragmentShaderPaths:(NSArray *)fsPaths vertexShaderPaths:(NSArray *)vsPaths error:(NSError *__autoreleasing *)error;
+
 
 /* 
  * Returns an image with the contents of the framebuffer. 

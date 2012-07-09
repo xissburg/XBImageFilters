@@ -75,7 +75,6 @@ float pagesToMB(int pages);
 @synthesize contentModeTransform = _contentModeTransform;
 @synthesize contentSize = _contentSize;
 @synthesize texCoordTransform = _texCoordTransform;
-@synthesize rawTexCoordTransform = _rawTexCoordTransform;
 @synthesize programs = _programs;
 @synthesize oddPassTexture = _oddPassTexture;
 @synthesize evenPassTexture = _evenPassTexture;
@@ -173,13 +172,6 @@ float pagesToMB(int pages);
     // The transform would be applied again on each filter otherwise.
     GLKProgram *firstProgram = [self.programs objectAtIndex:0];
     [firstProgram setValue:&_texCoordTransform forUniformNamed:@"u_texCoordTransform"];
-}
-
-- (void)setRawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform
-{
-    _rawTexCoordTransform = rawTexCoordTransform;
-    GLKProgram *firstProgram = [self.programs objectAtIndex:0];
-    [firstProgram setValue:&_rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor
@@ -300,11 +292,6 @@ float pagesToMB(int pages);
 
 - (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
-    return [self _filteredImageWithTextureCache:textureCache imageBuffer:imageBuffer targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform rawTexCoordTransform:self.rawTexCoordTransform];
-}
-
-- (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform rawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform
-{
     [EAGLContext setCurrentContext:self.context];
     
     size_t textureWidth = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
@@ -325,7 +312,7 @@ float pagesToMB(int pages);
     
     GLuint mainTexture = CVOpenGLESTextureGetName(texture);
     
-    return [self _filteredImageWithTexture:mainTexture textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform texCoordTransform:texCoordTransform rawTexCoordTransform:rawTexCoordTransform textureReleaseBlock:^{
+    return [self _filteredImageWithTexture:mainTexture textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform texCoordTransform:texCoordTransform textureReleaseBlock:^{
         CFRelease(texture);
         CVOpenGLESTextureCacheFlush(textureCache, 0);
     }];
@@ -333,28 +320,21 @@ float pagesToMB(int pages);
 
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
-    return [self _filteredImageWithData:data textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform rawTexCoordTransform:self.rawTexCoordTransform];
-}
-
-- (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform rawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform
-{
     [EAGLContext setCurrentContext:self.context];
     
     GLuint mainTexture = [self generateDefaultTextureWithWidth:textureWidth height:textureHeight data:data];
     
-    return [self _filteredImageWithTexture:mainTexture textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform texCoordTransform:GLKMatrix2Identity rawTexCoordTransform:rawTexCoordTransform textureReleaseBlock:^{
+    return [self _filteredImageWithTexture:mainTexture textureWidth:textureWidth textureHeight:textureHeight targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform texCoordTransform:GLKMatrix2Identity textureReleaseBlock:^{
         glDeleteTextures(1, &mainTexture);
     }];
 }
 
-- (UIImage *)_filteredImageWithTexture:(GLuint)texture textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform texCoordTransform:(GLKMatrix2)texCoordTransform rawTexCoordTransform:(GLKMatrix2)rawTexCoordTransform textureReleaseBlock:(void (^)(void))textureRelease
+- (UIImage *)_filteredImageWithTexture:(GLuint)texture textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform texCoordTransform:(GLKMatrix2)texCoordTransform textureReleaseBlock:(void (^)(void))textureRelease
 {
     [EAGLContext setCurrentContext:self.context];
     
     GLKMatrix2 oldTexCoordTransform = self.texCoordTransform;
     self.texCoordTransform = texCoordTransform;
-    GLKMatrix2 oldRawTexCoordTransform = self.rawTexCoordTransform;
-    self.rawTexCoordTransform = rawTexCoordTransform;
     GLKMatrix4 oldContentTransform = self.contentTransform;
     self.contentTransform = contentTransform;
     UIViewContentMode oldContentMode = self.contentMode;
@@ -460,7 +440,6 @@ float pagesToMB(int pages);
     glViewport(0, 0, self.viewportWidth, self.viewportHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
     self.texCoordTransform = oldTexCoordTransform;
-    self.rawTexCoordTransform = oldRawTexCoordTransform;
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
     
@@ -572,7 +551,7 @@ float pagesToMB(int pages);
 {
     NSMutableArray *fsSources = [[NSMutableArray alloc] initWithCapacity:fsPaths.count];
     NSMutableArray *vsSources = [[NSMutableArray alloc] initWithCapacity:vsPaths.count];
-    for (int i = 0; i < fsSources.count; ++i) {
+    for (int i = 0; i < fsPaths.count; ++i) {
         NSString *fsSource = [[NSString alloc] initWithContentsOfFile:[fsPaths objectAtIndex:i] encoding:NSUTF8StringEncoding error:error];
         NSString *vsSource = [[NSString alloc] initWithContentsOfFile:[vsPaths objectAtIndex:i] encoding:NSUTF8StringEncoding error:error];
         if (fsSource == nil || vsSource == nil) {
@@ -625,7 +604,6 @@ float pagesToMB(int pages);
         
         [program setValue:i == fsSources.count - 1?&_contentTransform: (void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
         [program setValue:i == 0?&_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
-        [program setValue:i == 0?&_rawTexCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
         
         GLuint sourceTexture = 0;
         
@@ -775,7 +753,6 @@ float pagesToMB(int pages);
     self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);
     self.contentTransform = GLKMatrix4Identity;
     self.texCoordTransform = GLKMatrix2Identity;
-    self.rawTexCoordTransform = GLKMatrix2Identity;
     
     // Get max tex size
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);

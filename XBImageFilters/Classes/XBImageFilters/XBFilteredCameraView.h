@@ -77,6 +77,7 @@ extern NSString *const XBCaptureQuality352x288;
 @property (nonatomic, assign) BOOL updateSecondsPerFrame;
 @property (nonatomic, assign, getter = isRendering) BOOL rendering;
 @property (nonatomic, assign, getter = isCapturing) BOOL capturing;
+@property (nonatomic, readonly) GLKMatrix2 rawTexCoordTransform; // utility property for filters with overlay textures
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.
@@ -88,5 +89,7 @@ extern NSString *const XBCaptureQuality352x288;
 - (void)toggleTorch;
 
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *image))completion;
+
+- (GLKMatrix2)rawTexCoordTransformForPhotoOrientation:(XBPhotoOrientation)photoOrientation cameraPosition:(XBCameraPosition)cameraPosition;
 
 @end

@@ -40,6 +40,7 @@
 		1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2814F31488003EE965 /* GLKAttribute.m */; };
 		1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */; };
 		1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */; };
+		1BE8667115AB23B60058E8C7 /* OverlayVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */; };
 		1BE99D111538A071001C532F /* CameraTargetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE99D101538A071001C532F /* CameraTargetView.m */; };
 		1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEB76EA15A923CD000CEFEF /* XBTexture.m */; };
 		3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F2111522EEC500C27406 /* ProcessingViewController.m */; };
@@ -110,9 +111,10 @@
 		1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKShaderVariable.h; sourceTree = "<group>"; };
 		1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKShaderVariable.m; sourceTree = "<group>"; };
 		1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultFragmentShader.glsl; path = Shaders/DefaultFragmentShader.glsl; sourceTree = "<group>"; };
+		1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = OverlayVertexShader.glsl; path = Shaders/OverlayVertexShader.glsl; sourceTree = "<group>"; };
 		1BE99D0F1538A071001C532F /* CameraTargetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraTargetView.h; path = Classes/XBImageFilters/CameraTargetView.h; sourceTree = "<group>"; };
 		1BE99D101538A071001C532F /* CameraTargetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraTargetView.m; path = Classes/XBImageFilters/CameraTargetView.m; sourceTree = "<group>"; };
-		1BEB76E915A923CD000CEFEF /* XBTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; path = XBTexture.h; sourceTree = "<group>"; };
+		1BEB76E915A923CD000CEFEF /* XBTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBTexture.h; sourceTree = "<group>"; };
 		1BEB76EA15A923CD000CEFEF /* XBTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTexture.m; sourceTree = "<group>"; };
 		3295F2101522EEC500C27406 /* ProcessingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessingViewController.h; path = Classes/Sample/ProcessingViewController.h; sourceTree = "<group>"; };
 		3295F2111522EEC500C27406 /* ProcessingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcessingViewController.m; path = Classes/Sample/ProcessingViewController.m; sourceTree = "<group>"; };
@@ -164,6 +166,7 @@
 				1BE4178814F922B200EB0ADD /* HGaussianBlur.glsl */,
 				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
 				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
+				1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */,
 				1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */,
 				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
 				1BE20C651535C54F00E9D595 /* SuckShader.glsl */,
@@ -405,6 +408,7 @@
 				1BE20C641535C33900E9D595 /* PixelateShader.glsl in Resources */,
 				1BE20C661535C54F00E9D595 /* SuckShader.glsl in Resources */,
 				1B36A52D15A3C4AC00D297B1 /* OverlayFragmentShader.glsl in Resources */,
+				1BE8667115AB23B60058E8C7 /* OverlayVertexShader.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

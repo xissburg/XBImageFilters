@@ -8,17 +8,22 @@
 
 #import "CameraViewController.h"
 
+#define kVSPathsKey @"vsPaths"
+#define kFSPathsKey @"fsPaths"
+
 @interface CameraViewController ()
-{
-    NSArray *paths;
-    int filterIndex;
-}
+
+@property (nonatomic, copy) NSArray *filterPathArray;
+@property (nonatomic, assign) NSUInteger filterIndex;
+
 @end
 
 @implementation CameraViewController
 
 @synthesize cameraView = _cameraView;
 @synthesize cameraTargetView = _cameraTargetView;
+@synthesize filterPathArray = _filterPathArray;
+@synthesize filterIndex = _filterIndex;
 
 #pragma mark - View lifecycle
 
@@ -28,19 +33,11 @@
     
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
     [self.cameraView addGestureRecognizer:tgr];
-    
     [self.cameraTargetView hideAnimated:NO];
     
-    [self loadFilters];
-    filterIndex = 1;
-    NSArray *files =  [paths objectAtIndex:0];
-
-    NSError *error = nil;
-    if (![self.cameraView setFilterFragmentShaderPaths:files error:&error]) {
-        NSLog(@"Error setting shader: %@", [error localizedDescription]);
-    }
+    [self setupFilterPaths];
+    self.filterIndex = 0;
     
-    //self.cameraView.flashMode = XBFlashModeOn;
     [self.cameraView startCapturing];
 }
 
@@ -54,11 +51,42 @@
     return interfaceOrientation == UIInterfaceOrientationPortrait;
 }
 
+#pragma mark - Properties
+
+- (void)setFilterIndex:(NSUInteger)filterIndex
+{
+    _filterIndex = filterIndex;
+    
+    NSDictionary *paths = [self.filterPathArray objectAtIndex:self.filterIndex];
+    NSArray *fsPaths = [paths objectForKey:kFSPathsKey];
+    NSArray *vsPaths = [paths objectForKey:kVSPathsKey];
+    NSError *error = nil;
+    if (vsPaths != nil) {
+        [self.cameraView setFilterFragmentShaderPaths:fsPaths vertexShaderPaths:vsPaths error:&error];
+    }
+    else {
+        [self.cameraView setFilterFragmentShaderPaths:fsPaths error:&error];
+    }
+    
+    if (error != nil) {
+        NSLog(@"Error setting shader: %@", [error localizedDescription]);
+    }
+    
+    if (self.filterIndex == 1) {
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"LucasCorrea" ofType:@"png"];
+        XBTexture *texture = [[XBTexture alloc] initWithContentsOfFile:path options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], GLKTextureLoaderOriginBottomLeft, nil] error:NULL];
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+        [program bindSamplerNamed:@"s_overlay" toXBTexture:texture unit:1];
+        [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
+    }
+}
+
 #pragma mark - Methods
 
-- (void)loadFilters
+- (void)setupFilterPaths
 {
     NSString *overlayPath = [[NSBundle mainBundle] pathForResource:@"OverlayFragmentShader" ofType:@"glsl"];
+    NSString *overlayVSPath = [[NSBundle mainBundle] pathForResource:@"OverlayVertexShader" ofType:@"glsl"];
     NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
     NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
     NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
@@ -68,24 +96,30 @@
     NSString *suckPath = [[NSBundle mainBundle] pathForResource:@"SuckShader" ofType:@"glsl"];
     
     // Setup a combination of these filters
-    paths = [[NSArray alloc] initWithObjects:
-             [[NSArray alloc] initWithObjects:defaultPath, nil],
-             [[NSArray alloc] initWithObjects:overlayPath, nil],
-             [[NSArray alloc] initWithObjects:suckPath, nil],
-             [[NSArray alloc] initWithObjects:pixelatePath, nil],
-             [[NSArray alloc] initWithObjects:discretizePath, nil],
-             [[NSArray alloc] initWithObjects:luminancePath, nil], 
-             [[NSArray alloc] initWithObjects:hBlurPath, nil],
-             [[NSArray alloc] initWithObjects:vBlurPath, nil],
-             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, nil],
-             [[NSArray alloc] initWithObjects:luminancePath, hBlurPath, vBlurPath, nil],
-             [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, discretizePath, nil], nil];
+    self.filterPathArray = [[NSArray alloc] initWithObjects:
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:defaultPath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:overlayPath], kFSPathsKey, [NSArray arrayWithObject:overlayVSPath], kVSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:suckPath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:pixelatePath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:discretizePath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:luminancePath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:hBlurPath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:vBlurPath], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:hBlurPath, vBlurPath, nil], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, hBlurPath, vBlurPath, nil], kFSPathsKey, nil],
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:hBlurPath, vBlurPath, discretizePath, nil], kFSPathsKey, nil], nil];
 }
 
 #pragma mark - Button Actions
 
-- (IBAction)takeAPictureButtonTouchUpInside:(id)sender 
+- (IBAction)takeAPictureButtonTouchUpInside:(id)sender
 {
+    if (self.filterIndex == 1) {
+        GLKMatrix2 rawTexCoordTransform = self.cameraView.rawTexCoordTransform;
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+        [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
+    }
+    
     [self.cameraView takeAPhotoWithCompletion:^(UIImage *image) {
         UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
         [self.view addSubview:imageView];
@@ -116,29 +150,17 @@
         }];
         
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, NULL);
+        
+        if (self.filterIndex == 1) {
+            GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+            [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
+        }
     }];
 }
 
 - (IBAction)changeFilterButtonTouchUpInside:(id)sender
 {
-    NSArray *files = [paths objectAtIndex:filterIndex];
-
-    NSError *error = nil;
-    if (![self.cameraView setFilterFragmentShaderPaths:files error:&error]) {
-        NSLog(@"Error setting shader: %@", [error localizedDescription]);
-    }
-    
-    if (filterIndex == 1) {
-        NSString *path = [[NSBundle mainBundle] pathForResource:@"LucasCorrea" ofType:@"png"];
-        XBTexture *texture = [[XBTexture alloc] initWithContentsOfFile:path options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], GLKTextureLoaderOriginBottomLeft, nil] error:NULL];
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
-        [program bindSamplerNamed:@"s_overlay" toXBTexture:texture unit:1];
-    }
-    
-    filterIndex++;
-    if (filterIndex > paths.count - 1) {
-        filterIndex = 0;
-    }
+    self.filterIndex = (self.filterIndex + 1) % self.filterPathArray.count;
 }
 
 - (IBAction)cameraButtonTouchUpInside:(id)sender 

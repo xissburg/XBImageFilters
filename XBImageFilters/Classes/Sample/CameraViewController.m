@@ -7,6 +7,7 @@
 //
 
 #import "CameraViewController.h"
+#import <QuartzCore/QuartzCore.h>
 
 #define kVSPathsKey @"vsPaths"
 #define kFSPathsKey @"fsPaths"
@@ -14,7 +15,9 @@
 @interface CameraViewController ()
 
 @property (nonatomic, copy) NSArray *filterPathArray;
+@property (nonatomic, copy) NSArray *filterNameArray;
 @property (nonatomic, assign) NSUInteger filterIndex;
+@property (nonatomic, assign) dispatch_source_t timer;
 
 @end
 
@@ -23,7 +26,11 @@
 @synthesize cameraView = _cameraView;
 @synthesize cameraTargetView = _cameraTargetView;
 @synthesize filterPathArray = _filterPathArray;
+@synthesize filterNameArray = _filterNameArray;
 @synthesize filterIndex = _filterIndex;
+@synthesize filterLabel;
+@synthesize secondsPerFrameLabel;
+@synthesize timer;
 
 #pragma mark - View lifecycle
 
@@ -34,16 +41,27 @@
     UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
     [self.cameraView addGestureRecognizer:tgr];
     [self.cameraTargetView hideAnimated:NO];
+    self.cameraView.updateSecondsPerFrame = YES;
     
     [self setupFilterPaths];
     self.filterIndex = 0;
     
     [self.cameraView startCapturing];
+    
+    // Create timer to update the SPF label
+    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+    dispatch_source_set_timer(self.timer, dispatch_walltime(NULL, 0), 1e9, 1e8);
+    dispatch_source_set_event_handler(self.timer, ^{
+        self.secondsPerFrameLabel.text = [NSString stringWithFormat:@"spf: %.4f", self.cameraView.secondsPerFrame];
+    });
+    dispatch_resume(self.timer);
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
+    dispatch_release(self.timer);
+    self.timer = NULL;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -56,6 +74,8 @@
 - (void)setFilterIndex:(NSUInteger)filterIndex
 {
     _filterIndex = filterIndex;
+    
+    self.filterLabel.text = [self.filterNameArray objectAtIndex:self.filterIndex];
     
     NSDictionary *paths = [self.filterPathArray objectAtIndex:self.filterIndex];
     NSArray *fsPaths = [paths objectForKey:kFSPathsKey];
@@ -72,12 +92,20 @@
         NSLog(@"Error setting shader: %@", [error localizedDescription]);
     }
     
-    if (self.filterIndex == 1) {
+    // Perform a few filter-specific initialization steps, like setting additional textures and uniforms
+    NSString *filterName = [self.filterNameArray objectAtIndex:self.filterIndex];
+    if ([filterName isEqualToString:@"Overlay"]) {
         NSString *path = [[NSBundle mainBundle] pathForResource:@"LucasCorrea" ofType:@"png"];
         XBTexture *texture = [[XBTexture alloc] initWithContentsOfFile:path options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], GLKTextureLoaderOriginBottomLeft, nil] error:NULL];
         GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
         [program bindSamplerNamed:@"s_overlay" toXBTexture:texture unit:1];
         [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
+    }
+    else if ([filterName isEqualToString:@"Sharpen"]) {
+        GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
+        [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
 }
 
@@ -91,6 +119,7 @@
     NSString *overlayVSPath = [[NSBundle mainBundle] pathForResource:@"OverlayVertexShader" ofType:@"glsl"];
     NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
     NSString *blurFSPath = [[NSBundle mainBundle] pathForResource:@"BlurFragmentShader" ofType:@"glsl"];
+    NSString *sharpFSPath = [[NSBundle mainBundle] pathForResource:@"UnsharpMaskFragmentShader" ofType:@"glsl"];
     NSString *hBlurVSPath = [[NSBundle mainBundle] pathForResource:@"HBlurVertexShader" ofType:@"glsl"];
     NSString *vBlurVSPath = [[NSBundle mainBundle] pathForResource:@"VBlurVertexShader" ofType:@"glsl"];
     NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"DiscretizeShader" ofType:@"glsl"];
@@ -99,27 +128,38 @@
     
     // Setup a combination of these filters
     self.filterPathArray = [[NSArray alloc] initWithObjects:
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:defaultFSPath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:overlayFSPath], kFSPathsKey, [NSArray arrayWithObject:overlayVSPath], kVSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, luminancePath, luminancePath, nil], kFSPathsKey, [NSArray arrayWithObjects:defaultVSPath, defaultVSPath, defaultVSPath, nil], kVSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:suckPath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:pixelatePath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:discretizePath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:luminancePath], kFSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:blurFSPath], kFSPathsKey, [NSArray arrayWithObject:hBlurVSPath], kVSPathsKey,nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:blurFSPath], kFSPathsKey, [NSArray arrayWithObject:vBlurVSPath], kVSPathsKey,nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, blurFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, blurFSPath, blurFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:defaultVSPath, vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil],
-             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, blurFSPath, discretizePath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, defaultVSPath, nil], kVSPathsKey, nil], nil];
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:defaultFSPath], kFSPathsKey, nil], // No Filter
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:overlayFSPath], kFSPathsKey, [NSArray arrayWithObject:overlayVSPath], kVSPathsKey, nil], // Overlay
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:suckPath], kFSPathsKey, nil], // Spread
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:pixelatePath], kFSPathsKey, nil], // Pixelate
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:discretizePath], kFSPathsKey, nil], // Discretize
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:luminancePath], kFSPathsKey, nil], // Luminance
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:blurFSPath], kFSPathsKey, [NSArray arrayWithObject:hBlurVSPath], kVSPathsKey,nil], // Horizontal Blur
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObject:blurFSPath], kFSPathsKey, [NSArray arrayWithObject:vBlurVSPath], kVSPathsKey,nil], // Vertical Blur
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, blurFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil], // Blur
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:luminancePath, blurFSPath, blurFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:defaultVSPath, vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil], // Blur B&W
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, sharpFSPath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, nil], kVSPathsKey, nil], // Sharpen
+             [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithObjects:blurFSPath, blurFSPath, discretizePath, nil], kFSPathsKey, [NSArray arrayWithObjects:vBlurVSPath, hBlurVSPath, defaultVSPath, nil], kVSPathsKey, nil], nil]; // Discrete Blur
+    
+    self.filterNameArray = [[NSArray alloc] initWithObjects:@"No Filter", @"Overlay", @"Spread", @"Pixelate", @"Discretize", @"Luminance", @"Horizontal Blur", @"Vertical Blur", @"Blur", @"Blur B&W", @"Sharpen", @"Discrete Blur", nil];
 }
 
 #pragma mark - Button Actions
 
-- (IBAction)takeAPictureButtonTouchUpInside:(id)sender
+- (IBAction)takeAPictureButtonTouchUpInside:(UIButton *)sender
 {
-    if (self.filterIndex == 1) {
+    sender.enabled = NO;
+    
+    // Perform filter specific setup before taking the photo
+    NSString *filterName = [self.filterNameArray objectAtIndex:self.filterIndex];
+    if ([filterName isEqualToString:@"Overlay"]) {
         GLKMatrix2 rawTexCoordTransform = self.cameraView.rawTexCoordTransform;
         GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+        [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
+    }
+    else if ([filterName isEqualToString:@"Sharpen"]) {
+        GLKMatrix2 rawTexCoordTransform = GLKMatrix2Multiply(self.cameraView.rawTexCoordTransform, (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -1});
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
     
@@ -154,10 +194,19 @@
         
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, NULL);
         
-        if (self.filterIndex == 1) {
+        // Restore filter-specific state
+        NSString *filterName = [self.filterNameArray objectAtIndex:self.filterIndex];
+        if ([filterName isEqualToString:@"Overlay"]) {
             GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
             [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
         }
+        else if ([filterName isEqualToString:@"Sharpen"]) {
+            GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
+            GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+            [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
+        }
+        
+        sender.enabled = YES;
     }];
 }
 
@@ -169,6 +218,14 @@
 - (IBAction)cameraButtonTouchUpInside:(id)sender 
 {
     self.cameraView.cameraPosition = self.cameraView.cameraPosition == XBCameraPositionBack? XBCameraPositionFront: XBCameraPositionBack;
+    
+    // The Sharpen filter needs to update its rawTexCoordTransform because it displays the mainTexture itself (raw camera texture) which flips
+    // when we swap between the front/back camera.
+    if ([[self.filterNameArray objectAtIndex:self.filterIndex] isEqualToString:@"Sharpen"]) {
+        GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
+    }
 }
 
 #pragma mark - Gesture recognition
@@ -203,6 +260,16 @@
 - (void)filteredCameraViewDidFinishAdjustingExposure:(XBFilteredCameraView *)filteredCameraView
 {
     [self.cameraTargetView hideAnimated:YES];
+}
+
+- (void)filteredView:(XBFilteredView *)filteredView didChangeMainTexture:(GLuint)mainTexture
+{
+    // The Sharpen filter uses the mainTexture (raw camera image) which might change names (because of the CVOpenGLESTextureCache), then we
+    // need to update it whenever it changes.
+    if ([[self.filterNameArray objectAtIndex:self.filterIndex] isEqualToString:@"Sharpen"]) {
+        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
+    }
 }
 
 @end

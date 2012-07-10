@@ -81,6 +81,7 @@ float pagesToMB(int pages);
 @synthesize oddPassFramebuffer = _oddPassFramebuffer;
 @synthesize evenPassFrambuffer = _evenPassFrambuffer;
 @synthesize maxTextureSize = _maxTextureSize;
+@synthesize delegate = _delegate;
 
 /**
  * Actual initializer. Called both in initWithFrame: when creating an instance programatically and in awakeFromNib when creating an instance
@@ -226,6 +227,10 @@ float pagesToMB(int pages);
     if (self.programs.count > 0) {
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
+        
+        if ([self.delegate respondsToSelector:@selector(filteredView:didChangeMainTexture:)]) {
+            [self.delegate filteredView:self didChangeMainTexture:self.mainTexture];
+        }
     }
 }
 
@@ -280,6 +285,10 @@ float pagesToMB(int pages);
         self.mainTexture = CVOpenGLESTextureGetName(*texture);
         GLKProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
+        
+        if ([self.delegate respondsToSelector:@selector(filteredView:didChangeMainTexture:)]) {
+            [self.delegate filteredView:self didChangeMainTexture:self.mainTexture];
+        }
     }
 }
 
@@ -602,8 +611,14 @@ float pagesToMB(int pages);
             return NO;
         }
         
-        [program setValue:i == fsSources.count - 1?&_contentTransform: (void *)&GLKMatrix4Identity forUniformNamed:@"u_contentTransform"];
-        [program setValue:i == 0?&_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
+        GLKMatrix4 m = GLKMatrix4Identity;
+        
+        if (i == fsSources.count - 1) {
+            m = GLKMatrix4Multiply(self.contentTransform, self.contentModeTransform);
+        }
+        
+        [program setValue:&m forUniformNamed:@"u_contentTransform"];
+        [program setValue:i == 0? &_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
         
         GLuint sourceTexture = 0;
         
@@ -632,6 +647,7 @@ float pagesToMB(int pages);
     }
     
     _programs = [programs copy];
+    [self refreshContentTransform];
     
     return YES;
 }
@@ -997,4 +1013,14 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size)
 float pagesToMB(int pages)
 {
     return pages*PAGE_SIZE/1024.f/1024.f;
+}
+
+GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1)
+{
+    GLKMatrix2 m;
+    m.m00 = m0.m00*m1.m00 + m0.m01*m1.m10;
+    m.m01 = m0.m00*m1.m01 + m0.m01*m1.m11;
+    m.m10 = m0.m10*m1.m00 + m0.m11*m1.m10;
+    m.m11 = m0.m10*m1.m01 + m0.m11*m1.m11;
+    return m;
 }

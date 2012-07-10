@@ -43,6 +43,7 @@
 		1BE99D111538A071001C532F /* CameraTargetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE99D101538A071001C532F /* CameraTargetView.m */; };
 		1BEA547A15AB6D7800A5F430 /* VBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BEA547915AB6D7800A5F430 /* VBlurVertexShader.glsl */; };
 		1BEA547C15AB6E0000A5F430 /* HBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BEA547B15AB6E0000A5F430 /* HBlurVertexShader.glsl */; };
+		1BEA549315ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BEA549215ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl */; };
 		1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEB76EA15A923CD000CEFEF /* XBTexture.m */; };
 		3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F2111522EEC500C27406 /* ProcessingViewController.m */; };
 		3295F22F1522FD3100C27406 /* basn0g01.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2201522FD3100C27406 /* basn0g01.png */; };
@@ -116,6 +117,7 @@
 		1BE99D101538A071001C532F /* CameraTargetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CameraTargetView.m; path = Classes/XBImageFilters/CameraTargetView.m; sourceTree = "<group>"; };
 		1BEA547915AB6D7800A5F430 /* VBlurVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = VBlurVertexShader.glsl; path = Shaders/VBlurVertexShader.glsl; sourceTree = "<group>"; };
 		1BEA547B15AB6E0000A5F430 /* HBlurVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = HBlurVertexShader.glsl; path = Shaders/HBlurVertexShader.glsl; sourceTree = "<group>"; };
+		1BEA549215ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = UnsharpMaskFragmentShader.glsl; path = Shaders/UnsharpMaskFragmentShader.glsl; sourceTree = "<group>"; };
 		1BEB76E915A923CD000CEFEF /* XBTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBTexture.h; sourceTree = "<group>"; };
 		1BEB76EA15A923CD000CEFEF /* XBTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTexture.m; sourceTree = "<group>"; };
 		3295F2101522EEC500C27406 /* ProcessingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessingViewController.h; path = Classes/Sample/ProcessingViewController.h; sourceTree = "<group>"; };
@@ -165,12 +167,13 @@
 			isa = PBXGroup;
 			children = (
 				1BE4179114F92E5E00EB0ADD /* BlurFragmentShader.glsl */,
-				1BEA547915AB6D7800A5F430 /* VBlurVertexShader.glsl */,
+				1BEA549215ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl */,
 				1BEA547B15AB6E0000A5F430 /* HBlurVertexShader.glsl */,
+				1BEA547915AB6D7800A5F430 /* VBlurVertexShader.glsl */,
 				1B675E6F14EE5DBC00ED8402 /* LuminanceFragmentShader.glsl */,
 				1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */,
-				1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */,
 				1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */,
+				1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */,
 				1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */,
 				1BE20C651535C54F00E9D595 /* SuckShader.glsl */,
 				1BE20C631535C33900E9D595 /* PixelateShader.glsl */,
@@ -413,6 +416,7 @@
 				1BE8667115AB23B60058E8C7 /* OverlayVertexShader.glsl in Resources */,
 				1BEA547A15AB6D7800A5F430 /* VBlurVertexShader.glsl in Resources */,
 				1BEA547C15AB6E0000A5F430 /* HBlurVertexShader.glsl in Resources */,
+				1BEA549315ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

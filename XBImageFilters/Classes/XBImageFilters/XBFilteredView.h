@@ -10,13 +10,24 @@
 #import <GLKit/GLKit.h>
 #import "GLKProgram.h"
 
+@class XBFilteredView;
+
+@protocol XBFilteredViewDelegate <NSObject>
+
+@optional
+- (void)filteredView:(XBFilteredView *)filteredView didChangeMainTexture:(GLuint)mainTexture;
+
+@end
+
 @interface XBFilteredView : UIView
 
+@property (weak, nonatomic) id<XBFilteredViewDelegate> delegate;
 @property (readonly, nonatomic) NSArray *programs;
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
 @property (assign, nonatomic) CGSize contentSize; // Content size used to compute the contentMode transform. By default it can be the texture size.
 @property (assign, nonatomic) GLKMatrix2 texCoordTransform;
 @property (readonly, nonatomic) GLint maxTextureSize; // Maximum texture width and height
+@property (readonly, nonatomic) GLuint mainTexture;
 @property (readonly, nonatomic) EAGLContext *context;
 
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error DEPRECATED_ATTRIBUTE;
@@ -61,3 +72,4 @@
 @end
 
 extern const GLKMatrix2 GLKMatrix2Identity;
+GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1);

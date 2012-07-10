@@ -19,10 +19,10 @@ void main()
 {
     gl_Position = u_contentTransform * a_position;
     v_texCoord = u_texCoordTransform * a_texCoord;
-    v_blurTexCoords[0] = v_texCoord + vec2(0.0, -0.012);
-    v_blurTexCoords[1] = v_texCoord + vec2(0.0, -0.008);
-    v_blurTexCoords[2] = v_texCoord + vec2(0.0, -0.004);
-    v_blurTexCoords[3] = v_texCoord + vec2(0.0,  0.004);
-    v_blurTexCoords[4] = v_texCoord + vec2(0.0,  0.008);
-    v_blurTexCoords[5] = v_texCoord + vec2(0.0,  0.012);
+    v_blurTexCoords[0] = v_texCoord + vec2(0.0, -0.009);
+    v_blurTexCoords[1] = v_texCoord + vec2(0.0, -0.006);
+    v_blurTexCoords[2] = v_texCoord + vec2(0.0, -0.003);
+    v_blurTexCoords[3] = v_texCoord + vec2(0.0,  0.003);
+    v_blurTexCoords[4] = v_texCoord + vec2(0.0,  0.006);
+    v_blurTexCoords[5] = v_texCoord + vec2(0.0,  0.009);
 }

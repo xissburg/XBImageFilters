@@ -47,7 +47,7 @@ extern NSString *const XBCaptureQuality352x288;
 
 @class XBFilteredCameraView;
 
-@protocol XBFilteredCameraViewDelegate <NSObject>
+@protocol XBFilteredCameraViewDelegate <XBFilteredViewDelegate>
 
 @optional
 - (void)filteredCameraViewDidBeginAdjustingFocus:(XBFilteredCameraView *)filteredCameraView;

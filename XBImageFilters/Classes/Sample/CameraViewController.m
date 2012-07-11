@@ -17,7 +17,6 @@
 @property (nonatomic, copy) NSArray *filterPathArray;
 @property (nonatomic, copy) NSArray *filterNameArray;
 @property (nonatomic, assign) NSUInteger filterIndex;
-@property (nonatomic, assign) dispatch_source_t timer;
 
 @end
 
@@ -30,7 +29,6 @@
 @synthesize filterIndex = _filterIndex;
 @synthesize filterLabel;
 @synthesize secondsPerFrameLabel;
-@synthesize timer;
 
 #pragma mark - View lifecycle
 
@@ -45,23 +43,18 @@
     
     [self setupFilterPaths];
     self.filterIndex = 0;
-    
-    [self.cameraView startCapturing];
-    
-    // Create timer to update the SPF label
-    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
-    dispatch_source_set_timer(self.timer, dispatch_walltime(NULL, 0), 1e9, 1e8);
-    dispatch_source_set_event_handler(self.timer, ^{
-        self.secondsPerFrameLabel.text = [NSString stringWithFormat:@"spf: %.4f", self.cameraView.secondsPerFrame];
-    });
-    dispatch_resume(self.timer);
 }
 
-- (void)viewDidUnload
+- (void)viewWillAppear:(BOOL)animated
 {
-    [super viewDidUnload];
-    dispatch_release(self.timer);
-    self.timer = NULL;
+    [super viewWillAppear:animated];
+    [self.cameraView startCapturing];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [self.cameraView stopCapturing];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -270,6 +263,11 @@
         GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
     }
+}
+
+- (void)filteredCameraView:(XBFilteredCameraView *)filteredCameraView didUpdateSecondsPerFrame:(NSTimeInterval)secondsPerFrame
+{
+    self.secondsPerFrameLabel.text = [NSString stringWithFormat:@"spf: %.4f", secondsPerFrame];
 }
 
 @end

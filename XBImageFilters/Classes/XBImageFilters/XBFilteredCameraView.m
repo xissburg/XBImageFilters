@@ -34,6 +34,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (assign, nonatomic) BOOL shouldStartCapturingWhenBecomesActive;
 @property (strong, nonatomic) NSMutableArray *secondsPerFrameArray;
 @property (assign, nonatomic) BOOL secondsPerFrameArrayDirty;
+@property (nonatomic, assign) dispatch_source_t timerSPF; // Timer for updating secondsPerFrame for the delegate
 
 - (void)setupOutputs;
 
@@ -63,6 +64,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @synthesize updateSecondsPerFrame = _updateSecondsPerFrame;
 @synthesize rendering = _rendering;
 @synthesize capturing = _capturing;
+@synthesize timerSPF = _timerSPF;
 
 - (void)_XBFilteredCameraViewInit
 {
@@ -76,8 +78,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     self.videoCaptureQuality = XBCaptureQualityPhoto;
     self.imageCaptureQuality = XBCaptureQualityPhoto;
     self.photoOrientation = XBPhotoOrientationAuto;
-    
-    self.secondsPerFrameArray = [[NSMutableArray alloc] init];
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
@@ -115,6 +115,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self removeObservers];
     [self cleanUpTextures];
     CFRelease(self.videoTextureCache);
+    
+    if (self.timerSPF != NULL) {
+        dispatch_suspend(self.timerSPF);
+        dispatch_release(self.timerSPF);
+    }
 }
 
 #pragma mark - Properties
@@ -315,6 +320,18 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     return _secondsPerFrame;
 }
 
+- (void)setUpdateSecondsPerFrame:(BOOL)updateSecondsPerFrame
+{
+    _updateSecondsPerFrame = updateSecondsPerFrame;
+    
+    if (_updateSecondsPerFrame && self.isCapturing) {
+        [self createSPFTimer];
+    }
+    else {
+        [self destroySPFTimer];
+    }
+}
+
 - (BOOL)isCapturing
 {
     return self.captureSession.isRunning;
@@ -349,12 +366,17 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 {
     self.rendering = YES;
     [self.captureSession startRunning];
+    
+    if (self.updateSecondsPerFrame) {
+        [self createSPFTimer];
+    }
 }
 
 - (void)stopCapturing
 {
     self.rendering = NO;
     [self.captureSession stopRunning];
+    [self destroySPFTimer];
 }
 
 - (BOOL)hasCameraAtPosition:(XBCameraPosition)cameraPosition
@@ -667,6 +689,29 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     else {
         return nil;
     }
+}
+
+- (void)createSPFTimer
+{
+    [self destroySPFTimer];
+    self.secondsPerFrameArray = [[NSMutableArray alloc] init];
+    self.timerSPF = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+    dispatch_source_set_timer(self.timerSPF, dispatch_walltime(NULL, 0), 1e9, 1e8);
+    dispatch_source_set_event_handler(self.timerSPF, ^{
+        if (self.isCapturing && [self.delegate respondsToSelector:@selector(filteredCameraView:didUpdateSecondsPerFrame:)]) {
+            [self.delegate filteredCameraView:self didUpdateSecondsPerFrame:self.secondsPerFrame];
+        }
+    });
+    dispatch_resume(self.timerSPF);
+}
+
+- (void)destroySPFTimer
+{
+    if (self.timerSPF != NULL) {
+        dispatch_release(self.timerSPF);
+        self.timerSPF = NULL;
+    }
+    self.secondsPerFrameArray = nil;
 }
 
 #pragma mark - Key-Value Observing

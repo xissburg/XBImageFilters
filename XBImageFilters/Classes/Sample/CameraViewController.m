@@ -161,15 +161,6 @@
         [self.view addSubview:imageView];
         imageView.frame = CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height);
         imageView.contentMode = UIViewContentModeScaleAspectFit;
-        
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, imageView.frame.size.width, 40)];
-        label.textAlignment = UITextAlignmentCenter;
-        label.backgroundColor = [UIColor clearColor];
-        label.textColor = [UIColor whiteColor];
-        label.font = [UIFont systemFontOfSize:18];
-        label.text = @"This is an UIImageView";
-        [imageView addSubview:label];
-        
         imageView.transform = CGAffineTransformMakeScale(0.01, 0.01);
         imageView.alpha = 0.5;
         

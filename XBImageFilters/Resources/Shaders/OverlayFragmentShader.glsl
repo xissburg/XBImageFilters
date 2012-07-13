@@ -19,6 +19,6 @@ void main()
 {
     vec4 color = texture2D(s_texture, v_texCoord);
     vec4 overlay = texture2D(s_overlay, v_rawTexCoord);
-    vec3 br = clamp(sign(overlay.rgb - vec3(0.5)), vec3(0.0), vec3(1.0));
+    vec3 br = clamp(sign(color.rgb - vec3(0.5)), vec3(0.0), vec3(1.0));
     gl_FragColor = vec4(mix(2.0*color.rgb*overlay.rgb, vec3(1.0) - 2.0*(vec3(1.0)-color.rgb)*(vec3(1.0)-overlay.rgb), br), color.a);
 }

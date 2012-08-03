@@ -760,7 +760,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         return;
     }
     
-    NSTimeInterval t0, t1;
+    NSTimeInterval t0 = 0, t1 = 0;
     
     if (self.updateSecondsPerFrame) {
         struct timeval t;

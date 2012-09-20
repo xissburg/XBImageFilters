@@ -84,7 +84,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     [self setupOutputs];
     
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
+    CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, self.context, NULL, &_videoTextureCache);
+#else
     CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)self.context, NULL, &_videoTextureCache);
+#endif
     if (ret != kCVReturnSuccess) {
         NSLog(@"Error at CVOpenGLESTextureCacheCreate: %d", ret);
     }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B1ED24B160E1D3D00ADABA1 /* XBTextureInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B1ED24A160E1D3D00ADABA1 /* XBTextureInfo.m */; };
 		1B36A52D15A3C4AC00D297B1 /* OverlayFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */; };
 		1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D529A1501A188007D743A /* XBFilteredCameraView.m */; };
 		1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D52A41501A6AA007D743A /* CameraViewController.m */; };
@@ -67,6 +68,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B1ED249160E1D3D00ADABA1 /* XBTextureInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBTextureInfo.h; sourceTree = "<group>"; };
+		1B1ED24A160E1D3D00ADABA1 /* XBTextureInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTextureInfo.m; sourceTree = "<group>"; };
 		1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = OverlayFragmentShader.glsl; path = Shaders/OverlayFragmentShader.glsl; sourceTree = "<group>"; };
 		1B4D52991501A188007D743A /* XBFilteredCameraView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredCameraView.h; path = Classes/XBImageFilters/XBFilteredCameraView.h; sourceTree = "<group>"; };
 		1B4D529A1501A188007D743A /* XBFilteredCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredCameraView.m; path = Classes/XBImageFilters/XBFilteredCameraView.m; sourceTree = "<group>"; };
@@ -305,6 +308,8 @@
 				1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */,
 				1BEB76E915A923CD000CEFEF /* XBTexture.h */,
 				1BEB76EA15A923CD000CEFEF /* XBTexture.m */,
+				1B1ED249160E1D3D00ADABA1 /* XBTextureInfo.h */,
+				1B1ED24A160E1D3D00ADABA1 /* XBTextureInfo.m */,
 			);
 			name = GLKitAdditions;
 			path = Classes/XBImageFilters/GLKitAdditions;
@@ -442,6 +447,7 @@
 				3295F2401522FE4D00C27406 /* UIImage+XBImageFilters.m in Sources */,
 				1BE99D111538A071001C532F /* CameraTargetView.m in Sources */,
 				1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */,
+				1B1ED24B160E1D3D00ADABA1 /* XBTextureInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -121,7 +121,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     CFRelease(self.videoTextureCache);
     
     if (self.timerSPF != NULL) {
-        dispatch_suspend(self.timerSPF);
         dispatch_release(self.timerSPF);
     }
 }
@@ -168,7 +167,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     // refresh orientation
     AVCaptureConnection *connection = [self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
     connection.videoOrientation = AVCaptureVideoOrientationPortrait;
-    connection.videoMirrored = YES;
     
     // And the contentTransform
     if (_cameraPosition == XBCameraPositionBack) {
@@ -422,7 +420,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     }
     
     imageConnection.videoOrientation = AVCaptureVideoOrientationPortrait;
-    imageConnection.videoMirrored = YES;
     
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
         self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
@@ -651,7 +648,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     AVCaptureConnection *connection = [self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
     connection.videoOrientation = AVCaptureVideoOrientationPortrait;
-    connection.videoMirrored = YES;
 }
 
 - (void)removeObservers

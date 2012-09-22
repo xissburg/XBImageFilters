@@ -7,6 +7,7 @@
 //
 
 #import "XBTexture.h"
+#import "XBTextureInfo.h"
 
 @implementation XBTexture
 
@@ -21,10 +22,7 @@
     self = [super init];
     if (self) {
         _textureInfo = [textureInfo copy];
-        _wrapSMode = XBTextureWrapModeRepeat;
-        _wrapTMode = XBTextureWrapModeRepeat;
-        _minFilter = XBTextureMinFilterNearestMipmapLinear;
-        _magFilter = XBTextureMagFilterLinear;
+        [self setDefaults];
     }
     return self;
 }
@@ -38,6 +36,20 @@
     }
     
     return [self initWithTextureInfo:textureInfo];
+}
+
+- (id)initWithWidth:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data
+{
+    self = [super init];
+    if (self) {
+        GLuint name;
+        glGenTextures(1, &name);
+        glBindTexture(GL_TEXTURE_2D, name);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+        _textureInfo = [[XBTextureInfo alloc] initWithName:name target:GL_TEXTURE_2D width:width height:height];
+        [self setDefaults];
+    }
+    return self;
 }
 
 - (void)dealloc
@@ -140,6 +152,14 @@
         case XBTextureMagFilterNearest:
             return GL_NEAREST;
     }
+}
+
+- (void)setDefaults
+{
+    _wrapSMode = XBTextureWrapModeRepeat;
+    _wrapTMode = XBTextureWrapModeRepeat;
+    _minFilter = XBTextureMinFilterNearestMipmapLinear;
+    _magFilter = XBTextureMagFilterLinear;
 }
 
 @end

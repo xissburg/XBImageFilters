@@ -38,5 +38,6 @@ typedef enum {
 
 - (id)initWithTextureInfo:(GLKTextureInfo *)textureInfo;
 - (id)initWithContentsOfFile:(NSString *)path options:(NSDictionary *)options error:(NSError **)error; // samething as -[GLKTextureLoader initWithContentsOfFile:opetions:error:] or +[GLKTextureLoader textureWithContentsOfFile:opetions:error:]
+- (id)initWithWidth:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data;
 
 @end

@@ -91,6 +91,7 @@ float pagesToMB(int pages);
 {
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
     self.layer.opaque = YES;
+    ((CAEAGLLayer *)self.layer).drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], kEAGLDrawablePropertyRetainedBacking, nil];
 
     _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     

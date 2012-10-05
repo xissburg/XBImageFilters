@@ -8,6 +8,7 @@
 
 #import "XBFilteredCameraView.h"
 #import <sys/time.h>
+#import <objc/message.h>
 
 #define kMaxTimeSamples 10
 
@@ -222,6 +223,43 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 - (CGPoint)exposurePoint
 {
     return CGPointMake((1 - self.device.exposurePointOfInterest.y)*self.bounds.size.width, self.device.exposurePointOfInterest.x*self.bounds.size.height);
+}
+
+- (BOOL)lowLightBoostSupported
+{
+    if ([self.device respondsToSelector:@selector(isLowLightBoostSupported)]) {
+        return ((BOOL (*)(id, SEL))objc_msgSend)(self.device, @selector(isLowLightBoostSupported));
+    }
+    return NO;
+}
+
+- (BOOL)lowLightBoostEnabled
+{
+    if ([self.device respondsToSelector:@selector(isLowLightBoostEnabled)]) {
+        return ((BOOL (*)(id, SEL))objc_msgSend)(self.device, @selector(isLowLightBoostEnabled));
+    }
+    return NO;
+}
+
+- (BOOL)automaticallyEnablesLowLightBoostWhenAvailable
+{
+    if ([self.device respondsToSelector:@selector(automaticallyEnablesLowLightBoostWhenAvailable)]) {
+        return ((BOOL (*)(id, SEL))objc_msgSend)(self.device, @selector(automaticallyEnablesLowLightBoostWhenAvailable));
+    }
+    return NO;
+}
+
+- (void)setAutomaticallyEnablesLowLightBoostWhenAvailable:(BOOL)automaticallyEnablesLowLightBoostWhenAvailable
+{
+    if (self.lowLightBoostSupported && [self.device respondsToSelector:@selector(setAutomaticallyEnablesLowLightBoostWhenAvailable:)]) {
+        NSError *error = nil;
+        if (![self.device lockForConfiguration:&error]) {
+            NSLog(@"XBFilteredCameraView: Failed to enable automatic low light boost: %@", [error localizedDescription]);
+            return;
+        }
+        objc_msgSend(self.device, @selector(setAutomaticallyEnablesLowLightBoostWhenAvailable:), automaticallyEnablesLowLightBoostWhenAvailable);
+        [self.device unlockForConfiguration];
+    }
 }
 
 - (void)setExposurePoint:(CGPoint)exposurePoint

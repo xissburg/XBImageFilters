@@ -396,7 +396,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (GLKMatrix2)rawTexCoordTransform
 {
-    XBPhotoOrientation orientation = self.photoOrientation != XBPhotoOrientationAuto? : [self photoOrientationForDeviceOrientation];
+    XBPhotoOrientation orientation = self.photoOrientation != XBPhotoOrientationAuto? self.photoOrientation: [self photoOrientationForDeviceOrientation];
     return [self rawTexCoordTransformForPhotoOrientation:orientation cameraPosition:self.cameraPosition];
 }
 

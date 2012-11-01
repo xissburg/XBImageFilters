@@ -81,7 +81,10 @@ extern NSString *const XBCaptureQuality352x288;
 @property (nonatomic, assign) BOOL updateSecondsPerFrame;
 @property (nonatomic, assign, getter = isRendering) BOOL rendering;
 @property (nonatomic, assign, getter = isCapturing) BOOL capturing;
-@property (nonatomic, readonly) GLKMatrix2 rawTexCoordTransform; // utility property for filters with overlay textures
+/** Utility property for filters with overlay textures. It is set to a texture coordinate that will stretch a texture over the whole view
+ *  according to the current camera (front or back) and desired photo orientation.
+ */
+@property (nonatomic, readonly) GLKMatrix2 rawTexCoordTransform;
 
 /*
  * Starts/stops capturing and rendering the camera image with filters applied in realtime.

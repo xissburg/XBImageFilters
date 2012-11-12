@@ -7,12 +7,7 @@
 //
 
 #import "XBFilteredView.h"
-#import "GLKProgram.h"
 #import <QuartzCore/QuartzCore.h>
-#import <mach/host_info.h>
-#import <mach/mach.h>
-
-const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
 
 typedef struct {
     GLKVector3 position;
@@ -20,14 +15,11 @@ typedef struct {
 } Vertex;
 
 void ImageProviderReleaseData(void *info, const void *data, size_t size);
-float pagesToMB(int pages);
 
 @interface XBFilteredView ()
 
-@property (assign, nonatomic) GLuint framebuffer;
-@property (assign, nonatomic) GLuint colorRenderbuffer;
-@property (assign, nonatomic) GLint viewportWidth;
-@property (assign, nonatomic) GLint viewportHeight;
+@property (strong, nonatomic) XBGLFramebuffer *framebuffer;
+@property (strong, nonatomic) XBGLRenderbuffer *renderbuffer;
 
 @property (assign, nonatomic) CGRect previousBounds; //used in layoutSubviews to determine whether the framebuffer should be recreated
 
@@ -62,11 +54,8 @@ float pagesToMB(int pages);
 
 @implementation XBFilteredView
 
-@synthesize context = _context;
 @synthesize framebuffer = _framebuffer;
-@synthesize colorRenderbuffer = _colorRenderbuffer;
-@synthesize viewportWidth = _viewportWidth;
-@synthesize viewportHeight = _viewportHeight;
+@synthesize renderbuffer = _renderbuffer;
 @synthesize previousBounds = _previousBounds;
 @synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
 @synthesize mainTexture = _mainTexture;
@@ -80,7 +69,6 @@ float pagesToMB(int pages);
 @synthesize evenPassTexture = _evenPassTexture;
 @synthesize oddPassFramebuffer = _oddPassFramebuffer;
 @synthesize evenPassFrambuffer = _evenPassFrambuffer;
-@synthesize maxTextureSize = _maxTextureSize;
 @synthesize delegate = _delegate;
 
 /**
@@ -92,17 +80,10 @@ float pagesToMB(int pages);
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
     self.layer.opaque = YES;
     ((CAEAGLLayer *)self.layer).drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], kEAGLDrawablePropertyRetainedBacking, nil];
-
-    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
-    self.previousBounds = CGRectZero;
-    
-    if ([self needsToCreateFramebuffer]) {
-        [self createFramebuffer];
-        self.previousBounds = self.bounds;
-    }
-    
+    [self createFramebuffer];
     [self setupGL];
+    self.previousBounds = self.bounds;
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -117,14 +98,6 @@ float pagesToMB(int pages);
 - (void)awakeFromNib
 {
     [self _XBFilteredViewInit];
-}
-
-- (void)dealloc
-{
-    [EAGLContext setCurrentContext:self.context];
-    [self destroyGL];
-    _context = nil;
-    [EAGLContext setCurrentContext:nil];
 }
 
 #pragma mark - Overrides
@@ -172,14 +145,14 @@ float pagesToMB(int pages);
     
     // The transform is applied only on the first program, because the next ones will already receive the image with the transform applied.
     // The transform would be applied again on each filter otherwise.
-    GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+    XBGLProgram *firstProgram = [self.programs objectAtIndex:0];
     [firstProgram setValue:&_texCoordTransform forUniformNamed:@"u_texCoordTransform"];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor
 {
     [super setBackgroundColor:backgroundColor];
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     CGFloat r, g, b, a;
     [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
@@ -195,7 +168,7 @@ float pagesToMB(int pages);
 
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     glDeleteTextures(1, &_mainTexture);
     
@@ -226,7 +199,7 @@ float pagesToMB(int pages);
     
     // Update the texture in the first shader
     if (self.programs.count > 0) {
-        GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+        XBGLProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
         
         if ([self.delegate respondsToSelector:@selector(filteredView:didChangeMainTexture:)]) {
@@ -237,7 +210,7 @@ float pagesToMB(int pages);
 
 - (void)_updateTextureWithData:(GLvoid *)textureData
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     glBindTexture(GL_TEXTURE_2D, self.mainTexture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.textureWidth, self.textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
@@ -246,7 +219,7 @@ float pagesToMB(int pages);
 
 - (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
     size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
@@ -284,7 +257,7 @@ float pagesToMB(int pages);
     // Update the texture in the first shader
     if (self.programs.count > 0 && CVOpenGLESTextureGetName(*texture) != self.mainTexture) {
         self.mainTexture = CVOpenGLESTextureGetName(*texture);
-        GLKProgram *firstProgram = [self.programs objectAtIndex:0];
+        XBGLProgram *firstProgram = [self.programs objectAtIndex:0];
         [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
         
         if ([self.delegate respondsToSelector:@selector(filteredView:didChangeMainTexture:)]) {
@@ -295,14 +268,14 @@ float pagesToMB(int pages);
 
 - (void)_deleteMainTexture
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     glDeleteTextures(1, &_mainTexture);
     _mainTexture = 0;
 }
 
 - (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     size_t textureWidth = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t textureHeight = CVPixelBufferGetHeight(imageBuffer);
@@ -330,7 +303,7 @@ float pagesToMB(int pages);
 
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     GLuint mainTexture = [self generateDefaultTextureWithWidth:textureWidth height:textureHeight data:data];
     
@@ -341,7 +314,7 @@ float pagesToMB(int pages);
 
 - (UIImage *)_filteredImageWithTexture:(GLuint)texture textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform texCoordTransform:(GLKMatrix2)texCoordTransform textureReleaseBlock:(void (^)(void))textureRelease
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     GLKMatrix2 oldTexCoordTransform = self.texCoordTransform;
     self.texCoordTransform = texCoordTransform;
@@ -365,7 +338,7 @@ float pagesToMB(int pages);
     glViewport(0, 0, targetWidth, targetHeight);
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
+        XBGLProgram *program = [self.programs objectAtIndex:pass];
         
         if (pass%2 == 0) {
             glBindFramebuffer(GL_FRAMEBUFFER, evenPassFrambuffer);
@@ -431,7 +404,7 @@ float pagesToMB(int pages);
     
     // Reset texture bindings
     for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
+        XBGLProgram *program = [self.programs objectAtIndex:pass];
         GLuint sourceTexture = 0;
         
         if (pass == 0) { // First pass always uses the original image
@@ -447,8 +420,8 @@ float pagesToMB(int pages);
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
     }
     
-    glViewport(0, 0, self.viewportWidth, self.viewportHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+    [XBGLEngine sharedInstance].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
+    [[XBGLEngine sharedInstance] bindFramebuffer:self.framebuffer.name];
     self.texCoordTransform = oldTexCoordTransform;
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
@@ -465,7 +438,7 @@ float pagesToMB(int pages);
 
 - (UIImage *)_imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     size_t size = width * height * 4;
     GLvoid *pixels = malloc(size);
@@ -581,7 +554,7 @@ float pagesToMB(int pages);
 
 - (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources vertexShaderSources:(NSArray *)vsSources error:(NSError *__autoreleasing *)error
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     [self destroyEvenPass];
     [self destroyOddPass];
@@ -607,7 +580,7 @@ float pagesToMB(int pages);
     for (int i = 0; i < fsSources.count; ++i) {
         NSString *fsSource = [fsSources objectAtIndex:i];
         NSString *vsSource = [vsSources objectAtIndex:i];
-        GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderSource:vsSource fragmentShaderSource:fsSource error:error];
+        XBGLProgram *program = [[XBGLProgram alloc] initWithVertexShaderSource:vsSource fragmentShaderSource:fsSource error:error];
         if (program == nil) {
             return NO;
         }
@@ -636,11 +609,11 @@ float pagesToMB(int pages);
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
         
         // Enable vertex position and texCoord attributes
-        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
+        XBGLShaderAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
         glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
         glEnableVertexAttribArray(positionAttribute.location);
         
-        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
+        XBGLShaderAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
         glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
         glEnableVertexAttribArray(texCoordAttribute.location);
         
@@ -662,20 +635,20 @@ float pagesToMB(int pages);
 {
     int width = (int)(self.bounds.size.width * self.contentScaleFactor);
     int height = (int)(self.bounds.size.height * self.contentScaleFactor);
-    return [self _imageFromFramebuffer:self.framebuffer width:width height:height orientation:orientation];
+    return [self _imageFromFramebuffer:self.framebuffer.name width:width height:height orientation:orientation];
 }
 
 - (void)display
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
-        GLKProgram *program = [self.programs objectAtIndex:pass];
+        XBGLProgram *program = [self.programs objectAtIndex:pass];
         
         if (self.programs.count > 1) {
             if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
-                glViewport(0, 0, self.viewportWidth, self.viewportHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+                [XBGLEngine sharedInstance].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
+                [[XBGLEngine sharedInstance] bindFramebuffer:self.framebuffer.name];
             }
             else if (pass%2 == 0) {
                 glViewport(0, 0, self.textureWidth, self.textureHeight);
@@ -700,7 +673,7 @@ float pagesToMB(int pages);
         }
     }
     
-    [self.context presentRenderbuffer:GL_RENDERBUFFER];
+    [XBGLEngine.sharedInstance.context presentRenderbuffer:GL_RENDERBUFFER];
     
 #ifdef DEBUG
     GLenum error = glGetError();
@@ -710,40 +683,14 @@ float pagesToMB(int pages);
 #endif
 }
 
-- (NSString *)memoryStatus
-{
-    // Code by Noel Llopis
-	vm_statistics_data_t vmStats;
-	mach_msg_type_number_t infoCount = HOST_VM_INFO_COUNT;
-	host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vmStats, &infoCount);
-    
-	const int totalPages = vmStats.wire_count + vmStats.active_count + vmStats.inactive_count + vmStats.free_count;
-	const int availablePages = vmStats.free_count;
-	const int activePages = vmStats.active_count;
-	const int wiredPages = vmStats.wire_count;
-	const int purgeablePages = vmStats.purgeable_count;
-    
-	NSMutableString *txt = [[NSMutableString alloc] initWithCapacity:512];
-	[txt appendFormat:@"\nTotal: %d (%.2fMB)", totalPages, pagesToMB(totalPages)];
-	[txt appendFormat:@"\nAvailable: %d (%.2fMB)", availablePages, pagesToMB(availablePages)];
-	[txt appendFormat:@"\nActive: %d (%.2fMB)", activePages, pagesToMB(activePages)];
-	[txt appendFormat:@"\nWired: %d (%.2fMB)", wiredPages, pagesToMB(wiredPages)];
-	[txt appendFormat:@"\nPurgeable: %d (%.2fMB)", purgeablePages, pagesToMB(purgeablePages)];
-    
-    return txt;
-}
-
 #pragma mark - Private Methods
 
 - (void)setupGL
 {
-    [EAGLContext setCurrentContext:self.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
-    // Make sure the background color is set
-    self.backgroundColor = self.backgroundColor;
-    
-    // Make sure depth testing will be kept disabled
-    glDisable(GL_DEPTH_TEST);
+    [XBGLEngine sharedInstance].clearColor = self.backgroundColor;
+    [XBGLEngine sharedInstance].depthTestEnabled = NO;
     
     // Create vertices
     Vertex vertices[] = {
@@ -771,16 +718,11 @@ float pagesToMB(int pages);
     self.contentTransform = GLKMatrix4Identity;
     self.texCoordTransform = GLKMatrix2Identity;
     
-    // Get max tex size
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
-    
     glActiveTexture(GL_TEXTURE0);
 }
 
 - (void)destroyGL
 {
-    [EAGLContext setCurrentContext:self.context];
-    
     glDeleteBuffers(1, &_imageQuadVertexBuffer);
     self.imageQuadVertexBuffer = 0;
     
@@ -790,8 +732,6 @@ float pagesToMB(int pages);
     
     glDeleteFramebuffers(1, &_evenPassFrambuffer);
     glDeleteFramebuffers(1, &_oddPassFramebuffer);
-    
-    [self destroyFramebuffer];
 }
 
 - (GLuint)generateDefaultTextureWithWidth:(GLint)width height:(GLint)height data:(GLvoid *)data
@@ -852,7 +792,7 @@ float pagesToMB(int pages);
     
     // The contentTransform is only applied on the last program otherwise it would be reapplied in each filter. Also, the contentTransform's
     // purpose is to adjust the final image on the framebuffer/screen. That is why it is applied only in the end.
-    GLKProgram *lastProgram = [self.programs lastObject];
+    XBGLProgram *lastProgram = [self.programs lastObject];
     [lastProgram setValue:composedTransform.m forUniformNamed:@"u_contentTransform"];
 }
 
@@ -930,41 +870,21 @@ float pagesToMB(int pages);
 
 - (BOOL)createFramebuffer
 {
-    [EAGLContext setCurrentContext:self.context];
+    self.framebuffer = [[XBGLFramebuffer alloc] init];
+    self.renderbuffer = [[XBGLRenderbuffer alloc] init];
+    [self.renderbuffer storageFromGLLayer:(CAEAGLLayer *)self.layer];
+    [self.framebuffer attachRenderbuffer:self.renderbuffer];
     
-    [self destroyFramebuffer];
-    
-    glGenFramebuffers(1, &_framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
-    
-    glGenRenderbuffers(1, &_colorRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
-    [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, self.colorRenderbuffer);
-    
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_viewportWidth);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_viewportHeight);
-    
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
+    XBGLFramebufferStatus status = self.framebuffer.status;
+    if (status != XBGLFramebufferStatusComplete) {
         NSLog(@"Failed to create framebuffer: %x", status);
         return NO;
     }
-    
-    glBindRenderbuffer(GL_RENDERBUFFER, self.colorRenderbuffer);
-    glViewport(0, 0, self.viewportWidth, self.viewportHeight);
+
+    [[XBGLEngine sharedInstance] bindRenderbuffer:self.renderbuffer.name];
+    [XBGLEngine sharedInstance].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
     
     return YES;
-}
-
-- (void)destroyFramebuffer
-{
-    glDeleteFramebuffers(1, &_framebuffer);
-    self.framebuffer = 0;
-    
-    glDeleteRenderbuffers(1, &_colorRenderbuffer);
-    self.colorRenderbuffer = 0;
 }
 
 - (void)refreshContentModeTransform
@@ -1004,24 +924,7 @@ float pagesToMB(int pages);
 
 @end
 
-#pragma mark - Functions
-
 void ImageProviderReleaseData(void *info, const void *data, size_t size)
 {
     free((void *)data);
-}
-
-float pagesToMB(int pages)
-{
-    return pages*PAGE_SIZE/1024.f/1024.f;
-}
-
-GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1)
-{
-    GLKMatrix2 m;
-    m.m00 = m0.m00*m1.m00 + m0.m01*m1.m10;
-    m.m01 = m0.m00*m1.m01 + m0.m01*m1.m11;
-    m.m10 = m0.m10*m1.m00 + m0.m11*m1.m10;
-    m.m11 = m0.m10*m1.m01 + m0.m11*m1.m11;
-    return m;
 }

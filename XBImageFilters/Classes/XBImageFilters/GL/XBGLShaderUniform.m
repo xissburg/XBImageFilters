@@ -1,14 +1,14 @@
 //
-//  GLKUniform.m
+//  XBGLShaderUniform.m
 //  XBImageFilters
 //
 //  Created by xiss burg on 2/20/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "GLKUniform.h"
+#import "XBGLShaderUniform.h"
 
-@implementation GLKUniform
+@implementation XBGLShaderUniform
 
 @synthesize value = _value;
 

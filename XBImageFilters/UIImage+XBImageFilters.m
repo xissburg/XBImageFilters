@@ -9,7 +9,7 @@
 #import "UIImage+XBImageFilters.h"
 
 #import "XBFilteredImageView.h"
-#import "GLKProgram.h"
+#import "XBGLProgram.h"
 
 @implementation UIImage (UIImagePlusXBImageFilters)
 

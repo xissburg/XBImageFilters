@@ -1,5 +1,5 @@
 //
-//  GLKAttribute.h
+//  XBGLShaderAttribute.h
 //  XBImageFilters
 //
 //  Created by xiss burg on 2/20/12.
@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "GLKShaderVariable.h"
+#import "XBGLShaderVariable.h"
 
-@interface GLKAttribute : GLKShaderVariable
+@interface XBGLShaderAttribute : XBGLShaderVariable
 
 @end

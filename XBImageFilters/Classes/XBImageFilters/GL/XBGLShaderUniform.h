@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "GLKShaderVariable.h"
+#import "XBGLShaderVariable.h"
 
-@interface GLKUniform : GLKShaderVariable
+@interface XBGLShaderUniform : XBGLShaderVariable
 
 @property (assign, nonatomic) void *value;
 

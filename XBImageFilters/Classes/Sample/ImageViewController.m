@@ -30,6 +30,7 @@
     if (![self.filteredImageView setFilterFragmentShaderPaths:fsPaths vertexShaderPaths:vsPaths error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
     }
+    [self.filteredImageView display];
 }
 
 - (void)viewDidUnload

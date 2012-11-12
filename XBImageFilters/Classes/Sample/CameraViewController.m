@@ -89,14 +89,14 @@
     NSString *filterName = [self.filterNameArray objectAtIndex:self.filterIndex];
     if ([filterName isEqualToString:@"Overlay"]) {
         NSString *path = [[NSBundle mainBundle] pathForResource:@"LucasCorrea" ofType:@"png"];
-        XBTexture *texture = [[XBTexture alloc] initWithContentsOfFile:path options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], GLKTextureLoaderOriginBottomLeft, nil] error:NULL];
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+        XBGLTexture *texture = [[XBGLTexture alloc] initWithContentsOfFile:path options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], GLKTextureLoaderOriginBottomLeft, nil] error:NULL];
+        XBGLProgram *program = [self.cameraView.programs objectAtIndex:0];
         [program bindSamplerNamed:@"s_overlay" toXBTexture:texture unit:1];
         [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
     }
     else if ([filterName isEqualToString:@"Sharpen"]) {
         GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
@@ -147,12 +147,12 @@
     NSString *filterName = [self.filterNameArray objectAtIndex:self.filterIndex];
     if ([filterName isEqualToString:@"Overlay"]) {
         GLKMatrix2 rawTexCoordTransform = self.cameraView.rawTexCoordTransform;
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+        XBGLProgram *program = [self.cameraView.programs objectAtIndex:0];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
     else if ([filterName isEqualToString:@"Sharpen"]) {
         GLKMatrix2 rawTexCoordTransform = GLKMatrix2Multiply(self.cameraView.rawTexCoordTransform, (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -1});
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
     
@@ -181,12 +181,12 @@
         // Restore filter-specific state
         NSString *filterName = [self.filterNameArray objectAtIndex:self.filterIndex];
         if ([filterName isEqualToString:@"Overlay"]) {
-            GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
+            XBGLProgram *program = [self.cameraView.programs objectAtIndex:0];
             [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
         }
         else if ([filterName isEqualToString:@"Sharpen"]) {
             GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
-            GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+            XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
             [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
         }
         
@@ -207,7 +207,7 @@
     // when we swap between the front/back camera.
     if ([[self.filterNameArray objectAtIndex:self.filterIndex] isEqualToString:@"Sharpen"]) {
         GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
 }
@@ -251,7 +251,7 @@
     // The Sharpen filter uses the mainTexture (raw camera image) which might change names (because of the CVOpenGLESTextureCache), then we
     // need to update it whenever it changes.
     if ([[self.filterNameArray objectAtIndex:self.filterIndex] isEqualToString:@"Sharpen"]) {
-        GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
+        XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
     }
 }

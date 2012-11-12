@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <GLKit/GLKit.h>
-#import "GLKProgram.h"
+#import "XBGL.h"
 
 @class XBFilteredView;
 
@@ -26,9 +26,7 @@
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
 @property (assign, nonatomic) CGSize contentSize; // Content size used to compute the contentMode transform. By default it can be the texture size.
 @property (assign, nonatomic) GLKMatrix2 texCoordTransform;
-@property (readonly, nonatomic) GLint maxTextureSize; // Maximum texture width and height
 @property (readonly, nonatomic) GLuint mainTexture;
-@property (readonly, nonatomic) EAGLContext *context;
 
 - (BOOL)setFilterFragmentShaderFromFile:(NSString *)path error:(NSError *__autoreleasing *)error DEPRECATED_ATTRIBUTE;
 - (BOOL)setFilterFragmentShadersFromFiles:(NSArray *)paths error:(NSError *__autoreleasing *)error DEPRECATED_ATTRIBUTE;
@@ -53,11 +51,6 @@
  * Draws the OpenGL contents immediately.
  */
 - (void)display;
-
-/*
- * Returns an string containing memory usage information.
- */
-- (NSString *)memoryStatus;
 
 /* These methods are conceptually protected and should not be called directly. They are intended to be called by subclasses. */
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height;

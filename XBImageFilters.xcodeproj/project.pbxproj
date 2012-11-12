@@ -7,8 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1B1ED24B160E1D3D00ADABA1 /* XBTextureInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B1ED24A160E1D3D00ADABA1 /* XBTextureInfo.m */; };
+		1B231F941644693C00CBE9C9 /* XBGLEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B231F871644693C00CBE9C9 /* XBGLEngine.m */; };
+		1B231F951644693C00CBE9C9 /* XBGLProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B231F891644693C00CBE9C9 /* XBGLProgram.m */; };
+		1B231F961644693C00CBE9C9 /* XBGLShaderAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B231F8B1644693C00CBE9C9 /* XBGLShaderAttribute.m */; };
+		1B231F971644693C00CBE9C9 /* XBGLShaderUniform.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B231F8D1644693C00CBE9C9 /* XBGLShaderUniform.m */; };
+		1B231F981644693C00CBE9C9 /* XBGLShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B231F8F1644693C00CBE9C9 /* XBGLShaderVariable.m */; };
+		1B231F991644693C00CBE9C9 /* XBGLTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B231F911644693C00CBE9C9 /* XBGLTexture.m */; };
 		1B36A52D15A3C4AC00D297B1 /* OverlayFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */; };
+		1B36ACA61648346C00D5C9F6 /* XBGLRenderbuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B36ACA51648346C00D5C9F6 /* XBGLRenderbuffer.m */; };
+		1B36ACAA16483DAC00D5C9F6 /* XBGLFramebuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B36ACA916483DAC00D5C9F6 /* XBGLFramebuffer.m */; };
 		1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D529A1501A188007D743A /* XBFilteredCameraView.m */; };
 		1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B4D52A41501A6AA007D743A /* CameraViewController.m */; };
 		1B675E7114EE5DF300ED8402 /* DefaultVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B675E6D14EE5D6F00ED8402 /* DefaultVertexShader.glsl */; };
@@ -35,17 +42,12 @@
 		1BE20C661535C54F00E9D595 /* SuckShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE20C651535C54F00E9D595 /* SuckShader.glsl */; };
 		1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE37E321500FA5C0074D29C /* XBFilteredView.m */; };
 		1BE4179214F92E5E00EB0ADD /* BlurFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE4179114F92E5E00EB0ADD /* BlurFragmentShader.glsl */; };
-		1BE4DB1B14F2D5E2003EE965 /* GLKProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */; };
-		1BE4DB1C14F2D5E2003EE965 /* GLKUniform.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */; };
-		1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2814F31488003EE965 /* GLKAttribute.m */; };
-		1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */; };
 		1BE4DB2D14F31BE1003EE965 /* DefaultFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */; };
 		1BE8667115AB23B60058E8C7 /* OverlayVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */; };
 		1BE99D111538A071001C532F /* CameraTargetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BE99D101538A071001C532F /* CameraTargetView.m */; };
 		1BEA547A15AB6D7800A5F430 /* VBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BEA547915AB6D7800A5F430 /* VBlurVertexShader.glsl */; };
 		1BEA547C15AB6E0000A5F430 /* HBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BEA547B15AB6E0000A5F430 /* HBlurVertexShader.glsl */; };
 		1BEA549315ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1BEA549215ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl */; };
-		1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BEB76EA15A923CD000CEFEF /* XBTexture.m */; };
 		3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3295F2111522EEC500C27406 /* ProcessingViewController.m */; };
 		3295F22F1522FD3100C27406 /* basn0g01.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2201522FD3100C27406 /* basn0g01.png */; };
 		3295F2301522FD3100C27406 /* basn0g02.png in Resources */ = {isa = PBXBuildFile; fileRef = 3295F2211522FD3100C27406 /* basn0g02.png */; };
@@ -68,9 +70,24 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1B1ED249160E1D3D00ADABA1 /* XBTextureInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBTextureInfo.h; sourceTree = "<group>"; };
-		1B1ED24A160E1D3D00ADABA1 /* XBTextureInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTextureInfo.m; sourceTree = "<group>"; };
+		1B231F861644693C00CBE9C9 /* XBGLEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLEngine.h; sourceTree = "<group>"; };
+		1B231F871644693C00CBE9C9 /* XBGLEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLEngine.m; sourceTree = "<group>"; };
+		1B231F881644693C00CBE9C9 /* XBGLProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLProgram.h; sourceTree = "<group>"; };
+		1B231F891644693C00CBE9C9 /* XBGLProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLProgram.m; sourceTree = "<group>"; };
+		1B231F8A1644693C00CBE9C9 /* XBGLShaderAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLShaderAttribute.h; sourceTree = "<group>"; };
+		1B231F8B1644693C00CBE9C9 /* XBGLShaderAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLShaderAttribute.m; sourceTree = "<group>"; };
+		1B231F8C1644693C00CBE9C9 /* XBGLShaderUniform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLShaderUniform.h; sourceTree = "<group>"; };
+		1B231F8D1644693C00CBE9C9 /* XBGLShaderUniform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLShaderUniform.m; sourceTree = "<group>"; };
+		1B231F8E1644693C00CBE9C9 /* XBGLShaderVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLShaderVariable.h; sourceTree = "<group>"; };
+		1B231F8F1644693C00CBE9C9 /* XBGLShaderVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLShaderVariable.m; sourceTree = "<group>"; };
+		1B231F901644693C00CBE9C9 /* XBGLTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLTexture.h; sourceTree = "<group>"; };
+		1B231F911644693C00CBE9C9 /* XBGLTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLTexture.m; sourceTree = "<group>"; };
 		1B36A52C15A3C4AC00D297B1 /* OverlayFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = OverlayFragmentShader.glsl; path = Shaders/OverlayFragmentShader.glsl; sourceTree = "<group>"; };
+		1B36ACA41648346C00D5C9F6 /* XBGLRenderbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLRenderbuffer.h; sourceTree = "<group>"; };
+		1B36ACA51648346C00D5C9F6 /* XBGLRenderbuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLRenderbuffer.m; sourceTree = "<group>"; };
+		1B36ACA816483DAC00D5C9F6 /* XBGLFramebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBGLFramebuffer.h; sourceTree = "<group>"; };
+		1B36ACA916483DAC00D5C9F6 /* XBGLFramebuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBGLFramebuffer.m; sourceTree = "<group>"; };
+		1B36ACAB1648533F00D5C9F6 /* XBGL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XBGL.h; sourceTree = "<group>"; };
 		1B4D52991501A188007D743A /* XBFilteredCameraView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredCameraView.h; path = Classes/XBImageFilters/XBFilteredCameraView.h; sourceTree = "<group>"; };
 		1B4D529A1501A188007D743A /* XBFilteredCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredCameraView.m; path = Classes/XBImageFilters/XBFilteredCameraView.m; sourceTree = "<group>"; };
 		1B4D52A31501A6AA007D743A /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraViewController.h; path = Classes/Sample/CameraViewController.h; sourceTree = "<group>"; };
@@ -106,14 +123,6 @@
 		1BE37E311500FA5C0074D29C /* XBFilteredView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XBFilteredView.h; path = Classes/XBImageFilters/XBFilteredView.h; sourceTree = "<group>"; };
 		1BE37E321500FA5C0074D29C /* XBFilteredView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XBFilteredView.m; path = Classes/XBImageFilters/XBFilteredView.m; sourceTree = "<group>"; };
 		1BE4179114F92E5E00EB0ADD /* BlurFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = BlurFragmentShader.glsl; path = Shaders/BlurFragmentShader.glsl; sourceTree = "<group>"; };
-		1BE4DB1714F2D5E2003EE965 /* GLKProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKProgram.h; sourceTree = "<group>"; };
-		1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKProgram.m; sourceTree = "<group>"; };
-		1BE4DB1914F2D5E2003EE965 /* GLKUniform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKUniform.h; sourceTree = "<group>"; };
-		1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKUniform.m; sourceTree = "<group>"; };
-		1BE4DB2714F31488003EE965 /* GLKAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKAttribute.h; sourceTree = "<group>"; };
-		1BE4DB2814F31488003EE965 /* GLKAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKAttribute.m; sourceTree = "<group>"; };
-		1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKShaderVariable.h; sourceTree = "<group>"; };
-		1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLKShaderVariable.m; sourceTree = "<group>"; };
 		1BE5764214F1F14200A91BC1 /* DefaultFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = DefaultFragmentShader.glsl; path = Shaders/DefaultFragmentShader.glsl; sourceTree = "<group>"; };
 		1BE8667015AB23B60058E8C7 /* OverlayVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = OverlayVertexShader.glsl; path = Shaders/OverlayVertexShader.glsl; sourceTree = "<group>"; };
 		1BE99D0F1538A071001C532F /* CameraTargetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CameraTargetView.h; path = Classes/XBImageFilters/CameraTargetView.h; sourceTree = "<group>"; };
@@ -121,8 +130,6 @@
 		1BEA547915AB6D7800A5F430 /* VBlurVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = VBlurVertexShader.glsl; path = Shaders/VBlurVertexShader.glsl; sourceTree = "<group>"; };
 		1BEA547B15AB6E0000A5F430 /* HBlurVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = HBlurVertexShader.glsl; path = Shaders/HBlurVertexShader.glsl; sourceTree = "<group>"; };
 		1BEA549215ABC64800A5F430 /* UnsharpMaskFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; name = UnsharpMaskFragmentShader.glsl; path = Shaders/UnsharpMaskFragmentShader.glsl; sourceTree = "<group>"; };
-		1BEB76E915A923CD000CEFEF /* XBTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBTexture.h; sourceTree = "<group>"; };
-		1BEB76EA15A923CD000CEFEF /* XBTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTexture.m; sourceTree = "<group>"; };
 		3295F2101522EEC500C27406 /* ProcessingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProcessingViewController.h; path = Classes/Sample/ProcessingViewController.h; sourceTree = "<group>"; };
 		3295F2111522EEC500C27406 /* ProcessingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProcessingViewController.m; path = Classes/Sample/ProcessingViewController.m; sourceTree = "<group>"; };
 		3295F2201522FD3100C27406 /* basn0g01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = basn0g01.png; sourceTree = "<group>"; };
@@ -166,6 +173,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1B231F851644693C00CBE9C9 /* GL */ = {
+			isa = PBXGroup;
+			children = (
+				1B36ACAB1648533F00D5C9F6 /* XBGL.h */,
+				1B231F861644693C00CBE9C9 /* XBGLEngine.h */,
+				1B231F871644693C00CBE9C9 /* XBGLEngine.m */,
+				1B231F881644693C00CBE9C9 /* XBGLProgram.h */,
+				1B231F891644693C00CBE9C9 /* XBGLProgram.m */,
+				1B231F8A1644693C00CBE9C9 /* XBGLShaderAttribute.h */,
+				1B231F8B1644693C00CBE9C9 /* XBGLShaderAttribute.m */,
+				1B231F8C1644693C00CBE9C9 /* XBGLShaderUniform.h */,
+				1B231F8D1644693C00CBE9C9 /* XBGLShaderUniform.m */,
+				1B231F8E1644693C00CBE9C9 /* XBGLShaderVariable.h */,
+				1B231F8F1644693C00CBE9C9 /* XBGLShaderVariable.m */,
+				1B231F901644693C00CBE9C9 /* XBGLTexture.h */,
+				1B231F911644693C00CBE9C9 /* XBGLTexture.m */,
+				1B36ACA41648346C00D5C9F6 /* XBGLRenderbuffer.h */,
+				1B36ACA51648346C00D5C9F6 /* XBGLRenderbuffer.m */,
+				1B36ACA816483DAC00D5C9F6 /* XBGLFramebuffer.h */,
+				1B36ACA916483DAC00D5C9F6 /* XBGLFramebuffer.m */,
+			);
+			name = GL;
+			path = Classes/XBImageFilters/GL;
+			sourceTree = "<group>";
+		};
 		1B675E6B14EE5D4B00ED8402 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -260,7 +292,7 @@
 		1BE16EE514EB4CE400570A64 /* XBImageFilters */ = {
 			isa = PBXGroup;
 			children = (
-				1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */,
+				1B231F851644693C00CBE9C9 /* GL */,
 				1BE37E311500FA5C0074D29C /* XBFilteredView.h */,
 				1BE37E321500FA5C0074D29C /* XBFilteredView.m */,
 				1BE16EE914EB4DD000570A64 /* XBFilteredImageView.h */,
@@ -293,26 +325,6 @@
 				1BE16EF514EB56EB00570A64 /* LucasCorrea@2x.png */,
 			);
 			path = Images;
-			sourceTree = "<group>";
-		};
-		1BE4DB1614F2D5E2003EE965 /* GLKitAdditions */ = {
-			isa = PBXGroup;
-			children = (
-				1BE4DB1714F2D5E2003EE965 /* GLKProgram.h */,
-				1BE4DB1814F2D5E2003EE965 /* GLKProgram.m */,
-				1BE4DB1914F2D5E2003EE965 /* GLKUniform.h */,
-				1BE4DB1A14F2D5E2003EE965 /* GLKUniform.m */,
-				1BE4DB2714F31488003EE965 /* GLKAttribute.h */,
-				1BE4DB2814F31488003EE965 /* GLKAttribute.m */,
-				1BE4DB2A14F31501003EE965 /* GLKShaderVariable.h */,
-				1BE4DB2B14F31501003EE965 /* GLKShaderVariable.m */,
-				1BEB76E915A923CD000CEFEF /* XBTexture.h */,
-				1BEB76EA15A923CD000CEFEF /* XBTexture.m */,
-				1B1ED249160E1D3D00ADABA1 /* XBTextureInfo.h */,
-				1B1ED24A160E1D3D00ADABA1 /* XBTextureInfo.m */,
-			);
-			name = GLKitAdditions;
-			path = Classes/XBImageFilters/GLKitAdditions;
 			sourceTree = "<group>";
 		};
 		3295F2431523006F00C27406 /* png test set */ = {
@@ -436,18 +448,20 @@
 				1BE16ED414EB4BE600570A64 /* AppDelegate.m in Sources */,
 				1BE16EE814EB4D0900570A64 /* ImageViewController.m in Sources */,
 				1BE16EEB14EB4DD000570A64 /* XBFilteredImageView.m in Sources */,
-				1BE4DB1B14F2D5E2003EE965 /* GLKProgram.m in Sources */,
-				1BE4DB1C14F2D5E2003EE965 /* GLKUniform.m in Sources */,
-				1BE4DB2914F31488003EE965 /* GLKAttribute.m in Sources */,
-				1BE4DB2C14F31501003EE965 /* GLKShaderVariable.m in Sources */,
 				1BE37E331500FA5C0074D29C /* XBFilteredView.m in Sources */,
 				1B4D529B1501A188007D743A /* XBFilteredCameraView.m in Sources */,
 				1B4D52A51501A6AA007D743A /* CameraViewController.m in Sources */,
 				3295F2131522EEC500C27406 /* ProcessingViewController.m in Sources */,
 				3295F2401522FE4D00C27406 /* UIImage+XBImageFilters.m in Sources */,
 				1BE99D111538A071001C532F /* CameraTargetView.m in Sources */,
-				1BEB76EB15A923CD000CEFEF /* XBTexture.m in Sources */,
-				1B1ED24B160E1D3D00ADABA1 /* XBTextureInfo.m in Sources */,
+				1B231F941644693C00CBE9C9 /* XBGLEngine.m in Sources */,
+				1B231F951644693C00CBE9C9 /* XBGLProgram.m in Sources */,
+				1B231F961644693C00CBE9C9 /* XBGLShaderAttribute.m in Sources */,
+				1B231F971644693C00CBE9C9 /* XBGLShaderUniform.m in Sources */,
+				1B231F981644693C00CBE9C9 /* XBGLShaderVariable.m in Sources */,
+				1B231F991644693C00CBE9C9 /* XBGLTexture.m in Sources */,
+				1B36ACA61648346C00D5C9F6 /* XBGLRenderbuffer.m in Sources */,
+				1B36ACAA16483DAC00D5C9F6 /* XBGLFramebuffer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

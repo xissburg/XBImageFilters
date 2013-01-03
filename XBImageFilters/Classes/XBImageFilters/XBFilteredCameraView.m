@@ -70,7 +70,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)_XBFilteredCameraViewInit
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     self.contentMode = UIViewContentModeScaleAspectFill;
     
     self.videoHeight = self.videoWidth = 0;
@@ -87,9 +87,9 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self setupOutputs];
     
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
-    CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, XBGLEngine.sharedInstance.context, NULL, &_videoTextureCache);
+    CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, XBGLEngine.sharedEngine.context, NULL, &_videoTextureCache);
 #else
-    CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)XBGLEngine.sharedInstance.context, NULL, &_videoTextureCache);
+    CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)XBGLEngine.sharedEngine.context, NULL, &_videoTextureCache);
 #endif
     if (ret != kCVReturnSuccess) {
         NSLog(@"Error at CVOpenGLESTextureCacheCreate: %d", ret);
@@ -477,7 +477,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         UIImage *filteredImage = nil;
         
         // Resize image if it is above the maximum texture size
-        if (width > XBGLEngine.sharedInstance.maxTextureSize || height > XBGLEngine.sharedInstance.maxTextureSize) {
+        if (width > XBGLEngine.sharedEngine.maxTextureSize || height > XBGLEngine.sharedEngine.maxTextureSize) {
             CVPixelBufferLockBaseAddress(imageBuffer, 0);
             void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
             UIImage *image = [self _imageWithData:baseAddress width:width height:height orientation:UIImageOrientationUp ownsData:NO];
@@ -486,12 +486,12 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             size_t newWidth = 0, newHeight = 0;
             
             if (width > height) {
-                newWidth = XBGLEngine.sharedInstance.maxTextureSize;
-                newHeight = height * XBGLEngine.sharedInstance.maxTextureSize / width;
+                newWidth = XBGLEngine.sharedEngine.maxTextureSize;
+                newHeight = height * XBGLEngine.sharedEngine.maxTextureSize / width;
             }
             else {
-                newWidth = width * XBGLEngine.sharedInstance.maxTextureSize / height;
-                newHeight = XBGLEngine.sharedInstance.maxTextureSize;
+                newWidth = width * XBGLEngine.sharedEngine.maxTextureSize / height;
+                newHeight = XBGLEngine.sharedEngine.maxTextureSize;
             }
             
             targetWidth = portrait? newHeight: newWidth;
@@ -807,7 +807,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         t0 = t.tv_sec + t.tv_usec*1.0e-6;
     }
     
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     [self cleanUpTextures];
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);

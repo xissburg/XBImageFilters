@@ -152,7 +152,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)setBackgroundColor:(UIColor *)backgroundColor
 {
     [super setBackgroundColor:backgroundColor];
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     CGFloat r, g, b, a;
     [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
@@ -168,7 +168,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     glDeleteTextures(1, &_mainTexture);
     
@@ -210,7 +210,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)_updateTextureWithData:(GLvoid *)textureData
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     glBindTexture(GL_TEXTURE_2D, self.mainTexture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.textureWidth, self.textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
@@ -219,7 +219,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
     size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
@@ -268,14 +268,14 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)_deleteMainTexture
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     glDeleteTextures(1, &_mainTexture);
     _mainTexture = 0;
 }
 
 - (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     size_t textureWidth = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
     size_t textureHeight = CVPixelBufferGetHeight(imageBuffer);
@@ -303,7 +303,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (UIImage *)_filteredImageWithData:(GLvoid *)data textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     GLuint mainTexture = [self generateDefaultTextureWithWidth:textureWidth height:textureHeight data:data];
     
@@ -314,7 +314,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (UIImage *)_filteredImageWithTexture:(GLuint)texture textureWidth:(GLint)textureWidth textureHeight:(GLint)textureHeight targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform texCoordTransform:(GLKMatrix2)texCoordTransform textureReleaseBlock:(void (^)(void))textureRelease
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     GLKMatrix2 oldTexCoordTransform = self.texCoordTransform;
     self.texCoordTransform = texCoordTransform;
@@ -438,7 +438,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (UIImage *)_imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     size_t size = width * height * 4;
     GLvoid *pixels = malloc(size);
@@ -554,7 +554,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources vertexShaderSources:(NSArray *)vsSources error:(NSError *__autoreleasing *)error
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     [self destroyEvenPass];
     [self destroyOddPass];
@@ -640,7 +640,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)display
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
         XBGLProgram *program = [self.programs objectAtIndex:pass];
@@ -673,7 +673,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         }
     }
     
-    [XBGLEngine.sharedInstance.context presentRenderbuffer:GL_RENDERBUFFER];
+    [XBGLEngine.sharedEngine.context presentRenderbuffer:GL_RENDERBUFFER];
     
 #ifdef DEBUG
     GLenum error = glGetError();
@@ -687,7 +687,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)setupGL
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
+    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     [XBGLEngine sharedEngine].clearColor = self.backgroundColor;
     [XBGLEngine sharedEngine].depthTestEnabled = NO;

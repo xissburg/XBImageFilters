@@ -37,39 +37,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 @property (assign, nonatomic) GLuint oddPassFramebuffer;
 @property (assign, nonatomic) GLuint evenPassFrambuffer;
 
-- (void)setupGL;
-- (void)destroyGL;
-- (GLuint)generateDefaultTextureWithWidth:(GLint)width height:(GLint)height data:(GLvoid *)data;
-- (GLuint)generateDefaultFramebufferWithTargetTexture:(GLuint)texture;
-- (void)setupEvenPass;
-- (void)destroyEvenPass;
-- (void)setupOddPass;
-- (void)destroyOddPass;
-- (void)refreshContentTransform;
-
-- (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit;
-- (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode;
-
 @end
 
 @implementation XBFilteredView
-
-@synthesize framebuffer = _framebuffer;
-@synthesize renderbuffer = _renderbuffer;
-@synthesize previousBounds = _previousBounds;
-@synthesize imageQuadVertexBuffer = _imageQuadVertexBuffer;
-@synthesize mainTexture = _mainTexture;
-@synthesize textureWidth = _textureWidth, textureHeight = _textureHeight;
-@synthesize contentTransform = _contentTransform;
-@synthesize contentModeTransform = _contentModeTransform;
-@synthesize contentSize = _contentSize;
-@synthesize texCoordTransform = _texCoordTransform;
-@synthesize programs = _programs;
-@synthesize oddPassTexture = _oddPassTexture;
-@synthesize evenPassTexture = _evenPassTexture;
-@synthesize oddPassFramebuffer = _oddPassFramebuffer;
-@synthesize evenPassFrambuffer = _evenPassFrambuffer;
-@synthesize delegate = _delegate;
 
 /**
  * Actual initializer. Called both in initWithFrame: when creating an instance programatically and in awakeFromNib when creating an instance
@@ -79,7 +49,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     self.contentScaleFactor = [[UIScreen mainScreen] scale];
     self.layer.opaque = YES;
-    ((CAEAGLLayer *)self.layer).drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], kEAGLDrawablePropertyRetainedBacking, nil];
+    ((CAEAGLLayer *)self.layer).drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @YES};
     
     [self createFramebuffer];
     [self setupGL];
@@ -651,12 +621,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
                 [[XBGLEngine sharedEngine] bindFramebuffer:self.framebuffer.name];
             }
             else if (pass%2 == 0) {
-                glViewport(0, 0, self.textureWidth, self.textureHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.textureWidth, self.textureHeight);
+                [[XBGLEngine sharedEngine] bindFramebuffer:self.evenPassFrambuffer];
             }
             else {
-                glViewport(0, 0, self.textureWidth, self.textureHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.textureWidth, self.textureHeight);
+                [[XBGLEngine sharedEngine] bindFramebuffer:self.oddPassFramebuffer];
             }
         }
         
@@ -870,9 +840,9 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (BOOL)createFramebuffer
 {
-    self.framebuffer = [[XBGLFramebuffer alloc] init];
     self.renderbuffer = [[XBGLRenderbuffer alloc] init];
     [self.renderbuffer storageFromGLLayer:(CAEAGLLayer *)self.layer];
+    self.framebuffer = [[XBGLFramebuffer alloc] init];
     [self.framebuffer attachRenderbuffer:self.renderbuffer];
     
     XBGLFramebufferStatus status = self.framebuffer.status;
@@ -881,7 +851,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         return NO;
     }
 
-    [[XBGLEngine sharedEngine] bindRenderbuffer:self.renderbuffer.name];
     [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
     
     return YES;

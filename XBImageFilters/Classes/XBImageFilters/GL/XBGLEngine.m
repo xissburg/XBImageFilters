@@ -29,7 +29,6 @@ float pagesToMB(int pages);
     GLuint boundFramebuffer;
 }
 
-@synthesize context = _context;
 @synthesize maxTextureSize = _maxTextureSize;
 @synthesize clearColor = _clearColor;
 
@@ -58,7 +57,6 @@ float pagesToMB(int pages);
 - (GLint)maxTextureSize
 {
     if (_maxTextureSize == 0) {
-        [EAGLContext setCurrentContext:self.context];
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
     }
     return _maxTextureSize;
@@ -67,7 +65,6 @@ float pagesToMB(int pages);
 - (UIColor *)clearColor
 {
     if (_clearColor == nil) {
-        [EAGLContext setCurrentContext:self.context];
         GLfloat color[4];
         glGetFloatv(GL_COLOR_CLEAR_VALUE, color);
         _clearColor = [[UIColor alloc] initWithRed:color[0] green:color[1] blue:color[2] alpha:color[3]];
@@ -81,7 +78,6 @@ float pagesToMB(int pages);
         return;
     }
     _clearColor = [clearColor copy];
-    [EAGLContext setCurrentContext:self.context];
     CGFloat r, g, b, a;
     [_clearColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
@@ -94,7 +90,6 @@ float pagesToMB(int pages);
     }
     
     _viewportRect = viewportRect;
-    [EAGLContext setCurrentContext:self.context];
     glViewport(_viewportRect.origin.x, _viewportRect.origin.y, _viewportRect.size.width, _viewportRect.size.height);
 }
 
@@ -105,7 +100,6 @@ float pagesToMB(int pages);
     }
 
     _depthTestEnabled = depthTestEnabled;
-    [EAGLContext setCurrentContext:self.context];
     if (_depthTestEnabled) {
         glEnable(GL_DEPTH_TEST);
     }
@@ -125,7 +119,6 @@ float pagesToMB(int pages);
 
 - (GLuint)createTextureWithWidth:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data
 {
-    [EAGLContext setCurrentContext:self.context];
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -136,14 +129,12 @@ float pagesToMB(int pages);
 
 - (void)deleteTexture:(GLuint)texture
 {
-    [EAGLContext setCurrentContext:self.context];
     glDeleteTextures(1, &texture);
 }
 
 - (void)setActiveTextureUnit:(GLint)unit
 {
     if (activeTextureUnit != unit) {
-        [EAGLContext setCurrentContext:self.context];
         glActiveTexture(GL_TEXTURE0 + unit);
         activeTextureUnit = unit;
     }
@@ -152,7 +143,6 @@ float pagesToMB(int pages);
 - (void)bindTexture:(GLuint)texture
 {
     if (boundTextures[activeTextureUnit] != texture) {
-        [EAGLContext setCurrentContext:self.context];
         glBindTexture(GL_TEXTURE_2D, texture);
         boundTextures[activeTextureUnit] = texture;
     }
@@ -166,35 +156,30 @@ float pagesToMB(int pages);
 
 - (void)setWrapSMode:(XBGLTextureWrapMode)wrapMode texture:(GLuint)texture
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindTexture:texture];
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, [self convertWrapMode:wrapMode]);
 }
 
 - (void)setWrapTMode:(XBGLTextureWrapMode)wrapMode texture:(GLuint)texture
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindTexture:texture];
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, [self convertWrapMode:wrapMode]);
 }
 
 - (void)setMagFilter:(XBGLTextureMagFilter)filter texture:(GLuint)texture
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindTexture:texture];
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, [self convertMagFilter:filter]);
 }
 
 - (void)setMinFilter:(XBGLTextureMinFilter)filter texture:(GLuint)texture
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindTexture:texture];
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, [self convertMinFilter:filter]);
 }
 
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error
 {
-    [EAGLContext setCurrentContext:self.context];
     GLuint shader = glCreateShader(type);
     
     if (shader == 0) {
@@ -230,7 +215,6 @@ float pagesToMB(int pages);
 
 - (GLuint)createProgramWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error
 {
-    // createShaderWithSource:type:error: already sets the gl context
     GLuint vertexShader = [self createShaderWithSource:vertexShaderSource type:GL_VERTEX_SHADER error:error];
     if (vertexShader == 0) {
         return 0;
@@ -268,7 +252,6 @@ float pagesToMB(int pages);
 
 - (void)deleteProgram:(GLuint)program
 {
-    [EAGLContext setCurrentContext:self.context];
     glDeleteProgram(program);
 }
 
@@ -299,7 +282,6 @@ float pagesToMB(int pages);
 - (void)useProgram:(GLuint)program
 {
     if (boundProgram != program) {
-        [EAGLContext setCurrentContext:self.context];
         glUseProgram(program);
         boundProgram = program;
     }
@@ -392,7 +374,6 @@ float pagesToMB(int pages);
 
 - (GLuint)createRenderbuffer
 {
-    [EAGLContext setCurrentContext:self.context];
     GLuint renderbuffer;
     glGenRenderbuffers(1, &renderbuffer);
     return renderbuffer;
@@ -400,14 +381,12 @@ float pagesToMB(int pages);
 
 - (void)deleteRenderbuffer:(GLuint)renderbuffer
 {
-    [EAGLContext setCurrentContext:self.context];
     glDeleteRenderbuffers(1, &renderbuffer);
 }
 
 - (void)bindRenderbuffer:(GLuint)renderbuffer
 {
     if (boundRenderbuffer != renderbuffer) {
-        [EAGLContext setCurrentContext:self.context];
         glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
         boundRenderbuffer = renderbuffer;
     }
@@ -415,7 +394,6 @@ float pagesToMB(int pages);
 
 - (CGSize)storageForRenderbuffer:(GLuint)renderbuffer fromDrawable:(id<EAGLDrawable>)drawable
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindRenderbuffer:renderbuffer];
     [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:drawable];
     GLint width, height;
@@ -426,7 +404,6 @@ float pagesToMB(int pages);
 
 - (GLuint)createFramebuffer
 {
-    [EAGLContext setCurrentContext:self.context];
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
     return framebuffer;
@@ -434,14 +411,12 @@ float pagesToMB(int pages);
 
 - (void)deleteFramebuffer:(GLuint)framebuffer
 {
-    [EAGLContext setCurrentContext:self.context];
     glDeleteFramebuffers(1, &framebuffer);
 }
 
 - (void)bindFramebuffer:(GLuint)framebuffer
 {
     if (boundFramebuffer != framebuffer) {
-        [EAGLContext setCurrentContext:self.context];
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         boundFramebuffer = framebuffer;
     }
@@ -449,21 +424,18 @@ float pagesToMB(int pages);
 
 - (XBGLFramebufferStatus)statusForFramebuffer:(GLuint)framebuffer
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindFramebuffer:framebuffer];
     return [self convertFramebufferStatus:glCheckFramebufferStatus(GL_FRAMEBUFFER)];
 }
 
 - (void)attachRenderbuffer:(GLuint)renderbuffer toFramebuffer:(GLuint)framebuffer attachment:(XBGLAttachment)attachment
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindFramebuffer:framebuffer];
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, [self convertAttachment:attachment], GL_RENDERBUFFER, renderbuffer);
 }
 
 - (void)attachTexture:(GLuint)texture toFramebuffer:(GLuint)framebuffer attachment:(XBGLAttachment)attachment
 {
-    [EAGLContext setCurrentContext:self.context];
     [self bindFramebuffer:framebuffer];
     glFramebufferTexture2D(GL_FRAMEBUFFER, [self convertAttachment:attachment], GL_TEXTURE_2D, texture, 0);
 }

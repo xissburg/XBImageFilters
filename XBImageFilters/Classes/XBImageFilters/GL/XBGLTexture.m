@@ -40,7 +40,7 @@
 {
     self = [super init];
     if (self) {
-        _name = [[XBGLEngine sharedInstance] createTextureWithWidth:width height:height data:data];
+        _name = [[XBGLEngine sharedEngine] createTextureWithWidth:width height:height data:data];
         _width = width;
         _height = height;
         _wrapSMode = XBGLTextureWrapModeRepeat;
@@ -53,7 +53,7 @@
 
 - (void)dealloc
 {
-    [[XBGLEngine sharedInstance] deleteTexture:self.name];
+    [[XBGLEngine sharedEngine] deleteTexture:self.name];
 }
 
 #pragma mark - Properties
@@ -65,7 +65,7 @@
     }
     
     _wrapSMode = wrapSMode;
-    [[XBGLEngine sharedInstance] setWrapSMode:self.wrapSMode texture:self.name];
+    [[XBGLEngine sharedEngine] setWrapSMode:self.wrapSMode texture:self.name];
 }
 
 - (void)setWrapTMode:(XBGLTextureWrapMode)wrapTMode
@@ -75,7 +75,7 @@
     }
     
     _wrapTMode = wrapTMode;
-    [[XBGLEngine sharedInstance] setWrapTMode:self.wrapTMode texture:self.name];
+    [[XBGLEngine sharedEngine] setWrapTMode:self.wrapTMode texture:self.name];
 }
 
 - (void)setMinFilter:(XBGLTextureMinFilter)minFilter
@@ -85,7 +85,7 @@
     }
     
     _minFilter = minFilter;
-    [[XBGLEngine sharedInstance] setMinFilter:self.minFilter texture:self.name];
+    [[XBGLEngine sharedEngine] setMinFilter:self.minFilter texture:self.name];
 }
 
 - (void)setMagFilter:(XBGLTextureMagFilter)magFilter
@@ -95,7 +95,7 @@
     }
     
     _magFilter = magFilter;
-    [[XBGLEngine sharedInstance] setMagFilter:self.magFilter texture:self.name];
+    [[XBGLEngine sharedEngine] setMagFilter:self.magFilter texture:self.name];
 }
 
 @end

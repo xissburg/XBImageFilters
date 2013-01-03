@@ -90,7 +90,7 @@ extern NSString *const XBGLProgramErrorDomain;
 - (void)attachRenderbuffer:(GLuint)renderbuffer toFramebuffer:(GLuint)framebuffer attachment:(XBGLAttachment)attachment;
 - (void)attachTexture:(GLuint)texture toFramebuffer:(GLuint)framebuffer attachment:(XBGLAttachment)attachment;
 
-+ (XBGLEngine *)sharedInstance;
++ (XBGLEngine *)sharedEngine;
 
 /*
  * Returns an string containing memory usage information.

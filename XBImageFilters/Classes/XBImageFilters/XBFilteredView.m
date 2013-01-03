@@ -420,8 +420,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
     }
     
-    [XBGLEngine sharedInstance].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
-    [[XBGLEngine sharedInstance] bindFramebuffer:self.framebuffer.name];
+    [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
+    [[XBGLEngine sharedEngine] bindFramebuffer:self.framebuffer.name];
     self.texCoordTransform = oldTexCoordTransform;
     self.contentTransform = oldContentTransform;
     self.contentMode = oldContentMode;
@@ -647,8 +647,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         
         if (self.programs.count > 1) {
             if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
-                [XBGLEngine sharedInstance].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
-                [[XBGLEngine sharedInstance] bindFramebuffer:self.framebuffer.name];
+                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
+                [[XBGLEngine sharedEngine] bindFramebuffer:self.framebuffer.name];
             }
             else if (pass%2 == 0) {
                 glViewport(0, 0, self.textureWidth, self.textureHeight);
@@ -689,8 +689,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     [EAGLContext setCurrentContext:XBGLEngine.sharedInstance.context];
     
-    [XBGLEngine sharedInstance].clearColor = self.backgroundColor;
-    [XBGLEngine sharedInstance].depthTestEnabled = NO;
+    [XBGLEngine sharedEngine].clearColor = self.backgroundColor;
+    [XBGLEngine sharedEngine].depthTestEnabled = NO;
     
     // Create vertices
     Vertex vertices[] = {
@@ -881,8 +881,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         return NO;
     }
 
-    [[XBGLEngine sharedInstance] bindRenderbuffer:self.renderbuffer.name];
-    [XBGLEngine sharedInstance].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
+    [[XBGLEngine sharedEngine] bindRenderbuffer:self.renderbuffer.name];
+    [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
     
     return YES;
 }

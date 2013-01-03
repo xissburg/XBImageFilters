@@ -580,7 +580,7 @@ float pagesToMB(int pages);
 
 #pragma mark - Singleton
 
-+ (XBGLEngine *)sharedInstance
++ (XBGLEngine *)sharedEngine
 {
     static XBGLEngine *engine = nil;
     static dispatch_once_t onceToken;

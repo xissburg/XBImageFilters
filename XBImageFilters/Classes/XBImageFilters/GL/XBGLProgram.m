@@ -50,14 +50,14 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
 {
     self = [super init];
     if (self) {
-        _program = [[XBGLEngine sharedInstance] createProgramWithVertexShaderSource:vertexShaderSource fragmentShaderSource:fragmentShaderSource error:error];
+        _program = [[XBGLEngine sharedEngine] createProgramWithVertexShaderSource:vertexShaderSource fragmentShaderSource:fragmentShaderSource error:error];
         
         if (self.program == 0) {
             return nil;
         }
         
-        _uniforms = [[XBGLEngine sharedInstance] uniformsForProgram:self.program];
-        _attributes = [[XBGLEngine sharedInstance] attributesForProgram:self.program];
+        _uniforms = [[XBGLEngine sharedEngine] uniformsForProgram:self.program];
+        _attributes = [[XBGLEngine sharedEngine] attributesForProgram:self.program];
         self.samplerBindings = [[NSMutableDictionary alloc] init];
         self.samplerXBBindings = [[NSMutableDictionary alloc] init];
         self.dirtyUniforms = [[NSMutableDictionary alloc] init];
@@ -67,7 +67,7 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
 
 - (void)dealloc
 {
-    [[XBGLEngine sharedInstance] deleteProgram:self.program];
+    [[XBGLEngine sharedEngine] deleteProgram:self.program];
 }
 
 #pragma mark - Methods
@@ -105,12 +105,12 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
 
 - (void)prepareToDraw
 {
-    [[XBGLEngine sharedInstance] useProgram:self.program];
+    [[XBGLEngine sharedEngine] useProgram:self.program];
     
     // Flush dirty uniforms
     for (NSString *name in [self.dirtyUniforms allKeys]) {
         XBGLShaderUniform *uniform = [self.dirtyUniforms objectForKey:name];
-        [[XBGLEngine sharedInstance] flushUniform:uniform];
+        [[XBGLEngine sharedEngine] flushUniform:uniform];
     }
     
     [self.dirtyUniforms removeAllObjects];
@@ -120,12 +120,12 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
         XBGLShaderUniform *uniform = [self.uniforms objectForKey:key];
         XBGLTexture *texture = [self.samplerXBBindings objectForKey:key];
         if (texture != nil) {
-            [[XBGLEngine sharedInstance] bindTexture:texture.name unit:*(GLint *)uniform.value];
+            [[XBGLEngine sharedEngine] bindTexture:texture.name unit:*(GLint *)uniform.value];
         }
         else {
             NSNumber *textureNumber = [self.samplerBindings objectForKey:uniform.name];
             if (textureNumber != nil) {
-                [[XBGLEngine sharedInstance] bindTexture:textureNumber.unsignedIntValue unit:*(GLint *)uniform.value];
+                [[XBGLEngine sharedEngine] bindTexture:textureNumber.unsignedIntValue unit:*(GLint *)uniform.value];
             }
         }
     }

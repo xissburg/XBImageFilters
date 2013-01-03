@@ -16,21 +16,21 @@
 {
     self = [super init];
     if (self) {
-        _name = [[XBGLEngine sharedInstance] createRenderbuffer];
+        _name = [[XBGLEngine sharedEngine] createRenderbuffer];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    [[XBGLEngine sharedInstance] deleteRenderbuffer:self.name];
+    [[XBGLEngine sharedEngine] deleteRenderbuffer:self.name];
 }
 
 #pragma mark - Methods
 
 - (void)storageFromGLLayer:(CAEAGLLayer *)layer
 {
-    _size = [[XBGLEngine sharedInstance] storageForRenderbuffer:self.name fromDrawable:layer];
+    _size = [[XBGLEngine sharedEngine] storageForRenderbuffer:self.name fromDrawable:layer];
 }
 
 @end

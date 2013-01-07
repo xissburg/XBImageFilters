@@ -10,6 +10,8 @@
 #import <mach/host_info.h>
 #import <mach/mach.h>
 
+#define kTextureUnits 32
+
 typedef struct {
     GLKVector3 position;
     GLKVector2 texCoord;
@@ -22,7 +24,7 @@ float pagesToMB(int pages);
 
 
 @implementation XBGLEngine {
-    GLuint boundTextures[32];
+    GLuint boundTextures[kTextureUnits];
     GLuint boundProgram;
     GLuint activeTextureUnit;
     GLuint boundRenderbuffer;
@@ -47,7 +49,6 @@ float pagesToMB(int pages);
 - (void)dealloc
 {
     [EAGLContext setCurrentContext:self.context];
-    [self destroyGL];
     _context = nil;
     [EAGLContext setCurrentContext:nil];
 }
@@ -108,13 +109,6 @@ float pagesToMB(int pages);
     }
 }
 
-#pragma mark - Private Methods
-
-- (void)destroyGL
-{
-    
-}
-
 #pragma mark - Methods
 
 - (GLuint)createTextureWithWidth:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data
@@ -129,6 +123,11 @@ float pagesToMB(int pages);
 
 - (void)deleteTexture:(GLuint)texture
 {
+    for (int i = 0; i < kTextureUnits; ++i) {
+        if (boundTextures[i] == texture) {
+            boundTextures[i] = 0;
+        }
+    }
     glDeleteTextures(1, &texture);
 }
 
@@ -252,6 +251,9 @@ float pagesToMB(int pages);
 
 - (void)deleteProgram:(GLuint)program
 {
+    if (boundProgram == program) {
+        boundProgram = 0;
+    }
     glDeleteProgram(program);
 }
 
@@ -381,6 +383,9 @@ float pagesToMB(int pages);
 
 - (void)deleteRenderbuffer:(GLuint)renderbuffer
 {
+    if (boundRenderbuffer == renderbuffer) {
+        boundRenderbuffer = 0;
+    }
     glDeleteRenderbuffers(1, &renderbuffer);
 }
 
@@ -392,10 +397,15 @@ float pagesToMB(int pages);
     }
 }
 
-- (CGSize)storageForRenderbuffer:(GLuint)renderbuffer fromDrawable:(id<EAGLDrawable>)drawable
+- (BOOL)storageForRenderbuffer:(GLuint)renderbuffer fromDrawable:(id<EAGLDrawable>)drawable
 {
     [self bindRenderbuffer:renderbuffer];
-    [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:drawable];
+    return [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:drawable];
+}
+
+- (CGSize)sizeForRenderbuffer:(GLuint)renderbuffer
+{
+    [self bindRenderbuffer:renderbuffer];
     GLint width, height;
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &width);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &height);
@@ -411,6 +421,9 @@ float pagesToMB(int pages);
 
 - (void)deleteFramebuffer:(GLuint)framebuffer
 {
+    if (boundFramebuffer == framebuffer) {
+        boundFramebuffer = 0;
+    }
     glDeleteFramebuffers(1, &framebuffer);
 }
 
@@ -584,4 +597,27 @@ GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1)
     m.m10 = m0.m10*m1.m00 + m0.m11*m1.m10;
     m.m11 = m0.m10*m1.m01 + m0.m11*m1.m11;
     return m;
+}
+
+NSString *NSStringFromFramebufferStatus(XBGLFramebufferStatus status)
+{
+    switch (status) {
+        case XBGLFramebufferStatusComplete:
+            return @"XBGLFramebufferStatusComplete";
+            
+        case XBGLFramebufferStatusIncompleteAttachment:
+            return @"XBGLFramebufferStatusIncompleteAttachment";
+            
+        case XBGLFramebufferStatusIncompleteDimensions:
+            return @"XBGLFramebufferStatusIncompleteDimensions";
+            
+        case XBGLFramebufferStatusIncompleteMissingAttachment:
+            return @"XBGLFramebufferStatusIncompleteMissingAttachment";
+            
+        case XBGLFramebufferStatusUnsupported:
+            return @"XBGLFramebufferStatusUnsupported";
+            
+        default:
+            return @"XBGLFramebufferStatusUnknown";
+    }
 }

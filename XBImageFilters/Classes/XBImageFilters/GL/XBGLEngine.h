@@ -53,6 +53,8 @@ typedef enum {
     XBGLProgramErrorLinkFailed = 2
 } XBGLProgramError;
 
+NSString *NSStringFromFramebufferStatus(XBGLFramebufferStatus status);
+
 extern NSString *const XBGLProgramErrorDomain;
 
 @interface XBGLEngine : NSObject
@@ -82,7 +84,8 @@ extern NSString *const XBGLProgramErrorDomain;
 - (GLuint)createRenderbuffer;
 - (void)deleteRenderbuffer:(GLuint)renderbuffer;
 - (void)bindRenderbuffer:(GLuint)renderbuffer;
-- (CGSize)storageForRenderbuffer:(GLuint)renderbuffer fromDrawable:(id<EAGLDrawable>)drawable;
+- (BOOL)storageForRenderbuffer:(GLuint)renderbuffer fromDrawable:(id<EAGLDrawable>)drawable;
+- (CGSize)sizeForRenderbuffer:(GLuint)renderbuffer;
 - (GLuint)createFramebuffer;
 - (void)deleteFramebuffer:(GLuint)framebuffer;
 - (void)bindFramebuffer:(GLuint)framebuffer;

@@ -23,14 +23,19 @@
 
 - (void)dealloc
 {
+    [[XBGLEngine sharedEngine] storageForRenderbuffer:self.name fromDrawable:nil];
     [[XBGLEngine sharedEngine] deleteRenderbuffer:self.name];
 }
 
 #pragma mark - Methods
 
-- (void)storageFromGLLayer:(CAEAGLLayer *)layer
+- (BOOL)storageFromGLLayer:(CAEAGLLayer *)layer
 {
-    _size = [[XBGLEngine sharedEngine] storageForRenderbuffer:self.name fromDrawable:layer];
+    if (![[XBGLEngine sharedEngine] storageForRenderbuffer:self.name fromDrawable:layer]) {
+        return NO;
+    }
+    _size = [[XBGLEngine sharedEngine] sizeForRenderbuffer:self.name];
+    return YES;
 }
 
 @end

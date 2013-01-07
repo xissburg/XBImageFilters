@@ -70,7 +70,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 
 - (void)_XBFilteredCameraViewInit
 {
-    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     self.contentMode = UIViewContentModeScaleAspectFill;
     
     self.videoHeight = self.videoWidth = 0;
@@ -806,8 +805,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         gettimeofday(&t, NULL);
         t0 = t.tv_sec + t.tv_usec*1.0e-6;
     }
-    
-    [EAGLContext setCurrentContext:XBGLEngine.sharedEngine.context];
     
     [self cleanUpTextures];
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);

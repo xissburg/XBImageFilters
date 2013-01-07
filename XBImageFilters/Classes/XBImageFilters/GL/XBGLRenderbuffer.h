@@ -15,6 +15,6 @@
 @property (nonatomic, readonly) GLuint name;
 @property (nonatomic, readonly) CGSize size;
 
-- (void)storageFromGLLayer:(CAEAGLLayer *)layer;
+- (BOOL)storageFromGLLayer:(CAEAGLLayer *)layer;
 
 @end

@@ -296,7 +296,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     
     GLuint lastFramebuffer = 0;
     
-    glViewport(0, 0, targetWidth, targetHeight);
+    [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, targetWidth, targetHeight);
     
     for (int pass = 0; pass < self.programs.count; ++pass) {
         XBGLProgram *program = [self.programs objectAtIndex:pass];
@@ -657,7 +657,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     glGenBuffers(1, &_imageQuadVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     
     // Setup default shader
     NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
@@ -833,6 +832,8 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         NSLog(@"Failed to create framebuffer: %@", NSStringFromFramebufferStatus(status));
         return NO;
     }
+    
+    [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
     
     return YES;
 }

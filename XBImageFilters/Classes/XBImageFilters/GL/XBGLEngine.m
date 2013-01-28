@@ -75,7 +75,7 @@ float pagesToMB(int pages);
 
 - (void)setClearColor:(UIColor *)clearColor
 {
-    if ([self.clearColor isEqual:clearColor]) {
+    if ([_clearColor isEqual:clearColor]) {
         return;
     }
     _clearColor = [clearColor copy];
@@ -96,7 +96,7 @@ float pagesToMB(int pages);
 
 - (void)setDepthTestEnabled:(BOOL)depthTestEnabled
 {
-    if (self.depthTestEnabled == depthTestEnabled) {
+    if (_depthTestEnabled == depthTestEnabled) {
         return;
     }
 

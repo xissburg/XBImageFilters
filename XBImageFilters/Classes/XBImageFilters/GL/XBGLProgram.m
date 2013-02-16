@@ -13,7 +13,7 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
 
 @interface XBGLProgram ()
 
-@property (readonly, copy, nonatomic) NSDictionary *uniforms;
+@property (readonly, nonatomic) NSDictionary *uniforms;
 @property (strong, nonatomic) NSMutableDictionary *dirtyUniforms;
 @property (strong, nonatomic) NSMutableDictionary *samplerBindings;
 @property (strong, nonatomic) NSMutableDictionary *samplerXBBindings;
@@ -56,8 +56,18 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
             return nil;
         }
         
-        _uniforms = [[XBGLEngine sharedEngine] uniformsForProgram:self.program];
-        _attributes = [[XBGLEngine sharedEngine] attributesForProgram:self.program];
+        NSMutableDictionary *uniforms = [[NSMutableDictionary alloc] init];
+        [[XBGLEngine sharedEngine] enumerateUniformsForProgram:self.program usingBlock:^(NSString *name, GLint location, GLint size, GLenum type) {
+            uniforms[name] = [[XBGLShaderUniform alloc] initWithName:name location:location size:size type:type];
+        }];
+        _uniforms = [uniforms copy];
+        
+        NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
+        [[XBGLEngine sharedEngine] enumerateAttributesForProgram:self.program usingBlock:^(NSString *name, GLint location, GLint size, GLenum type) {
+            attributes[name] = [[XBGLShaderAttribute alloc] initWithName:name location:location size:size type:type];
+        }];
+        _attributes = [attributes copy];
+        
         self.samplerBindings = [[NSMutableDictionary alloc] init];
         self.samplerXBBindings = [[NSMutableDictionary alloc] init];
         self.dirtyUniforms = [[NSMutableDictionary alloc] init];
@@ -110,7 +120,7 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
     // Flush dirty uniforms
     for (NSString *name in [self.dirtyUniforms allKeys]) {
         XBGLShaderUniform *uniform = [self.dirtyUniforms objectForKey:name];
-        [[XBGLEngine sharedEngine] flushUniform:uniform];
+        [self flushUniform:uniform];
     }
     
     [self.dirtyUniforms removeAllObjects];
@@ -129,6 +139,11 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
             }
         }
     }
+}
+
+- (void)flushUniform:(XBGLShaderUniform *)uniform
+{
+    [[XBGLEngine sharedEngine] flushUniformWithLocation:uniform.location size:uniform.size type:uniform.type value:uniform.value];
 }
 
 @end

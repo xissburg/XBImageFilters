@@ -11,23 +11,23 @@
 /**
  * OpenGL data type sizes
  */
-#define GL_FLOAT_SIZE           sizeof(GLfloat)
-#define GL_FLOAT_VEC2_SIZE      2*sizeof(GLfloat)
-#define GL_FLOAT_VEC3_SIZE      3*sizeof(GLfloat)
-#define GL_FLOAT_VEC4_SIZE      4*sizeof(GLfloat)
-#define GL_INT_SIZE             sizeof(GLint)
-#define GL_INT_VEC2_SIZE        2*sizeof(GLint)
-#define GL_INT_VEC3_SIZE        3*sizeof(GLint)
-#define GL_INT_VEC4_SIZE        4*sizeof(GLint)
-#define GL_BOOL_SIZE        	sizeof(GLint)
-#define GL_BOOL_VEC2_SIZE   	2*sizeof(GLint)
-#define GL_BOOL_VEC3_SIZE       3*sizeof(GLint)
-#define GL_BOOL_VEC4_SIZE       4*sizeof(GLint)
-#define GL_FLOAT_MAT2_SIZE      4*sizeof(GLfloat)
-#define GL_FLOAT_MAT3_SIZE      9*sizeof(GLfloat)
-#define GL_FLOAT_MAT4_SIZE      16*sizeof(GLfloat)
-#define GL_SAMPLER_2D_SIZE      sizeof(GLint)
-#define GL_SAMPLER_CUBE_SIZE    sizeof(GLint)
+#define XBGL_FLOAT_SIZE           sizeof(GLfloat)
+#define XBGL_FLOAT_VEC2_SIZE      2*sizeof(GLfloat)
+#define XBGL_FLOAT_VEC3_SIZE      3*sizeof(GLfloat)
+#define XBGL_FLOAT_VEC4_SIZE      4*sizeof(GLfloat)
+#define XBGL_INT_SIZE             sizeof(GLint)
+#define XBGL_INT_VEC2_SIZE        2*sizeof(GLint)
+#define XBGL_INT_VEC3_SIZE        3*sizeof(GLint)
+#define XBGL_INT_VEC4_SIZE        4*sizeof(GLint)
+#define XBGL_BOOL_SIZE            sizeof(GLint)
+#define XBGL_BOOL_VEC2_SIZE   	  2*sizeof(GLint)
+#define XBGL_BOOL_VEC3_SIZE       3*sizeof(GLint)
+#define XBGL_BOOL_VEC4_SIZE       4*sizeof(GLint)
+#define XBGL_FLOAT_MAT2_SIZE      4*sizeof(GLfloat)
+#define XBGL_FLOAT_MAT3_SIZE      9*sizeof(GLfloat)
+#define XBGL_FLOAT_MAT4_SIZE      16*sizeof(GLfloat)
+#define XBGL_SAMPLER_2D_SIZE      sizeof(GLint)
+#define XBGL_SAMPLER_CUBE_SIZE    sizeof(GLint)
 
 @implementation XBGLShaderVariable
 
@@ -58,71 +58,71 @@ size_t TypeSizeForType(GLenum type)
     
     switch (type) {
         case GL_FLOAT:
-            size = GL_FLOAT_SIZE;
+            size = XBGL_FLOAT_SIZE;
             break;
             
         case GL_FLOAT_VEC2:
-            size = GL_FLOAT_VEC2_SIZE;
+            size = XBGL_FLOAT_VEC2_SIZE;
             break;
             
         case GL_FLOAT_VEC3:
-            size = GL_FLOAT_VEC3_SIZE;
+            size = XBGL_FLOAT_VEC3_SIZE;
             break;
             
         case GL_FLOAT_VEC4:
-            size = GL_FLOAT_VEC4_SIZE;
+            size = XBGL_FLOAT_VEC4_SIZE;
             break;
             
         case GL_INT:
-            size = GL_INT_SIZE;
+            size = XBGL_INT_SIZE;
             break;
             
         case GL_INT_VEC2:
-            size = GL_INT_VEC2_SIZE;
+            size = XBGL_INT_VEC2_SIZE;
             break;
             
         case GL_INT_VEC3:
-            size = GL_INT_VEC3_SIZE;
+            size = XBGL_INT_VEC3_SIZE;
             break;
             
         case GL_INT_VEC4:
-            size = GL_INT_VEC4_SIZE;
+            size = XBGL_INT_VEC4_SIZE;
             break;
             
         case GL_BOOL:
-            size = GL_BOOL_SIZE;
+            size = XBGL_BOOL_SIZE;
             break;
             
         case GL_BOOL_VEC2:
-            size = GL_BOOL_VEC2_SIZE;
+            size = XBGL_BOOL_VEC2_SIZE;
             break;
             
         case GL_BOOL_VEC3:
-            size = GL_BOOL_VEC3_SIZE;
+            size = XBGL_BOOL_VEC3_SIZE;
             break;
             
         case GL_BOOL_VEC4:
-            size = GL_BOOL_VEC4_SIZE;
+            size = XBGL_BOOL_VEC4_SIZE;
             break;
             
         case GL_FLOAT_MAT2:
-            size = GL_FLOAT_MAT2_SIZE;
+            size = XBGL_FLOAT_MAT2_SIZE;
             break;
             
         case GL_FLOAT_MAT3:
-            size = GL_FLOAT_MAT3_SIZE;
+            size = XBGL_FLOAT_MAT3_SIZE;
             break;
             
         case GL_FLOAT_MAT4:
-            size = GL_FLOAT_MAT4_SIZE;
+            size = XBGL_FLOAT_MAT4_SIZE;
             break;
             
         case GL_SAMPLER_2D:
-            size = GL_SAMPLER_2D_SIZE;
+            size = XBGL_SAMPLER_2D_SIZE;
             break;
             
         case GL_SAMPLER_CUBE:
-            size = GL_SAMPLER_CUBE_SIZE;
+            size = XBGL_SAMPLER_CUBE_SIZE;
             break;
             
         default:

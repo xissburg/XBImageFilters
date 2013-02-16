@@ -7,8 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "XBGLShaderAttribute.h"
-#import "XBGLShaderUniform.h"
 #import <GLKit/GLKit.h>
 #import <QuartzCore/QuartzCore.h>
 
@@ -76,11 +74,11 @@ extern NSString *const XBGLProgramErrorDomain;
 - (void)setMinFilter:(XBGLTextureMinFilter)filter texture:(GLuint)texture;
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error;
 - (GLuint)createProgramWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error;
-- (void)deleteProgram:(GLuint)program;
 - (void)useProgram:(GLuint)program;
-- (NSDictionary *)uniformsForProgram:(GLuint)program;
-- (NSDictionary *)attributesForProgram:(GLuint)program;
-- (void)flushUniform:(XBGLShaderUniform *)uniform;
+- (void)deleteProgram:(GLuint)program;
+- (void)enumerateUniformsForProgram:(GLuint)program usingBlock:(void (^)(NSString *name, GLint location, GLint size, GLenum type))block;
+- (void)enumerateAttributesForProgram:(GLuint)program usingBlock:(void (^)(NSString *name, GLint location, GLint size, GLenum type))block;
+- (void)flushUniformWithLocation:(GLint)location size:(GLint)size type:(GLenum)type value:(void *)value;
 - (GLuint)createRenderbuffer;
 - (void)deleteRenderbuffer:(GLuint)renderbuffer;
 - (void)bindRenderbuffer:(GLuint)renderbuffer;

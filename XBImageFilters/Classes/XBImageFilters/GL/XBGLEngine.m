@@ -249,38 +249,6 @@ float pagesToMB(int pages);
     return program;
 }
 
-- (void)deleteProgram:(GLuint)program
-{
-    if (boundProgram == program) {
-        boundProgram = 0;
-    }
-    glDeleteProgram(program);
-}
-
-- (NSDictionary *)uniformsForProgram:(GLuint)program
-{
-    GLint count;
-    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
-    GLint maxLength;
-    glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
-    GLchar *nameBuffer = (GLchar *)malloc(maxLength * sizeof(GLchar));
-    NSMutableDictionary *uniforms = [[NSMutableDictionary alloc] initWithCapacity:count];
-    
-    for (int i = 0; i < count; ++i) {
-        GLint size;
-        GLenum type;
-        glGetActiveUniform(program, i, maxLength, NULL, &size, &type, nameBuffer);
-        GLint location = glGetUniformLocation(program, nameBuffer);
-        NSString *name = [[NSString alloc] initWithCString:nameBuffer encoding:NSUTF8StringEncoding];
-        XBGLShaderUniform *uniform = [[XBGLShaderUniform alloc] initWithName:name location:location size:size type:type];
-        [uniforms setObject:uniform forKey:name];
-    }
-    
-    free(nameBuffer);
-    
-    return uniforms;
-}
-
 - (void)useProgram:(GLuint)program
 {
     if (boundProgram != program) {
@@ -289,14 +257,41 @@ float pagesToMB(int pages);
     }
 }
 
-- (NSDictionary *)attributesForProgram:(GLuint)program
+- (void)deleteProgram:(GLuint)program
+{
+    if (boundProgram == program) {
+        boundProgram = 0;
+    }
+    glDeleteProgram(program);
+}
+
+- (void)enumerateUniformsForProgram:(GLuint)program usingBlock:(void (^)(NSString *name, GLint location, GLint size, GLenum type))block
+{
+    GLint count;
+    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
+    GLint maxLength;
+    glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
+    GLchar *nameBuffer = (GLchar *)malloc(maxLength * sizeof(GLchar));
+    
+    for (int i = 0; i < count; ++i) {
+        GLint size;
+        GLenum type;
+        glGetActiveUniform(program, i, maxLength, NULL, &size, &type, nameBuffer);
+        GLint location = glGetUniformLocation(program, nameBuffer);
+        NSString *name = [[NSString alloc] initWithCString:nameBuffer encoding:NSUTF8StringEncoding];
+        block(name, location, size, type);
+    }
+    
+    free(nameBuffer);
+}
+
+- (void)enumerateAttributesForProgram:(GLuint)program usingBlock:(void (^)(NSString *name, GLint location, GLint size, GLenum type))block
 {
     GLint count;
     glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &count);
     GLint maxLength;
     glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxLength);
     GLchar *nameBuffer = (GLchar *)malloc(maxLength * sizeof(GLchar));
-    NSMutableDictionary *attributes = [[NSMutableDictionary alloc] initWithCapacity:count];
     
     for (int i = 0; i < count; ++i) {
         GLint size;
@@ -304,69 +299,66 @@ float pagesToMB(int pages);
         glGetActiveAttrib(program, i, maxLength, NULL, &size, &type, nameBuffer);
         GLint location = glGetAttribLocation(program, nameBuffer);
         NSString *name = [[NSString alloc] initWithCString:nameBuffer encoding:NSUTF8StringEncoding];
-        XBGLShaderAttribute *attribute = [[XBGLShaderAttribute alloc] initWithName:name location:location size:size type:type];
-        [attributes setObject:attribute forKey:name];
+        block(name, location, size, type);
     }
     
     free(nameBuffer);
-    
-    return attributes;
 }
 
-- (void)flushUniform:(XBGLShaderUniform *)uniform
+- (void)flushUniformWithLocation:(GLint)location size:(GLint)size type:(GLenum)type value:(void *)value
 {
-    switch (uniform.type) {
+    switch (type) {
         case GL_FLOAT:
-            glUniform1fv(uniform.location, uniform.size, uniform.value);
+            glUniform1fv(location, size, value);
             break;
             
         case GL_FLOAT_VEC2:
-            glUniform2fv(uniform.location, uniform.size, uniform.value);
+            glUniform2fv(location, size, value);
             break;
             
         case GL_FLOAT_VEC3:
-            glUniform3fv(uniform.location, uniform.size, uniform.value);
+            glUniform3fv(location, size, value);
             break;
             
         case GL_FLOAT_VEC4:
-            glUniform4fv(uniform.location, uniform.size, uniform.value);
+            glUniform4fv(location, size, value);
             break;
             
         case GL_INT:
         case GL_BOOL:
-            glUniform1iv(uniform.location, uniform.size, uniform.value);
+            glUniform1iv(location, size, value);
             break;
             
         case GL_INT_VEC2:
         case GL_BOOL_VEC2:
-            glUniform2iv(uniform.location, uniform.size, uniform.value);
+            glUniform2iv(location, size, value);
             break;
             
         case GL_INT_VEC3:
         case GL_BOOL_VEC3:
-            glUniform3iv(uniform.location, uniform.size, uniform.value);
+            glUniform3iv(location, size, value);
             break;
             
         case GL_INT_VEC4:
         case GL_BOOL_VEC4:
-            glUniform4iv(uniform.location, uniform.size, uniform.value);
+            glUniform4iv(location, size, value);
             break;
             
         case GL_FLOAT_MAT2:
-            glUniformMatrix2fv(uniform.location, uniform.size, GL_FALSE, uniform.value);
+            glUniformMatrix2fv(location, size, GL_FALSE, value);
             break;
             
         case GL_FLOAT_MAT3:
-            glUniformMatrix3fv(uniform.location, uniform.size, GL_FALSE, uniform.value);
+            glUniformMatrix3fv(location, size, GL_FALSE, value);
             break;
             
         case GL_FLOAT_MAT4:
-            glUniformMatrix4fv(uniform.location, uniform.size, GL_FALSE, uniform.value);
+            glUniformMatrix4fv(location, size, GL_FALSE, value);
             break;
             
         case GL_SAMPLER_2D:
         case GL_SAMPLER_CUBE:
-            glUniform1iv(uniform.location, uniform.size, uniform.value);
+            glUniform1iv(location, size, value);
             break;
             
         default:

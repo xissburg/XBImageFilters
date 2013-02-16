@@ -17,7 +17,7 @@
  */
 @interface XBGLProgram : NSObject
 
-@property (readonly, copy, nonatomic) NSDictionary *attributes;
+@property (readonly, nonatomic) NSDictionary *attributes;
 @property (readonly, nonatomic) GLuint program;
 
 - (id)initWithVertexShaderFromFile:(NSString *)vertexShaderPath fragmentShaderFromFile:(NSString *)fragmentShaderPath error:(NSError *__autoreleasing *)error;

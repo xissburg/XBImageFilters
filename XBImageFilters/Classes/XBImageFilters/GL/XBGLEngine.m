@@ -18,7 +18,6 @@ typedef struct {
 } Vertex;
 
 const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
-GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1);
 //void ImageProviderReleaseData(void *info, const void *data, size_t size);
 float pagesToMB(int pages);
 
@@ -78,7 +77,7 @@ float pagesToMB(int pages);
     if ([_clearColor isEqual:clearColor]) {
         return;
     }
-    _clearColor = [clearColor copy];
+    _clearColor = clearColor;
     CGFloat r, g, b, a;
     [_clearColor getRed:&r green:&g blue:&b alpha:&a];
     glClearColor(r, g, b, a);
@@ -119,6 +118,12 @@ float pagesToMB(int pages);
     boundTextures[activeTextureUnit] = texture;
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
     return texture;
+}
+
+- (void)updateTexture:(GLuint)texture width:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data
+{
+    [self bindTexture:texture];
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, data);
 }
 
 - (void)deleteTexture:(GLuint)texture
@@ -175,6 +180,22 @@ float pagesToMB(int pages);
 {
     [self bindTexture:texture];
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, [self convertMinFilter:filter]);
+}
+
+- (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer
+{
+    // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
+    size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0, texture);
+    if (ret != kCVReturnSuccess) {
+        NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
+    }
+    
+    glBindTexture(CVOpenGLESTextureGetTarget(*texture), CVOpenGLESTextureGetName(*texture));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 - (GLuint)createShaderWithSource:(NSString *)sourceCode type:(GLenum)type error:(NSError *__autoreleasing *)error

@@ -101,7 +101,7 @@ NSString *const XBGLProgramErrorDomain = @"GLKProgramErrorDomain";
     }
 }
 
-- (void)bindSamplerNamed:(NSString *)samplerName toTexture:(GLuint)texture unit:(GLint)unit
+- (void)bindSamplerNamed:(NSString *)samplerName toTextureNamed:(GLuint)texture unit:(GLint)unit
 {
     [self setValue:&unit forUniformNamed:samplerName];
     

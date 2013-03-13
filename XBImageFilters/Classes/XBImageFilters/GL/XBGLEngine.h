@@ -59,11 +59,12 @@ extern NSString *const XBGLProgramErrorDomain;
 
 @property (readonly, nonatomic) EAGLContext *context;
 @property (readonly, nonatomic) GLint maxTextureSize; // Maximum value for texture width and height
-@property (copy, nonatomic) UIColor *clearColor;
+@property (strong, nonatomic) UIColor *clearColor;
 @property (assign, nonatomic) CGRect viewportRect;
 @property (assign, nonatomic) BOOL depthTestEnabled;
 
 - (GLuint)createTextureWithWidth:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data;
+- (void)updateTexture:(GLuint)texture width:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data;
 - (void)deleteTexture:(GLuint)texture;
 - (void)setActiveTextureUnit:(GLint)unit;
 - (void)bindTexture:(GLuint)texture;
@@ -99,3 +100,6 @@ extern NSString *const XBGLProgramErrorDomain;
 + (NSString *)memoryStatus;
 
 @end
+
+extern const GLKMatrix2 GLKMatrix2Identity;
+GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1);

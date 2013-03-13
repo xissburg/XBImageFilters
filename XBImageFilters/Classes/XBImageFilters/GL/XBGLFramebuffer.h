@@ -16,7 +16,9 @@
 @property (nonatomic, readonly) id attachment;
 @property (nonatomic, readonly) XBGLFramebufferStatus status;
 
-- (void)attachRenderbuffer:(XBGLRenderbuffer *)renderbuffer;
+- (id)initWithTexture:(XBGLTexture *)texture;
+- (id)initWithRenderbuffer:(XBGLRenderbuffer *)renderbuffer;
 - (void)attachTexture:(XBGLTexture *)texture;
+- (void)attachRenderbuffer:(XBGLRenderbuffer *)renderbuffer;
 
 @end

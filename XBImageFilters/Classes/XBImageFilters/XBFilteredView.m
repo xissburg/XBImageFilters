@@ -24,18 +24,17 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 @property (assign, nonatomic) CGRect previousBounds; //used in layoutSubviews to determine whether the framebuffer should be recreated
 
 @property (assign, nonatomic) GLuint imageQuadVertexBuffer;
-@property (assign, nonatomic) GLuint mainTexture;
-@property (assign, nonatomic) GLint textureWidth, textureHeight;
+@property (strong, nonatomic) XBGLTexture *mainTexture;
 
 @property (assign, nonatomic) GLKMatrix4 contentModeTransform;
 
 /**
  * Multi-pass filtering support.
  */
-@property (assign, nonatomic) GLuint oddPassTexture;
-@property (assign, nonatomic) GLuint evenPassTexture;
-@property (assign, nonatomic) GLuint oddPassFramebuffer;
-@property (assign, nonatomic) GLuint evenPassFrambuffer;
+@property (strong, nonatomic) XBGLTexture *oddPassTexture;
+@property (strong, nonatomic) XBGLTexture *evenPassTexture;
+@property (strong, nonatomic) XBGLFramebuffer *oddPassFramebuffer;
+@property (strong, nonatomic) XBGLFramebuffer *evenPassFrambuffer;
 
 @end
 
@@ -127,9 +126,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 - (void)setBackgroundColor:(UIColor *)backgroundColor
 {
     [super setBackgroundColor:backgroundColor];
-    CGFloat r, g, b, a;
-    [self.backgroundColor getRed:&r green:&g blue:&b alpha:&a];
-    glClearColor(r, g, b, a);
+    [XBGLEngine sharedEngine].clearColor = backgroundColor;
+}
+
+- (UIColor *)backgroundColor
+{
+    return [XBGLEngine sharedEngine].clearColor;
 }
 
 - (void)setContentMode:(UIViewContentMode)contentMode
@@ -142,16 +144,10 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height
 {
-    glDeleteTextures(1, &_mainTexture);
-    
-    if (width != self.textureWidth || height != self.textureHeight) {
-        [self destroyEvenPass];
-        [self destroyOddPass];
+    if (width != self.mainTexture.width || height != self.mainTexture.height) {
+        [self destroyEvenOddPasses];
         
-        self.textureWidth = width;
-        self.textureHeight = height;
-        
-        self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
+        self.mainTexture = [[XBGLTexture alloc] initWithWidth:width height:height data:textureData];
         
         // Resize the even and odd textures because their size have to match that of the mainTexture
         if (self.programs.count >= 2) {
@@ -172,7 +168,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     // Update the texture in the first shader
     if (self.programs.count > 0) {
         XBGLProgram *firstProgram = [self.programs objectAtIndex:0];
-        [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
+        [firstProgram bindSamplerNamed:@"s_texture" toTextureNamed:self.mainTexture.name unit:0];
         
         if ([self.delegate respondsToSelector:@selector(filteredView:didChangeMainTexture:)]) {
             [self.delegate filteredView:self didChangeMainTexture:self.mainTexture];
@@ -182,9 +178,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)_updateTextureWithData:(GLvoid *)textureData
 {
-    glBindTexture(GL_TEXTURE_2D, self.mainTexture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, self.textureWidth, self.textureHeight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    [self.mainTexture updateWithData:textureData];
 }
 
 - (void)_setTextureDataWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache texture:(CVOpenGLESTextureRef *)texture imageBuffer:(CVImageBufferRef)imageBuffer
@@ -198,12 +192,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage: %d", ret);
     }
     
-    if (width != self.textureWidth || height != self.textureHeight) {
-        [self destroyEvenPass];
-        [self destroyOddPass];
-        
-        self.textureWidth = width;
-        self.textureHeight = height;
+    glBindTexture(CVOpenGLESTextureGetTarget(*texture), CVOpenGLESTextureGetName(*texture));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    if (width != self.mainTexture.width || height != self.mainTexture.height) {
+        [self destroyEvenOddPasses];
         
         // Resize the even and odd textures because their size have to match that of the mainTexture
         if (self.programs.count >= 2) {
@@ -218,26 +212,17 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         [self refreshContentTransform];
     }
     
-    glBindTexture(CVOpenGLESTextureGetTarget(*texture), CVOpenGLESTextureGetName(*texture));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
     // Update the texture in the first shader
-    if (self.programs.count > 0 && CVOpenGLESTextureGetName(*texture) != self.mainTexture) {
-        self.mainTexture = CVOpenGLESTextureGetName(*texture);
+    if (self.programs.count > 0 && CVOpenGLESTextureGetName(*texture) != self.mainTexture.name) {
+        GLuint name = CVOpenGLESTextureGetName(*texture);
+        self.mainTexture = [[XBGLTexture alloc] initWithExistingTextureNamed:name width:self.mainTexture.width height:self.mainTexture.height];
         XBGLProgram *firstProgram = [self.programs objectAtIndex:0];
-        [firstProgram bindSamplerNamed:@"s_texture" toTexture:self.mainTexture unit:0];
+        [firstProgram bindSamplerNamed:@"s_texture" toTextureNamed:self.mainTexture.name unit:0];
         
         if ([self.delegate respondsToSelector:@selector(filteredView:didChangeMainTexture:)]) {
             [self.delegate filteredView:self didChangeMainTexture:self.mainTexture];
         }
     }
-}
-
-- (void)_deleteMainTexture
-{
-    glDeleteTextures(1, &_mainTexture);
-    _mainTexture = 0;
 }
 
 - (UIImage *)_filteredImageWithTextureCache:(CVOpenGLESTextureCacheRef)textureCache imageBuffer:(CVImageBufferRef)imageBuffer targetWidth:(GLint)targetWidth targetHeight:(GLint)targetHeight contentTransform:(GLKMatrix4)contentTransform
@@ -323,7 +308,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
             sourceTexture = oddPassTexture;
         }
         
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        [program bindSamplerNamed:@"s_texture" toTextureNamed:sourceTexture unit:0];
         
         glClear(GL_COLOR_BUFFER_BIT);
         
@@ -369,16 +354,16 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         GLuint sourceTexture = 0;
         
         if (pass == 0) { // First pass always uses the original image
-            sourceTexture = self.mainTexture;
+            sourceTexture = self.mainTexture.name;
         }
         else if (pass%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
-            sourceTexture = self.evenPassTexture;
+            sourceTexture = self.evenPassTexture.name;
         }
         else { // Third pass uses the result of the second, which is number 1, then it's odd
-            sourceTexture = self.oddPassTexture;
+            sourceTexture = self.oddPassTexture.name;
         }
         
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        [program bindSamplerNamed:@"s_texture" toTextureNamed:sourceTexture unit:0];
     }
     
     [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.renderbuffer.size.width, self.renderbuffer.size.height);
@@ -513,8 +498,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources vertexShaderSources:(NSArray *)vsSources error:(NSError *__autoreleasing *)error
 {
-    [self destroyEvenPass];
-    [self destroyOddPass];
+    [self destroyEvenOddPasses];
     
     /* Create frame buffers for render to texture in multi-pass filters if necessary. If we have a single pass/fragment shader, we'll render
      * directly to the framebuffer. If we have two passes, we'll render to the evenPassFramebuffer using the original image as the filter source
@@ -525,11 +509,10 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
     if (fsSources.count >= 2) {
         // Two or more passes, create evenPass*
         [self setupEvenPass];
-    }
-    
-    if (fsSources.count > 2) {
-        // More than two passes, create oddPass*
-        [self setupOddPass];
+        if (fsSources.count > 2) {
+            // More than two passes, create oddPass*
+            [self setupOddPass];
+        }
     }
     
     NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:fsSources.count];
@@ -551,7 +534,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
         [program setValue:&m forUniformNamed:@"u_contentTransform"];
         [program setValue:i == 0? &_texCoordTransform: (void *)&GLKMatrix2Identity forUniformNamed:@"u_texCoordTransform"];
         
-        GLuint sourceTexture = 0;
+        XBGLTexture *sourceTexture = nil;
         
         if (i == 0) { // First pass always uses the original image
             sourceTexture = self.mainTexture;
@@ -563,7 +546,7 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
             sourceTexture = self.oddPassTexture;
         }
         
-        [program bindSamplerNamed:@"s_texture" toTexture:sourceTexture unit:0];
+        [program bindSamplerNamed:@"s_texture" toTextureNamed:sourceTexture.name unit:0];
         
         // Enable vertex position and texCoord attributes
         XBGLShaderAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
@@ -606,12 +589,12 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
                 [[XBGLEngine sharedEngine] bindFramebuffer:self.framebuffer.name];
             }
             else if (pass%2 == 0) {
-                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.textureWidth, self.textureHeight);
-                [[XBGLEngine sharedEngine] bindFramebuffer:self.evenPassFrambuffer];
+                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.mainTexture.width, self.mainTexture.height);
+                [[XBGLEngine sharedEngine] bindFramebuffer:self.evenPassFrambuffer.name];
             }
             else {
-                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.textureWidth, self.textureHeight);
-                [[XBGLEngine sharedEngine] bindFramebuffer:self.oddPassFramebuffer];
+                [XBGLEngine sharedEngine].viewportRect = CGRectMake(0, 0, self.mainTexture.width, self.mainTexture.height);
+                [[XBGLEngine sharedEngine] bindFramebuffer:self.oddPassFramebuffer.name];
             }
         }
         
@@ -677,13 +660,6 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 {
     glDeleteBuffers(1, &_imageQuadVertexBuffer);
     self.imageQuadVertexBuffer = 0;
-    
-    glDeleteTextures(1, &_mainTexture);
-    glDeleteTextures(1, &_evenPassTexture);
-    glDeleteTextures(1, &_oddPassTexture);
-    
-    glDeleteFramebuffers(1, &_evenPassFrambuffer);
-    glDeleteFramebuffers(1, &_oddPassFramebuffer);
 }
 
 - (GLuint)generateDefaultTextureWithWidth:(GLint)width height:(GLint)height data:(GLvoid *)data
@@ -712,30 +688,22 @@ void ImageProviderReleaseData(void *info, const void *data, size_t size);
 
 - (void)setupEvenPass
 {
-    self.evenPassTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:NULL];
-    self.evenPassFrambuffer = [self generateDefaultFramebufferWithTargetTexture:self.evenPassTexture];
-}
-
-- (void)destroyEvenPass
-{
-    glDeleteTextures(1, &_evenPassTexture);
-    self.evenPassTexture = 0;
-    glDeleteFramebuffers(1, &_evenPassFrambuffer);
-    self.evenPassFrambuffer = 0;
+    self.evenPassTexture = [[XBGLTexture alloc] initWithWidth:self.mainTexture.width height:self.mainTexture.height data:NULL];
+    self.evenPassFrambuffer = [[XBGLFramebuffer alloc] initWithTexture:self.evenPassTexture];
 }
 
 - (void)setupOddPass
 {
-    self.oddPassTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:NULL];
-    self.oddPassFramebuffer = [self generateDefaultFramebufferWithTargetTexture:self.oddPassTexture];
+    self.oddPassTexture = [[XBGLTexture alloc] initWithWidth:self.mainTexture.width height:self.mainTexture.height data:NULL];
+    self.oddPassFramebuffer = [[XBGLFramebuffer alloc] initWithTexture:self.oddPassTexture];
 }
 
-- (void)destroyOddPass
+- (void)destroyEvenOddPasses
 {
-    glDeleteTextures(1, &_oddPassTexture);
-    self.oddPassTexture = 0;
-    glDeleteFramebuffers(1, &_oddPassFramebuffer);
-    self.oddPassFramebuffer = 0;
+    self.evenPassTexture = nil;
+    self.evenPassFrambuffer = nil;
+    self.oddPassTexture = nil;
+    self.oddPassFramebuffer = nil;
 }
 
 - (void)refreshContentTransform

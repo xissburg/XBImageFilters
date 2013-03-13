@@ -20,6 +20,26 @@
     return self;
 }
 
+- (id)initWithTexture:(XBGLTexture *)texture
+{
+    self = [super init];
+    if (self) {
+        _name = [[XBGLEngine sharedEngine] createFramebuffer];
+        [self attachTexture:texture];
+    }
+    return self;
+}
+
+- (id)initWithRenderbuffer:(XBGLRenderbuffer *)renderbuffer
+{
+    self = [super init];
+    if (self) {
+        _name = [[XBGLEngine sharedEngine] createFramebuffer];
+        [self attachRenderbuffer:renderbuffer];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     [[XBGLEngine sharedEngine] deleteFramebuffer:self.name];
@@ -27,16 +47,16 @@
 
 #pragma mark - Methods
 
-- (void)attachRenderbuffer:(XBGLRenderbuffer *)renderbuffer
-{
-    [[XBGLEngine sharedEngine] attachRenderbuffer:renderbuffer.name toFramebuffer:self.name attachment:XBGLAttachmentColor0];
-    _attachment = renderbuffer;
-}
-
 - (void)attachTexture:(XBGLTexture *)texture
 {
     [[XBGLEngine sharedEngine] attachTexture:texture.name toFramebuffer:self.name attachment:XBGLAttachmentColor0];
     _attachment = texture;
+}
+
+- (void)attachRenderbuffer:(XBGLRenderbuffer *)renderbuffer
+{
+    [[XBGLEngine sharedEngine] attachRenderbuffer:renderbuffer.name toFramebuffer:self.name attachment:XBGLAttachmentColor0];
+    _attachment = renderbuffer;
 }
 
 - (XBGLFramebufferStatus)status

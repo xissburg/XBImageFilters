@@ -17,10 +17,7 @@
         _name = textureInfo.name;
         _width = textureInfo.width;
         _height = textureInfo.height;
-        _wrapSMode = XBGLTextureWrapModeRepeat;
-        _wrapTMode = XBGLTextureWrapModeRepeat;
-        _minFilter = XBGLTextureMinFilterNearestMipmapLinear;
-        _magFilter = XBGLTextureMagFilterLinear;
+        [self initDefaultTexParameters];
     }
     return self;
 }
@@ -43,12 +40,29 @@
         _name = [[XBGLEngine sharedEngine] createTextureWithWidth:width height:height data:data];
         _width = width;
         _height = height;
-        _wrapSMode = XBGLTextureWrapModeRepeat;
-        _wrapTMode = XBGLTextureWrapModeRepeat;
-        _minFilter = XBGLTextureMinFilterNearestMipmapLinear;
-        _magFilter = XBGLTextureMagFilterLinear;
+        [self initDefaultTexParameters];
     }
     return self;
+}
+
+- (id)initWithExistingTextureNamed:(GLuint)name width:(GLsizei)width height:(GLsizei)height
+{
+    self = [super init];
+    if (self) {
+        _name = name;
+        _width = width;
+        _height = height;
+        [self initDefaultTexParameters];
+    }
+    return self;
+}
+
+- (void)initDefaultTexParameters
+{
+    _wrapSMode = XBGLTextureWrapModeRepeat;
+    _wrapTMode = XBGLTextureWrapModeRepeat;
+    _minFilter = XBGLTextureMinFilterNearestMipmapLinear;
+    _magFilter = XBGLTextureMagFilterLinear;
 }
 
 - (void)dealloc
@@ -96,6 +110,13 @@
     
     _magFilter = magFilter;
     [[XBGLEngine sharedEngine] setMagFilter:self.magFilter texture:self.name];
+}
+
+#pragma mark - Methods
+
+- (void)updateWithData:(GLvoid *)data
+{
+    [[XBGLEngine sharedEngine] updateTexture:self.name width:self.width height:self.height data:data];
 }
 
 @end

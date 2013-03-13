@@ -97,7 +97,7 @@
     else if ([filterName isEqualToString:@"Sharpen"]) {
         GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
         XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
-        [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
+        [program bindSamplerNamed:@"s_mainTexture" toTextureNamed:self.cameraView.mainTexture unit:1];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
     }
 }
@@ -252,7 +252,7 @@
     // need to update it whenever it changes.
     if ([[self.filterNameArray objectAtIndex:self.filterIndex] isEqualToString:@"Sharpen"]) {
         XBGLProgram *program = [self.cameraView.programs objectAtIndex:1];
-        [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
+        [program bindSamplerNamed:@"s_mainTexture" toTextureNamed:self.cameraView.mainTexture unit:1];
     }
 }
 

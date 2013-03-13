@@ -24,7 +24,7 @@
 - (id)initWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error;
 - (void)setValue:(void *)value forUniformNamed:(NSString *)uniform;
 - (void)bindSamplerNamed:(NSString *)samplerName toXBTexture:(XBGLTexture *)texture unit:(GLint)unit;
-- (void)bindSamplerNamed:(NSString *)samplerName toTexture:(GLuint)texture unit:(GLint)unit;
+- (void)bindSamplerNamed:(NSString *)samplerName toTextureNamed:(GLuint)texture unit:(GLint)unit;
 - (void)prepareToDraw;
 
 @end

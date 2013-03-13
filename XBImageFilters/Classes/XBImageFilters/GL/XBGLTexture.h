@@ -22,5 +22,7 @@
 - (id)initWithTextureInfo:(GLKTextureInfo *)textureInfo;
 - (id)initWithContentsOfFile:(NSString *)path options:(NSDictionary *)options error:(NSError **)error;
 - (id)initWithWidth:(GLsizei)width height:(GLsizei)height data:(GLvoid *)data;
+- (id)initWithExistingTextureNamed:(GLuint)name width:(GLsizei)width height:(GLsizei)height;
+- (void)updateWithData:(GLvoid *)data;
 
 @end

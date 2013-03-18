@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="1.1" toolsVersion="2182" systemVersion="11E53" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="KIW-52-JQ5">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="2.0" toolsVersion="3084" systemVersion="12C60" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="KIW-52-JQ5">
     <dependencies>
-        <deployment defaultVersion="1296" identifier="iOS"/>
-        <development defaultVersion="4200" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="1181"/>
+        <deployment defaultVersion="1552" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
     <scenes>
         <!--Table View Controller - XBImageFilters-->
         <scene sceneID="VGd-s9-a0C">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="6Bg-5I-tbm" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController id="FTc-Bx-YzI" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="1qO-m5-pRO">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
@@ -87,13 +85,13 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="XBImageFilters" id="mh9-cX-Wx5"/>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6Bg-5I-tbm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1570" y="294"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="iXt-4e-n0e">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="GJD-EC-hM6" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController definesPresentationContext="YES" id="KIW-52-JQ5" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="i1Z-PK-zYR">
                         <autoresizingMask key="autoresizingMask"/>
@@ -102,13 +100,13 @@
                         <segue destination="FTc-Bx-YzI" kind="relationship" relationship="rootViewController" id="frF-bu-xTs"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GJD-EC-hM6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-2104" y="294"/>
         </scene>
         <!--Image View Controller - Image Filter-->
         <scene sceneID="5">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="ImageViewController" id="2" customClass="ImageViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
@@ -133,13 +131,13 @@
                         <outlet property="imageView" destination="0qh-fN-4s6" id="XDY-RW-xen"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1023" y="-53"/>
         </scene>
         <!--Camera View Controller - Camera Filter-->
         <scene sceneID="VH7-RC-c9g">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="rZ0-dq-srg" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="CameraViewController" id="EdN-G9-MgA" customClass="CameraViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Otk-T4-f9Y">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
@@ -168,11 +166,6 @@
                                 <connections>
                                     <outlet property="delegate" destination="EdN-G9-MgA" id="7ad-kJ-koD"/>
                                 </connections>
-                            </view>
-                            <view contentMode="scaleToFill" id="04v-z8-DsY" customClass="CameraTargetView">
-                                <rect key="frame" x="128" y="167" width="65" height="65"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="pso-f2-KHN">
                                 <rect key="frame" x="247" y="10" width="53" height="37"/>
@@ -225,19 +218,18 @@
                     <navigationItem key="navigationItem" title="Camera Filter" id="rMR-bP-Ah9"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
-                        <outlet property="cameraTargetView" destination="04v-z8-DsY" id="gt9-BT-WMF"/>
                         <outlet property="cameraView" destination="DgG-Jv-TgY" id="2fO-Wq-xSr"/>
                         <outlet property="filterLabel" destination="aHu-5S-7FD" id="hAi-iU-x4l"/>
                         <outlet property="secondsPerFrameLabel" destination="e6L-IC-A0u" id="oYn-GU-16q"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rZ0-dq-srg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1023" y="613"/>
         </scene>
         <!--Processing View Controller-->
         <scene sceneID="ruG-kf-vsx">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="1xc-dk-5VG" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="9ie-L6-FOb" customClass="ProcessingViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Bcj-yY-S6t">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
@@ -265,6 +257,7 @@
                         <outlet property="imageView" destination="6sL-H0-N2A" id="TUB-Eg-7kK"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1xc-dk-5VG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1449" y="877"/>
         </scene>

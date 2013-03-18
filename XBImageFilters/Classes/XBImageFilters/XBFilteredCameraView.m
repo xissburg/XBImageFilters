@@ -7,6 +7,7 @@
 //
 
 #import "XBFilteredCameraView.h"
+#import "XBCameraTargetView.h"
 #import <sys/time.h>
 #import <objc/message.h>
 
@@ -36,6 +37,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (strong, nonatomic) NSMutableArray *secondsPerFrameArray;
 @property (assign, nonatomic) BOOL secondsPerFrameArrayDirty;
 @property (nonatomic, assign) dispatch_source_t timerSPF; // Timer for updating secondsPerFrame for the delegate
+@property (strong, nonatomic) IBOutlet XBCameraTargetView *cameraTargetView;
 
 - (void)setupOutputs;
 
@@ -82,6 +84,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     
     // Use the rear camera by default
     self.cameraPosition = XBCameraPositionBack;
+    
+    self.cameraTargetView = [[XBCameraTargetView alloc] initWithFrame:CGRectMake(0, 0, 64, 64)];
+    
+    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    [self addGestureRecognizer:tgr];
     
     [self setupOutputs];
     
@@ -752,6 +759,23 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     self.secondsPerFrameArray = nil;
 }
 
+#pragma mark - Gesture recognition
+
+- (void)tapAction:(UITapGestureRecognizer *)tgr
+{
+    if (tgr.state == UIGestureRecognizerStateRecognized) {
+        CGPoint location = [tgr locationInView:self];
+        self.focusPoint = location;
+        self.exposurePoint = location;
+        
+        if (self.exposurePointSupported || self.focusPointSupported) {
+            [self.superview addSubview:self.cameraTargetView];
+            self.cameraTargetView.center = self.exposurePoint;
+            [self.cameraTargetView setVisible:YES animated:YES];
+        }
+    }
+}
+
 #pragma mark - Key-Value Observing
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -761,16 +785,22 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             if (self.device.adjustingFocus && [self.delegate respondsToSelector:@selector(filteredCameraViewDidBeginAdjustingFocus:)]) {
                 [self.delegate filteredCameraViewDidBeginAdjustingFocus:self];
             }
-            else if (!self.device.adjustingFocus && [self.delegate respondsToSelector:@selector(filteredCameraViewDidFinishAdjustingFocus:)]) {
-                [self.delegate filteredCameraViewDidFinishAdjustingFocus:self];
+            else if (!self.device.adjustingFocus) {
+                [self.cameraTargetView setVisible:NO animated:YES];
+                if ([self.delegate respondsToSelector:@selector(filteredCameraViewDidFinishAdjustingFocus:)]) {
+                    [self.delegate filteredCameraViewDidFinishAdjustingFocus:self];
+                }
             }
         }
         else if ([keyPath isEqualToString:@"adjustingExposure"]) {
             if (self.device.adjustingExposure && [self.delegate respondsToSelector:@selector(filteredCameraViewDidBeginAdjustingExposure:)]) {
                 [self.delegate filteredCameraViewDidBeginAdjustingExposure:self];
             }
-            else if (!self.device.adjustingExposure && [self.delegate respondsToSelector:@selector(filteredCameraViewDidFinishAdjustingExposure:)]) {
-                [self.delegate filteredCameraViewDidFinishAdjustingExposure:self];
+            else if (!self.device.adjustingExposure) {
+                [self.cameraTargetView setVisible:NO animated:YES];
+                if ([self.delegate respondsToSelector:@selector(filteredCameraViewDidFinishAdjustingExposure:)]) {
+                    [self.delegate filteredCameraViewDidFinishAdjustingExposure:self];
+                }
             }
         }
         else if ([keyPath isEqualToString:@"adjustingWhiteBalance"]) {

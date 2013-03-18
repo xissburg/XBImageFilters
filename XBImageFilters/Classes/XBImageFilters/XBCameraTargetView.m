@@ -6,15 +6,17 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import "CameraTargetView.h"
+#import "XBCameraTargetView.h"
 #import <QuartzCore/QuartzCore.h>
 
-@implementation CameraTargetView
+@implementation XBCameraTargetView
 
 - (void)_CameraTargetViewCommonInit
 {
+    _visible = YES;
     self.clipsToBounds = NO;
     self.userInteractionEnabled = NO;
+    self.backgroundColor = [UIColor clearColor];
     self.layer.shadowColor = [UIColor colorWithRed:0.04 green:0.21 blue:0.48 alpha:1].CGColor;
     self.layer.shadowOffset = CGSizeZero;
     self.layer.shadowOpacity = 1;
@@ -41,7 +43,8 @@
     CGContextSaveGState(context);
     
     CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
-    CGContextStrokeRectWithWidth(context, rect, 2);
+    UIBezierPath *roundedRect = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:8];
+    [roundedRect stroke];
     
     CGFloat innerLineLength = 6;
     
@@ -62,35 +65,31 @@
     CGContextRestoreGState(context);
 }
 
-- (void)showAnimated:(BOOL)animated
+- (void)setVisible:(BOOL)visible animated:(BOOL)animated;
 {
-    self.transform = CGAffineTransformMakeScale(2, 2);
-    self.alpha = 0;
+    if (visible == _visible) {
+        return;
+    }
     
-    void (^animations)(void) = ^{
-        self.transform = CGAffineTransformMakeScale(1, 1);
-        self.alpha = 1;
-    };
+    _visible = visible;
     
     if (animated) {
-        [UIView animateWithDuration:0.3 animations:animations];
+        if (visible) {
+            self.transform = CGAffineTransformMakeScale(2, 2);
+            self.alpha = 0;
+            [UIView animateWithDuration:0.3 animations:^{
+                self.transform = CGAffineTransformMakeScale(1, 1);
+                self.alpha = 1;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.3 animations:^{
+                self.alpha = 0;
+            }];
+        }
     }
     else {
-        animations();
-    }
-}
-
-- (void)hideAnimated:(BOOL)animated
-{
-    void (^animations)(void) = ^{
-        self.alpha = 0;
-    };
-    
-    if (animated) {
-        [UIView animateWithDuration:0.3 animations:animations];
-    }
-    else {
-        animations();
+        self.alpha = visible? 1: 0;
     }
 }
 

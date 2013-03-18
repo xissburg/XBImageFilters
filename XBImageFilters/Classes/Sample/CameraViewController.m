@@ -23,7 +23,6 @@
 @implementation CameraViewController
 
 @synthesize cameraView = _cameraView;
-@synthesize cameraTargetView = _cameraTargetView;
 @synthesize filterPathArray = _filterPathArray;
 @synthesize filterNameArray = _filterNameArray;
 @synthesize filterIndex = _filterIndex;
@@ -35,12 +34,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    UITapGestureRecognizer *tgr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cameraViewTapAction:)];
-    [self.cameraView addGestureRecognizer:tgr];
-    [self.cameraTargetView hideAnimated:NO];
     self.cameraView.updateSecondsPerFrame = YES;
-    
     [self setupFilterPaths];
     self.filterIndex = 0;
 }
@@ -212,39 +206,7 @@
     }
 }
 
-#pragma mark - Gesture recognition
-
-- (void)cameraViewTapAction:(UITapGestureRecognizer *)tgr
-{
-    if (tgr.state == UIGestureRecognizerStateRecognized) {
-        CGPoint location = [tgr locationInView:self.cameraView];
-        self.cameraView.focusPoint = location;
-        self.cameraView.exposurePoint = location;
-        
-        if (self.cameraView.exposurePointSupported || self.cameraView.focusPointSupported) {
-            self.cameraTargetView.center = self.cameraView.exposurePoint;
-            [self.cameraTargetView showAnimated:YES];
-        }
-    }
-}
-
 #pragma mark - XBFilteredCameraViewDelegate
-
-- (void)filteredCameraViewDidBeginAdjustingFocus:(XBFilteredCameraView *)filteredCameraView
-{
-    // NSLog(@"Focus point: %f, %f", self.cameraView.focusPoint.x, self.cameraView.focusPoint.y);
-}
-
-- (void)filteredCameraViewDidFinishAdjustingFocus:(XBFilteredCameraView *)filteredCameraView
-{
-    // NSLog(@"Focus point: %f, %f", self.cameraView.focusPoint.x, self.cameraView.focusPoint.y);
-    [self.cameraTargetView hideAnimated:YES];
-}
-
-- (void)filteredCameraViewDidFinishAdjustingExposure:(XBFilteredCameraView *)filteredCameraView
-{
-    [self.cameraTargetView hideAnimated:YES];
-}
 
 - (void)filteredView:(XBFilteredView *)filteredView didChangeMainTexture:(GLuint)mainTexture
 {

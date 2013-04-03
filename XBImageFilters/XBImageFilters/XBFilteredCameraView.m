@@ -11,6 +11,12 @@
 #import <sys/time.h>
 #import <objc/message.h>
 
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
+    #define XBDispatchRelease(d)
+#else
+    #define XBDispatchRelease(d) (dispatch_release(d));
+#endif
+
 #define kMaxTimeSamples 10
 
 NSString *const XBCaptureQualityPhoto = @"XBCaptureQualityPhoto";
@@ -36,8 +42,14 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (assign, nonatomic) BOOL shouldStartCapturingWhenBecomesActive;
 @property (strong, nonatomic) NSMutableArray *secondsPerFrameArray;
 @property (assign, nonatomic) BOOL secondsPerFrameArrayDirty;
-@property (nonatomic, assign) dispatch_source_t timerSPF; // Timer for updating secondsPerFrame for the delegate
 @property (strong, nonatomic) IBOutlet XBCameraTargetView *cameraTargetView;
+
+// Timer for updating secondsPerFrame for the delegate
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
+@property (nonatomic, strong) dispatch_source_t timerSPF;
+#else
+@property (nonatomic, assign) dispatch_source_t timerSPF;
+#endif
 
 - (void)setupOutputs;
 
@@ -129,7 +141,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     CFRelease(self.videoTextureCache);
     
     if (self.timerSPF != NULL) {
-        dispatch_release(self.timerSPF);
+        XBDispatchRelease(self.timerSPF);
     }
 }
 
@@ -753,7 +765,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 - (void)destroySPFTimer
 {
     if (self.timerSPF != NULL) {
-        dispatch_release(self.timerSPF);
+        XBDispatchRelease(self.timerSPF);
         self.timerSPF = NULL;
     }
     self.secondsPerFrameArray = nil;

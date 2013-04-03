@@ -43,7 +43,6 @@
 		1B653E69170CA09C009041D6 /* SuckShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E27170CA09C009041D6 /* SuckShader.glsl */; };
 		1B653E6A170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E28170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl */; };
 		1B653E6B170CA09C009041D6 /* VBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E29170CA09C009041D6 /* VBlurVertexShader.glsl */; };
-		1B653E6C170CA09C009041D6 /* XBImageFilters-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E2A170CA09C009041D6 /* XBImageFilters-Info.plist */; };
 		1B653E6D170CA09C009041D6 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E2F170CA09C009041D6 /* GLKAttribute.m */; };
 		1B653E6E170CA09C009041D6 /* GLKProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E31170CA09C009041D6 /* GLKProgram.m */; };
 		1B653E6F170CA09C009041D6 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E33170CA09C009041D6 /* GLKShaderVariable.m */; };
@@ -238,11 +237,11 @@
 				1B653DFE170CA09C009041D6 /* AppDelegate.m */,
 				1B653DFF170CA09C009041D6 /* CameraViewController.h */,
 				1B653E00170CA09C009041D6 /* CameraViewController.m */,
-				1B653E03170CA09C009041D6 /* MainStoryboard.storyboard */,
 				1B653E05170CA09C009041D6 /* ImageViewController.h */,
 				1B653E06170CA09C009041D6 /* ImageViewController.m */,
 				1B653E08170CA09C009041D6 /* ProcessingViewController.h */,
 				1B653E09170CA09C009041D6 /* ProcessingViewController.m */,
+				1B653E03170CA09C009041D6 /* MainStoryboard.storyboard */,
 				1B653E0A170CA09C009041D6 /* Resources */,
 				1B653E7A170CA0BC009041D6 /* Supporting Files */,
 			);
@@ -525,7 +524,6 @@
 				1B653E69170CA09C009041D6 /* SuckShader.glsl in Resources */,
 				1B653E6A170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl in Resources */,
 				1B653E6B170CA09C009041D6 /* VBlurVertexShader.glsl in Resources */,
-				1B653E6C170CA09C009041D6 /* XBImageFilters-Info.plist in Resources */,
 				1B653E73170CA09C009041D6 /* DefaultFragmentShader.glsl in Resources */,
 				1B653E74170CA09C009041D6 /* DefaultVertexShader.glsl in Resources */,
 			);
@@ -649,6 +647,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "XBImageFilters/Sample/XBImageFilters-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/XBImageFilters/Sample/XBImageFilters-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -662,6 +661,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "XBImageFilters/Sample/XBImageFilters-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/XBImageFilters/Sample/XBImageFilters-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

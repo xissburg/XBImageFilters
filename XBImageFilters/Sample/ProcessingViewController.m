@@ -101,9 +101,7 @@
     }
  
     NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
-    NSString *hBlurPath = [[NSBundle mainBundle] pathForResource:@"HGaussianBlur" ofType:@"glsl"];
-    NSString *vBlurPath = [[NSBundle mainBundle] pathForResource:@"VGaussianBlur" ofType:@"glsl"];
-    NSArray *shaders = [[NSArray alloc] initWithObjects:hBlurPath, vBlurPath, luminancePath, nil];
+    NSArray *shaders = [[NSArray alloc] initWithObjects:luminancePath, nil];
 
 #if 0
     imageView.image = [img imageByApplyingShaders:shaders];

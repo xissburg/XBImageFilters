@@ -533,7 +533,11 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             filteredImage = [self _filteredImageWithTextureCache:self.videoTextureCache imageBuffer:imageBuffer targetWidth:targetWidth targetHeight:targetHeight contentTransform:contentTransform];
         }
         
-        completion(filteredImage);
+        if (completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(filteredImage);
+            });
+        }
         self.rendering = YES;
     }];
 }

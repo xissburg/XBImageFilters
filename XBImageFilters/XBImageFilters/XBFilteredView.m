@@ -653,6 +653,15 @@ float pagesToMB(int pages);
     return YES;
 }
 
+- (void)setDefaultFilter
+{
+    NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
+    NSError *error = nil;
+    if (![self setFilterFragmentShaderPath:fragmentShaderPath error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+    }
+}
+
 - (UIImage *)takeScreenshot
 {
     return [self takeScreenshotWithImageOrientation:UIImageOrientationDownMirrored];
@@ -760,11 +769,7 @@ float pagesToMB(int pages);
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     
     // Setup default shader
-    NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
-    NSError *error = nil;
-    if (![self setFilterFragmentShaderPath:fragmentShaderPath error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-    }
+    [self setDefaultFilter];
     
     // Initialize transform to the most basic projection, and set others to identity
     self.contentModeTransform = GLKMatrix4MakeOrtho(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f);

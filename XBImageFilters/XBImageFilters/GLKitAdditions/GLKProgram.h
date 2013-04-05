@@ -35,6 +35,7 @@ enum {
 @property (readonly, copy, nonatomic) NSDictionary *attributes;
 @property (readonly, nonatomic) GLuint program;
 
++ (GLKProgram *)defaultProgram;
 - (id)initWithVertexShaderFromFile:(NSString *)vertexShaderPath fragmentShaderFromFile:(NSString *)fragmentShaderPath error:(NSError *__autoreleasing *)error;
 - (id)initWithVertexShaderSource:(NSString *)vertexShaderSource fragmentShaderSource:(NSString *)fragmentShaderSource error:(NSError *__autoreleasing *)error;
 - (void)setValue:(void *)value forUniformNamed:(NSString *)uniform;

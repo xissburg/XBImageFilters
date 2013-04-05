@@ -83,6 +83,19 @@ float pagesToMB(int pages);
 @synthesize maxTextureSize = _maxTextureSize;
 @synthesize delegate = _delegate;
 
++ (EAGLContext *)newContext
+{
+    static EAGLSharegroup *sharegroup = nil;
+    if (sharegroup == nil) {
+        EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        sharegroup = context.sharegroup;
+        return context;
+    }
+    else {
+        return [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:sharegroup];
+    }
+}
+
 /**
  * Actual initializer. Called both in initWithFrame: when creating an instance programatically and in awakeFromNib when creating an instance
  * from a nib/storyboard.
@@ -93,7 +106,7 @@ float pagesToMB(int pages);
     self.layer.opaque = YES;
     ((CAEAGLLayer *)self.layer).drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], kEAGLDrawablePropertyRetainedBacking, nil];
 
-    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    _context = [XBFilteredView newContext];
     
     self.previousBounds = CGRectZero;
     
@@ -583,6 +596,28 @@ float pagesToMB(int pages);
 {
     [EAGLContext setCurrentContext:self.context];
     
+    NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:fsSources.count];
+    for (int i = 0; i < fsSources.count; ++i) {
+        NSString *fsSource = [fsSources objectAtIndex:i];
+        NSString *vsSource = [vsSources objectAtIndex:i];
+        GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderSource:vsSource fragmentShaderSource:fsSource error:error];
+        if (program == nil) {
+            return NO;
+        }
+        [programs addObject:program];
+    }
+    self.programs = programs;
+    
+    return YES;
+}
+
+- (void)setPrograms:(NSArray *)programs
+{
+    if (programs == _programs) {
+        return;
+    }
+    _programs = [programs copy];
+    
     [self destroyEvenPass];
     [self destroyOddPass];
     
@@ -592,29 +627,21 @@ float pagesToMB(int pages);
      * filter will instead render to the oddPassFramebuffer and the third/last pass will render to the framebuffer using the oddPassTexture.
      * And so on... */
     
-    if (fsSources.count >= 2) {
+    if (_programs.count >= 2) {
         // Two or more passes, create evenPass*
         [self setupEvenPass];
     }
     
-    if (fsSources.count > 2) {
+    if (_programs.count > 2) {
         // More than two passes, create oddPass*
         [self setupOddPass];
     }
     
-    NSMutableArray *programs = [[NSMutableArray alloc] initWithCapacity:fsSources.count];
-    
-    for (int i = 0; i < fsSources.count; ++i) {
-        NSString *fsSource = [fsSources objectAtIndex:i];
-        NSString *vsSource = [vsSources objectAtIndex:i];
-        GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderSource:vsSource fragmentShaderSource:fsSource error:error];
-        if (program == nil) {
-            return NO;
-        }
-        
+    for (int i = 0; i < _programs.count; ++i) {
+        GLKProgram *program = _programs[i];
         GLKMatrix4 m = GLKMatrix4Identity;
         
-        if (i == fsSources.count - 1) {
+        if (i == _programs.count - 1) {
             m = GLKMatrix4Multiply(self.contentTransform, self.contentModeTransform);
         }
         
@@ -643,23 +670,13 @@ float pagesToMB(int pages);
         GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
         glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
         glEnableVertexAttribArray(texCoordAttribute.location);
-        
-        [programs addObject:program];
     }
-    
-    _programs = [programs copy];
     [self refreshContentTransform];
-    
-    return YES;
 }
 
 - (void)setDefaultFilter
 {
-    NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
-    NSError *error = nil;
-    if (![self setFilterFragmentShaderPath:fragmentShaderPath error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-    }
+    self.programs = @[[GLKProgram defaultProgram]];
 }
 
 - (UIImage *)takeScreenshot

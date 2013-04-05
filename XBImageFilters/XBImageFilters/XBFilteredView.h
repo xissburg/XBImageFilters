@@ -22,7 +22,7 @@
 @interface XBFilteredView : UIView
 
 @property (weak, nonatomic) id<XBFilteredViewDelegate> delegate;
-@property (readonly, nonatomic) NSArray *programs;
+@property (copy, nonatomic) NSArray *programs;
 @property (assign, nonatomic) GLKMatrix4 contentTransform;
 @property (assign, nonatomic) CGSize contentSize; // Content size used to compute the contentMode transform. By default it can be the texture size.
 @property (assign, nonatomic) GLKMatrix2 texCoordTransform;

@@ -46,6 +46,7 @@
 /* 
  * Returns an image with the contents of the framebuffer. 
  */
+- (void *)dataFromFramebuffer;
 - (UIImage *)takeScreenshot;
 - (UIImage *)takeScreenshotWithImageOrientation:(UIImageOrientation)orientation;
 

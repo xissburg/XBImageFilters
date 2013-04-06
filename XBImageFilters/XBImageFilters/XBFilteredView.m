@@ -476,6 +476,16 @@ float pagesToMB(int pages);
     return image;
 }
 
+- (void *)dataFromFramebuffer
+{
+    [EAGLContext setCurrentContext:self.context];
+    size_t size = self.viewportWidth * self.viewportHeight * 4;
+    GLvoid *pixels = malloc(size);
+    glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+    glReadPixels(0, 0, self.viewportWidth, self.viewportHeight, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    return pixels;
+}
+
 - (UIImage *)_imageFromFramebuffer:(GLuint)framebuffer width:(GLint)width height:(GLint)height orientation:(UIImageOrientation)orientation
 {
     [EAGLContext setCurrentContext:self.context];
@@ -712,11 +722,23 @@ float pagesToMB(int pages);
                 glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
             }
         }
+        else {
+            glViewport(0, 0, self.viewportWidth, self.viewportHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+        }
         
         glClear(GL_COLOR_BUFFER_BIT);
         
         [program prepareToDraw];
         
+        glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
+        GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
+        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+        glEnableVertexAttribArray(positionAttribute.location);
+        
+        GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
+        glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
+        glEnableVertexAttribArray(texCoordAttribute.location);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         
         // If it is not the last pass, discard the framebuffer contents
@@ -731,7 +753,7 @@ float pagesToMB(int pages);
 #ifdef DEBUG
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-        NSLog(@"%d", error);
+        NSLog(@"%x", error);
     }
 #endif
 }
@@ -783,7 +805,6 @@ float pagesToMB(int pages);
     glGenBuffers(1, &_imageQuadVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
     
     // Setup default shader
     [self setDefaultFilter];

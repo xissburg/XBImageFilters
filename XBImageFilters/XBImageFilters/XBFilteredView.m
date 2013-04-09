@@ -758,7 +758,7 @@ float pagesToMB(int pages);
 #endif
 }
 
-- (NSString *)memoryStatus
++ (NSString *)memoryStatus
 {
     // Code by Noel Llopis
 	vm_statistics_data_t vmStats;

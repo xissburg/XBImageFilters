@@ -58,7 +58,7 @@
 /*
  * Returns an string containing memory usage information.
  */
-- (NSString *)memoryStatus;
++ (NSString *)memoryStatus;
 
 /* These methods are conceptually protected and should not be called directly. They are intended to be called by subclasses. */
 - (void)_setTextureData:(GLvoid *)textureData width:(GLint)width height:(GLint)height;

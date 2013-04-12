@@ -417,8 +417,6 @@ float pagesToMB(int pages);
         }
     }
     
-    glFlush();
-    
     // Delete all this unnecessary stuff before _imageFromFramebuffer which is resource hungry.
     if (textureRelease != nil) {
         textureRelease();

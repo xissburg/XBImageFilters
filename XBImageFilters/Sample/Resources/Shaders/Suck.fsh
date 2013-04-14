@@ -1,5 +1,5 @@
 //
-//  SuckShader.glsl
+//  Suck.fsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 4/11/12.

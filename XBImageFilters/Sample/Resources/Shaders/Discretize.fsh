@@ -1,5 +1,5 @@
 //
-//  DiscretizeShader.glsl
+//  Discretize.fsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 4/11/12.

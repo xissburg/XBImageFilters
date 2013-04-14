@@ -100,18 +100,18 @@
 
 - (void)setupFilterPaths
 {
-    NSString *defaultVSPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
-    NSString *defaultFSPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
-    NSString *overlayFSPath = [[NSBundle mainBundle] pathForResource:@"OverlayFragmentShader" ofType:@"glsl"];
-    NSString *overlayVSPath = [[NSBundle mainBundle] pathForResource:@"OverlayVertexShader" ofType:@"glsl"];
-    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
-    NSString *blurFSPath = [[NSBundle mainBundle] pathForResource:@"BlurFragmentShader" ofType:@"glsl"];
-    NSString *sharpFSPath = [[NSBundle mainBundle] pathForResource:@"UnsharpMaskFragmentShader" ofType:@"glsl"];
-    NSString *hBlurVSPath = [[NSBundle mainBundle] pathForResource:@"HBlurVertexShader" ofType:@"glsl"];
-    NSString *vBlurVSPath = [[NSBundle mainBundle] pathForResource:@"VBlurVertexShader" ofType:@"glsl"];
-    NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"DiscretizeShader" ofType:@"glsl"];
-    NSString *pixelatePath = [[NSBundle mainBundle] pathForResource:@"PixelateShader" ofType:@"glsl"];
-    NSString *suckPath = [[NSBundle mainBundle] pathForResource:@"SuckShader" ofType:@"glsl"];
+    NSString *defaultVSPath = [[NSBundle mainBundle] pathForResource:@"Default" ofType:@"vsh"];
+    NSString *defaultFSPath = [[NSBundle mainBundle] pathForResource:@"Default" ofType:@"fsh"];
+    NSString *overlayFSPath = [[NSBundle mainBundle] pathForResource:@"Overlay" ofType:@"fsh"];
+    NSString *overlayVSPath = [[NSBundle mainBundle] pathForResource:@"Overlay" ofType:@"vsh"];
+    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"Luminance" ofType:@"fsh"];
+    NSString *blurFSPath = [[NSBundle mainBundle] pathForResource:@"Blur" ofType:@"fsh"];
+    NSString *sharpFSPath = [[NSBundle mainBundle] pathForResource:@"UnsharpMask" ofType:@"fsh"];
+    NSString *hBlurVSPath = [[NSBundle mainBundle] pathForResource:@"HBlur" ofType:@"vsh"];
+    NSString *vBlurVSPath = [[NSBundle mainBundle] pathForResource:@"VBlur" ofType:@"vsh"];
+    NSString *discretizePath = [[NSBundle mainBundle] pathForResource:@"Discretize" ofType:@"fsh"];
+    NSString *pixelatePath = [[NSBundle mainBundle] pathForResource:@"Pixelate" ofType:@"fsh"];
+    NSString *suckPath = [[NSBundle mainBundle] pathForResource:@"Suck" ofType:@"fsh"];
     
     // Setup a combination of these filters
     self.filterPathArray = [[NSArray alloc] initWithObjects:

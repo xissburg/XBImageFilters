@@ -1,5 +1,5 @@
 //
-//  DefaultFragmentShader.glsl.c
+//  Default.fsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 2/20/12.

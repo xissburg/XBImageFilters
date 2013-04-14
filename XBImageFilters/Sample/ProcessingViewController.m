@@ -100,7 +100,7 @@
         return;
     }
  
-    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"LuminanceFragmentShader" ofType:@"glsl"];
+    NSString *luminancePath = [[NSBundle mainBundle] pathForResource:@"Luminance" ofType:@"fsh"];
     NSArray *shaders = [[NSArray alloc] initWithObjects:luminancePath, nil];
 
 #if 0

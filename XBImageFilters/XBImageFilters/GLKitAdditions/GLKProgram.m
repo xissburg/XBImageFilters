@@ -78,8 +78,8 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 
 + (GLKProgram *)defaultProgram
 {
-    NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultFragmentShader" ofType:@"glsl"];
-    NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    NSString *fragmentShaderPath = [[NSBundle mainBundle] pathForResource:@"Default" ofType:@"fsh"];
+    NSString *vertexShaderPath = [[NSBundle mainBundle] pathForResource:@"Default" ofType:@"vsh"];
     NSError *error = nil;
     GLKProgram *program = [[GLKProgram alloc] initWithVertexShaderFromFile:vertexShaderPath fragmentShaderFromFile:fragmentShaderPath error:&error];
     if (program == nil) {

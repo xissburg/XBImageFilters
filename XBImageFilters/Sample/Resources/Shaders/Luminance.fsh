@@ -1,5 +1,5 @@
 //
-//  FragmentShader.glsl
+//  Luminance.fsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 2/17/12.

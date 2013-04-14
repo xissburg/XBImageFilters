@@ -1,5 +1,5 @@
 //
-//  HBlurVertexShader.glsl
+//  HBlur.vsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 7/9/12.

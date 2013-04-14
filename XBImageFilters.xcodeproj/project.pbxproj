@@ -33,24 +33,24 @@
 		1B653E5F170CA09C009041D6 /* LucasCorrea@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E1C170CA09C009041D6 /* LucasCorrea@2x.png */; };
 		1B653E60170CA09C009041D6 /* marvin.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E1D170CA09C009041D6 /* marvin.png */; };
 		1B653E61170CA09C009041D6 /* russian-ball.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E1E170CA09C009041D6 /* russian-ball.jpeg */; };
-		1B653E62170CA09C009041D6 /* BlurFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E20170CA09C009041D6 /* BlurFragmentShader.glsl */; };
-		1B653E63170CA09C009041D6 /* DiscretizeShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E21170CA09C009041D6 /* DiscretizeShader.glsl */; };
-		1B653E64170CA09C009041D6 /* HBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E22170CA09C009041D6 /* HBlurVertexShader.glsl */; };
-		1B653E65170CA09C009041D6 /* LuminanceFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E23170CA09C009041D6 /* LuminanceFragmentShader.glsl */; };
-		1B653E66170CA09C009041D6 /* OverlayFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E24170CA09C009041D6 /* OverlayFragmentShader.glsl */; };
-		1B653E67170CA09C009041D6 /* OverlayVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E25170CA09C009041D6 /* OverlayVertexShader.glsl */; };
-		1B653E68170CA09C009041D6 /* PixelateShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E26170CA09C009041D6 /* PixelateShader.glsl */; };
-		1B653E69170CA09C009041D6 /* SuckShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E27170CA09C009041D6 /* SuckShader.glsl */; };
-		1B653E6A170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E28170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl */; };
-		1B653E6B170CA09C009041D6 /* VBlurVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E29170CA09C009041D6 /* VBlurVertexShader.glsl */; };
+		1B653E62170CA09C009041D6 /* Blur.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E20170CA09C009041D6 /* Blur.fsh */; };
+		1B653E63170CA09C009041D6 /* Discretize.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E21170CA09C009041D6 /* Discretize.fsh */; };
+		1B653E64170CA09C009041D6 /* HBlur.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E22170CA09C009041D6 /* HBlur.vsh */; };
+		1B653E65170CA09C009041D6 /* Luminance.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E23170CA09C009041D6 /* Luminance.fsh */; };
+		1B653E66170CA09C009041D6 /* Overlay.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E24170CA09C009041D6 /* Overlay.fsh */; };
+		1B653E67170CA09C009041D6 /* Overlay.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E25170CA09C009041D6 /* Overlay.vsh */; };
+		1B653E68170CA09C009041D6 /* Pixelate.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E26170CA09C009041D6 /* Pixelate.fsh */; };
+		1B653E69170CA09C009041D6 /* Suck.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E27170CA09C009041D6 /* Suck.fsh */; };
+		1B653E6A170CA09C009041D6 /* UnsharpMask.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E28170CA09C009041D6 /* UnsharpMask.fsh */; };
+		1B653E6B170CA09C009041D6 /* VBlur.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E29170CA09C009041D6 /* VBlur.vsh */; };
 		1B653E6D170CA09C009041D6 /* GLKAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E2F170CA09C009041D6 /* GLKAttribute.m */; };
 		1B653E6E170CA09C009041D6 /* GLKProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E31170CA09C009041D6 /* GLKProgram.m */; };
 		1B653E6F170CA09C009041D6 /* GLKShaderVariable.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E33170CA09C009041D6 /* GLKShaderVariable.m */; };
 		1B653E70170CA09C009041D6 /* GLKUniform.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E35170CA09C009041D6 /* GLKUniform.m */; };
 		1B653E71170CA09C009041D6 /* XBTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E37170CA09C009041D6 /* XBTexture.m */; };
 		1B653E72170CA09C009041D6 /* XBTextureInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E39170CA09C009041D6 /* XBTextureInfo.m */; };
-		1B653E73170CA09C009041D6 /* DefaultFragmentShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E3C170CA09C009041D6 /* DefaultFragmentShader.glsl */; };
-		1B653E74170CA09C009041D6 /* DefaultVertexShader.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E3D170CA09C009041D6 /* DefaultVertexShader.glsl */; };
+		1B653E73170CA09C009041D6 /* Default.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E3C170CA09C009041D6 /* Default.fsh */; };
+		1B653E74170CA09C009041D6 /* Default.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E3D170CA09C009041D6 /* Default.vsh */; };
 		1B653E75170CA09C009041D6 /* UIImage+XBImageFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E3F170CA09C009041D6 /* UIImage+XBImageFilters.m */; };
 		1B653E76170CA09C009041D6 /* XBCameraTargetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E41170CA09C009041D6 /* XBCameraTargetView.m */; };
 		1B653E77170CA09C009041D6 /* XBFilteredCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E43170CA09C009041D6 /* XBFilteredCameraView.m */; };
@@ -67,8 +67,8 @@
 		1B653E83170CA226009041D6 /* XBFilteredCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E43170CA09C009041D6 /* XBFilteredCameraView.m */; };
 		1B653E84170CA226009041D6 /* XBFilteredImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E45170CA09C009041D6 /* XBFilteredImageView.m */; };
 		1B653E85170CA226009041D6 /* XBFilteredView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E47170CA09C009041D6 /* XBFilteredView.m */; };
-		1B653E86170CA239009041D6 /* DefaultFragmentShader.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1B653E3C170CA09C009041D6 /* DefaultFragmentShader.glsl */; };
-		1B653E87170CA239009041D6 /* DefaultVertexShader.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1B653E3D170CA09C009041D6 /* DefaultVertexShader.glsl */; };
+		1B653E86170CA239009041D6 /* Default.fsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1B653E3C170CA09C009041D6 /* Default.fsh */; };
+		1B653E87170CA239009041D6 /* Default.vsh in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1B653E3D170CA09C009041D6 /* Default.vsh */; };
 		1B653E88170CA24C009041D6 /* GLKAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B653E2E170CA09C009041D6 /* GLKAttribute.h */; };
 		1B653E89170CA24C009041D6 /* GLKProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B653E30170CA09C009041D6 /* GLKProgram.h */; };
 		1B653E8A170CA24C009041D6 /* GLKShaderVariable.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B653E32170CA09C009041D6 /* GLKShaderVariable.h */; };
@@ -107,8 +107,8 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
-				1B653E86170CA239009041D6 /* DefaultFragmentShader.glsl in CopyFiles */,
-				1B653E87170CA239009041D6 /* DefaultVertexShader.glsl in CopyFiles */,
+				1B653E86170CA239009041D6 /* Default.fsh in CopyFiles */,
+				1B653E87170CA239009041D6 /* Default.vsh in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,16 +145,16 @@
 		1B653E1C170CA09C009041D6 /* LucasCorrea@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "LucasCorrea@2x.png"; sourceTree = "<group>"; };
 		1B653E1D170CA09C009041D6 /* marvin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marvin.png; sourceTree = "<group>"; };
 		1B653E1E170CA09C009041D6 /* russian-ball.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "russian-ball.jpeg"; sourceTree = "<group>"; };
-		1B653E20170CA09C009041D6 /* BlurFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = BlurFragmentShader.glsl; sourceTree = "<group>"; };
-		1B653E21170CA09C009041D6 /* DiscretizeShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = DiscretizeShader.glsl; sourceTree = "<group>"; };
-		1B653E22170CA09C009041D6 /* HBlurVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = HBlurVertexShader.glsl; sourceTree = "<group>"; };
-		1B653E23170CA09C009041D6 /* LuminanceFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = LuminanceFragmentShader.glsl; sourceTree = "<group>"; };
-		1B653E24170CA09C009041D6 /* OverlayFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = OverlayFragmentShader.glsl; sourceTree = "<group>"; };
-		1B653E25170CA09C009041D6 /* OverlayVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = OverlayVertexShader.glsl; sourceTree = "<group>"; };
-		1B653E26170CA09C009041D6 /* PixelateShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = PixelateShader.glsl; sourceTree = "<group>"; };
-		1B653E27170CA09C009041D6 /* SuckShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = SuckShader.glsl; sourceTree = "<group>"; };
-		1B653E28170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = UnsharpMaskFragmentShader.glsl; sourceTree = "<group>"; };
-		1B653E29170CA09C009041D6 /* VBlurVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = VBlurVertexShader.glsl; sourceTree = "<group>"; };
+		1B653E20170CA09C009041D6 /* Blur.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Blur.fsh; sourceTree = "<group>"; };
+		1B653E21170CA09C009041D6 /* Discretize.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Discretize.fsh; sourceTree = "<group>"; };
+		1B653E22170CA09C009041D6 /* HBlur.vsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = HBlur.vsh; sourceTree = "<group>"; };
+		1B653E23170CA09C009041D6 /* Luminance.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Luminance.fsh; sourceTree = "<group>"; };
+		1B653E24170CA09C009041D6 /* Overlay.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Overlay.fsh; sourceTree = "<group>"; };
+		1B653E25170CA09C009041D6 /* Overlay.vsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Overlay.vsh; sourceTree = "<group>"; };
+		1B653E26170CA09C009041D6 /* Pixelate.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Pixelate.fsh; sourceTree = "<group>"; };
+		1B653E27170CA09C009041D6 /* Suck.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Suck.fsh; sourceTree = "<group>"; };
+		1B653E28170CA09C009041D6 /* UnsharpMask.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = UnsharpMask.fsh; sourceTree = "<group>"; };
+		1B653E29170CA09C009041D6 /* VBlur.vsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = VBlur.vsh; sourceTree = "<group>"; };
 		1B653E2A170CA09C009041D6 /* XBImageFilters-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "XBImageFilters-Info.plist"; sourceTree = "<group>"; };
 		1B653E2B170CA09C009041D6 /* XBImageFilters-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XBImageFilters-Prefix.pch"; sourceTree = "<group>"; };
 		1B653E2E170CA09C009041D6 /* GLKAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLKAttribute.h; sourceTree = "<group>"; };
@@ -169,8 +169,8 @@
 		1B653E37170CA09C009041D6 /* XBTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTexture.m; sourceTree = "<group>"; };
 		1B653E38170CA09C009041D6 /* XBTextureInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBTextureInfo.h; sourceTree = "<group>"; };
 		1B653E39170CA09C009041D6 /* XBTextureInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBTextureInfo.m; sourceTree = "<group>"; };
-		1B653E3C170CA09C009041D6 /* DefaultFragmentShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = DefaultFragmentShader.glsl; sourceTree = "<group>"; };
-		1B653E3D170CA09C009041D6 /* DefaultVertexShader.glsl */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = DefaultVertexShader.glsl; sourceTree = "<group>"; };
+		1B653E3C170CA09C009041D6 /* Default.fsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Default.fsh; sourceTree = "<group>"; };
+		1B653E3D170CA09C009041D6 /* Default.vsh */ = {isa = PBXFileReference; explicitFileType = sourcecode.glsl; fileEncoding = 4; path = Default.vsh; sourceTree = "<group>"; };
 		1B653E3E170CA09C009041D6 /* UIImage+XBImageFilters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+XBImageFilters.h"; sourceTree = "<group>"; };
 		1B653E3F170CA09C009041D6 /* UIImage+XBImageFilters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+XBImageFilters.m"; sourceTree = "<group>"; };
 		1B653E40170CA09C009041D6 /* XBCameraTargetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBCameraTargetView.h; sourceTree = "<group>"; };
@@ -287,16 +287,16 @@
 		1B653E1F170CA09C009041D6 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				1B653E20170CA09C009041D6 /* BlurFragmentShader.glsl */,
-				1B653E21170CA09C009041D6 /* DiscretizeShader.glsl */,
-				1B653E22170CA09C009041D6 /* HBlurVertexShader.glsl */,
-				1B653E23170CA09C009041D6 /* LuminanceFragmentShader.glsl */,
-				1B653E24170CA09C009041D6 /* OverlayFragmentShader.glsl */,
-				1B653E25170CA09C009041D6 /* OverlayVertexShader.glsl */,
-				1B653E26170CA09C009041D6 /* PixelateShader.glsl */,
-				1B653E27170CA09C009041D6 /* SuckShader.glsl */,
-				1B653E28170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl */,
-				1B653E29170CA09C009041D6 /* VBlurVertexShader.glsl */,
+				1B653E20170CA09C009041D6 /* Blur.fsh */,
+				1B653E21170CA09C009041D6 /* Discretize.fsh */,
+				1B653E22170CA09C009041D6 /* HBlur.vsh */,
+				1B653E23170CA09C009041D6 /* Luminance.fsh */,
+				1B653E24170CA09C009041D6 /* Overlay.fsh */,
+				1B653E25170CA09C009041D6 /* Overlay.vsh */,
+				1B653E26170CA09C009041D6 /* Pixelate.fsh */,
+				1B653E27170CA09C009041D6 /* Suck.fsh */,
+				1B653E28170CA09C009041D6 /* UnsharpMask.fsh */,
+				1B653E29170CA09C009041D6 /* VBlur.vsh */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -351,8 +351,8 @@
 		1B653E3B170CA09C009041D6 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				1B653E3C170CA09C009041D6 /* DefaultFragmentShader.glsl */,
-				1B653E3D170CA09C009041D6 /* DefaultVertexShader.glsl */,
+				1B653E3C170CA09C009041D6 /* Default.fsh */,
+				1B653E3D170CA09C009041D6 /* Default.vsh */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -514,18 +514,18 @@
 				1B653E5F170CA09C009041D6 /* LucasCorrea@2x.png in Resources */,
 				1B653E60170CA09C009041D6 /* marvin.png in Resources */,
 				1B653E61170CA09C009041D6 /* russian-ball.jpeg in Resources */,
-				1B653E62170CA09C009041D6 /* BlurFragmentShader.glsl in Resources */,
-				1B653E63170CA09C009041D6 /* DiscretizeShader.glsl in Resources */,
-				1B653E64170CA09C009041D6 /* HBlurVertexShader.glsl in Resources */,
-				1B653E65170CA09C009041D6 /* LuminanceFragmentShader.glsl in Resources */,
-				1B653E66170CA09C009041D6 /* OverlayFragmentShader.glsl in Resources */,
-				1B653E67170CA09C009041D6 /* OverlayVertexShader.glsl in Resources */,
-				1B653E68170CA09C009041D6 /* PixelateShader.glsl in Resources */,
-				1B653E69170CA09C009041D6 /* SuckShader.glsl in Resources */,
-				1B653E6A170CA09C009041D6 /* UnsharpMaskFragmentShader.glsl in Resources */,
-				1B653E6B170CA09C009041D6 /* VBlurVertexShader.glsl in Resources */,
-				1B653E73170CA09C009041D6 /* DefaultFragmentShader.glsl in Resources */,
-				1B653E74170CA09C009041D6 /* DefaultVertexShader.glsl in Resources */,
+				1B653E62170CA09C009041D6 /* Blur.fsh in Resources */,
+				1B653E63170CA09C009041D6 /* Discretize.fsh in Resources */,
+				1B653E64170CA09C009041D6 /* HBlur.vsh in Resources */,
+				1B653E65170CA09C009041D6 /* Luminance.fsh in Resources */,
+				1B653E66170CA09C009041D6 /* Overlay.fsh in Resources */,
+				1B653E67170CA09C009041D6 /* Overlay.vsh in Resources */,
+				1B653E68170CA09C009041D6 /* Pixelate.fsh in Resources */,
+				1B653E69170CA09C009041D6 /* Suck.fsh in Resources */,
+				1B653E6A170CA09C009041D6 /* UnsharpMask.fsh in Resources */,
+				1B653E6B170CA09C009041D6 /* VBlur.vsh in Resources */,
+				1B653E73170CA09C009041D6 /* Default.fsh in Resources */,
+				1B653E74170CA09C009041D6 /* Default.vsh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -677,7 +677,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DSTROOT = /tmp/XBImageFilters.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
+				GCC_PREFIX_HEADER = "XBImageFilters/Sample/XBImageFilters-Prefix.pch";
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -695,7 +695,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DSTROOT = /tmp/XBImageFilters.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "XBImageFilters/XBImageFilters-Prefix.pch";
+				GCC_PREFIX_HEADER = "XBImageFilters/Sample/XBImageFilters-Prefix.pch";
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

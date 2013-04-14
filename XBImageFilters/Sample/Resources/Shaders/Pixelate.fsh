@@ -1,5 +1,5 @@
 //
-//  PixelateShader.glsl
+//  Pixelate.fsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 4/11/12.

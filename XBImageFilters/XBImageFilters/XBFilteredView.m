@@ -559,7 +559,7 @@ float pagesToMB(int pages);
 
 - (BOOL)setFilterFragmentShaderSources:(NSArray *)fsSources error:(NSError *__autoreleasing *)error
 {
-    NSString *defaultVertexShaderPath = [[NSBundle mainBundle] pathForResource:@"DefaultVertexShader" ofType:@"glsl"];
+    NSString *defaultVertexShaderPath = [[NSBundle mainBundle] pathForResource:@"Default" ofType:@"vsh"];
     NSString *defaultVertexShaderSource = [[NSString alloc] initWithContentsOfFile:defaultVertexShaderPath encoding:NSUTF8StringEncoding error:error];
     if (defaultVertexShaderSource == nil) {
         return NO;

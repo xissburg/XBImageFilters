@@ -1,5 +1,5 @@
 //
-//  BlurFragmentShader.glsl
+//  Blur.fsh
 //  XBImageFilters
 //
 //  Created by xiss burg on 7/9/12.

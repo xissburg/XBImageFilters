@@ -751,7 +751,7 @@ float pagesToMB(int pages);
 #ifdef DEBUG
     GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-        NSLog(@"%x", error);
+        NSLog(@"OpenGL error: 0x%x", error);
     }
 #endif
 }

@@ -738,15 +738,19 @@ float pagesToMB(int pages);
         glVertexAttribPointer(texCoordAttribute.location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, texCoord));
         glEnableVertexAttribArray(texCoordAttribute.location);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        
-        // If it is not the last pass, discard the framebuffer contents
-        if (pass != self.programs.count - 1) {
-            const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
-            glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
-        }
     }
     
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
+    
+    const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
+    if (self.evenPassFrambuffer != 0) {
+        glBindFramebuffer(GL_FRAMEBUFFER, self.evenPassFrambuffer);
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+    }
+    if (self.oddPassFramebuffer != 0) {
+        glBindFramebuffer(GL_FRAMEBUFFER, self.oddPassFramebuffer);
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, discards);
+    }
     
 #ifdef DEBUG
     GLenum error = glGetError();

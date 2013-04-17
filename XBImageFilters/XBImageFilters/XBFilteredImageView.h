@@ -11,6 +11,6 @@
 
 @interface XBFilteredImageView : XBFilteredView
 
-@property (strong, nonatomic) UIImage *image;
+@property (weak, nonatomic) UIImage *image;
 
 @end

@@ -701,7 +701,7 @@ float pagesToMB(int pages);
 
 - (UIImage *)filteredImage
 {
-    GLKMatrix4 contentTransform = GLKMatrix4MakeScale(-1, -1, 1);
+    GLKMatrix4 contentTransform = GLKMatrix4MakeScale(1, -1, 1);
     return [self _filteredImageWithTexture:self.mainTexture textureWidth:self.textureWidth textureHeight:self.textureHeight targetWidth:self.textureWidth targetHeight:self.textureHeight contentTransform:contentTransform texCoordTransform:GLKMatrix2Identity textureReleaseBlock:nil];
 }
 

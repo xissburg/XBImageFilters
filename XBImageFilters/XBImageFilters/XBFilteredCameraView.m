@@ -43,6 +43,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 @property (strong, nonatomic) NSMutableArray *secondsPerFrameArray;
 @property (assign, nonatomic) BOOL secondsPerFrameArrayDirty;
 @property (strong, nonatomic) IBOutlet XBCameraTargetView *cameraTargetView;
+@property (assign, nonatomic) BOOL takeAPhotoAfterAdjustingFocus;
+@property (copy, nonatomic) void (^takeAPhotoCompletion)(UIImage *image);
 
 // Timer for updating secondsPerFrame for the delegate
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_6_0
@@ -103,6 +105,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self addGestureRecognizer:tgr];
     
     [self setupOutputs];
+    
+    self.waitForFocus = YES;
     
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_6_0
     CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, self.context, NULL, &_videoTextureCache);
@@ -458,7 +462,13 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
 }
 
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *))completion
-{    
+{
+    if (self.waitForFocus && self.device.isAdjustingFocus) {
+        self.takeAPhotoAfterAdjustingFocus = YES;
+        self.takeAPhotoCompletion = completion;
+        return;
+    }
+    
     self.rendering = NO;
     self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.imageCaptureQuality];
     
@@ -806,6 +816,12 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
                 if ([self.delegate respondsToSelector:@selector(filteredCameraViewDidFinishAdjustingFocus:)]) {
                     [self.delegate filteredCameraViewDidFinishAdjustingFocus:self];
                 }
+            }
+            
+            if (!self.device.adjustingFocus && self.takeAPhotoAfterAdjustingFocus) {
+                [self takeAPhotoWithCompletion:self.takeAPhotoCompletion];
+                self.takeAPhotoAfterAdjustingFocus = NO;
+                self.takeAPhotoCompletion = nil;
             }
         }
         else if ([keyPath isEqualToString:@"adjustingExposure"]) {

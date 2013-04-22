@@ -81,6 +81,7 @@ extern NSString *const XBCaptureQuality352x288;
 @property (nonatomic, assign) BOOL updateSecondsPerFrame;
 @property (nonatomic, assign, getter = isRendering) BOOL rendering;
 @property (nonatomic, assign, getter = isCapturing) BOOL capturing;
+@property (nonatomic, assign) BOOL waitForFocus; // only takes a photo after the camera stops adjusting focus in takeAPhotoWithCompletion:
 /** Utility property for filters with overlay textures. It is set to a texture coordinate that will stretch a texture over the whole view
  *  according to the current camera (front or back) and desired photo orientation.
  */

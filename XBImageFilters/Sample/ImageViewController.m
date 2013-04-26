@@ -30,6 +30,10 @@
     if (![self.filteredImageView setFilterFragmentShaderPaths:fsPaths vertexShaderPaths:vsPaths error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
     }
+    float blurRadius = 0.04;
+    for (GLKProgram *p in self.filteredImageView.programs) {
+        [p setValue:&blurRadius forUniformNamed:@"u_radius"];
+    }
 }
 
 - (void)viewDidUnload

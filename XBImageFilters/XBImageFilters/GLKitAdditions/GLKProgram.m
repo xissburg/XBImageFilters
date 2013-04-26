@@ -93,8 +93,10 @@ NSString *const GLKProgramErrorDomain = @"GLKProgramErrorDomain";
 - (void)setValue:(void *)value forUniformNamed:(NSString *)uniformName
 {
     GLKUniform *uniform = [self.uniforms objectForKey:uniformName];
-    uniform.value = value;
-    [self.dirtyUniforms setObject:uniform forKey:uniform.name];
+    if (uniform) {
+        uniform.value = value;
+        [self.dirtyUniforms setObject:uniform forKey:uniform.name];
+    }
 }
 
 - (void)bindSamplerNamed:(NSString *)samplerName toXBTexture:(XBTexture *)texture unit:(GLint)unit

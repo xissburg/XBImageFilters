@@ -64,6 +64,7 @@
     
     self.filterLabel.text = [self.filterNameArray objectAtIndex:self.filterIndex];
     
+    float blurRadius = 0.05;
     NSDictionary *paths = [self.filterPathArray objectAtIndex:self.filterIndex];
     NSArray *fsPaths = [paths objectForKey:kFSPathsKey];
     NSArray *vsPaths = [paths objectForKey:kVSPathsKey];
@@ -87,12 +88,20 @@
         GLKProgram *program = [self.cameraView.programs objectAtIndex:0];
         [program bindSamplerNamed:@"s_overlay" toXBTexture:texture unit:1];
         [program setValue:(void *)&GLKMatrix2Identity forUniformNamed:@"u_rawTexCoordTransform"];
+        for (GLKProgram *p in self.cameraView.programs) {
+            [p setValue:&blurRadius forUniformNamed:@"u_radius"];
+        }
     }
     else if ([filterName isEqualToString:@"Sharpen"]) {
         GLKMatrix2 rawTexCoordTransform = (GLKMatrix2){self.cameraView.cameraPosition == XBCameraPositionBack? 1: -1, 0, 0, -0.976};
         GLKProgram *program = [self.cameraView.programs objectAtIndex:1];
         [program bindSamplerNamed:@"s_mainTexture" toTexture:self.cameraView.mainTexture unit:1];
         [program setValue:(void *)&rawTexCoordTransform forUniformNamed:@"u_rawTexCoordTransform"];
+    }
+    else if ([@[@"Horizontal Blur", @"Vertical Blur", @"Blur", @"Blur B&W", @"Discrete Blur"] containsObject:filterName]) {
+        for (GLKProgram *p in self.cameraView.programs) {
+            [p setValue:&blurRadius forUniformNamed:@"u_radius"];
+        }
     }
 }
 

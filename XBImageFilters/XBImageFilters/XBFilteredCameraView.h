@@ -96,6 +96,11 @@ extern NSString *const XBCaptureQuality352x288;
 - (BOOL)hasCameraAtPosition:(XBCameraPosition)cameraPosition;
 - (void)toggleTorch;
 
+/*
+ * Takes a photo. It stops capturing in order to free memory and filter the high resolution image without running out of resources.
+ * Hence, if you want to continue capturing, call startCapturing in the completion block. Usually this is not necessary since in most
+ * applications you are going to display the filtered image right after.
+ */
 - (void)takeAPhotoWithCompletion:(void (^)(UIImage *image))completion;
 
 - (GLKMatrix2)rawTexCoordTransformForPhotoOrientation:(XBPhotoOrientation)photoOrientation cameraPosition:(XBCameraPosition)cameraPosition;

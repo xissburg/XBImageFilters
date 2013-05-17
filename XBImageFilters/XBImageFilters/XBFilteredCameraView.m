@@ -489,6 +489,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     imageConnection.videoOrientation = AVCaptureVideoOrientationPortrait;
     
     [self.stillImageOutput captureStillImageAsynchronouslyFromConnection:imageConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+        [self stopCapturing]; // This frees a lot of memory (!)
+        
         self.captureSession.sessionPreset = [self captureSessionPresetFromCaptureQuality:self.videoCaptureQuality];
         
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
@@ -548,7 +550,6 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
                 completion(filteredImage);
             });
         }
-        self.rendering = YES;
     }];
 }
 

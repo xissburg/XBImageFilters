@@ -44,6 +44,8 @@ float pagesToMB(int pages);
 @property (assign, nonatomic) GLuint evenPassTexture;
 @property (assign, nonatomic) GLuint oddPassFramebuffer;
 @property (assign, nonatomic) GLuint evenPassFrambuffer;
+@property (strong, nonatomic) NSMutableDictionary *passTargetTextures;
+@property (strong, nonatomic) NSMutableDictionary *passTargetFramebuffers;
 
 - (void)setupGL;
 - (void)destroyGL;
@@ -116,6 +118,9 @@ float pagesToMB(int pages);
     }
     
     [self setupGL];
+    
+    self.passTargetFramebuffers = [[NSMutableDictionary alloc] init];
+    self.passTargetTextures = [[NSMutableDictionary alloc] init];
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -682,6 +687,32 @@ float pagesToMB(int pages);
     [self refreshContentTransform];
 }
 
+- (GLuint)createTargetTextureForPass:(NSUInteger)pass
+{
+    GLuint texture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:NULL];
+    GLuint framebuffer = [self generateDefaultFramebufferWithTargetTexture:texture];
+    self.passTargetTextures[@(pass)] = @(texture);
+    self.passTargetFramebuffers[@(pass)] = @(framebuffer);
+    
+    GLKProgram *program = self.programs[pass + 1];
+    [program bindSamplerNamed:@"s_texture" toTexture:texture unit:0];
+    
+    return texture;
+}
+
+- (void)destroyTargetTextureForPass:(NSUInteger)pass
+{
+    NSNumber *textureNumber = self.passTargetTextures[@(pass)];
+    GLuint texture = textureNumber.unsignedIntegerValue;
+    glDeleteTextures(1, &texture);
+    [self.passTargetTextures removeObjectForKey:@(pass)];
+    
+    NSNumber *framebufferNumber = self.passTargetFramebuffers[@(pass)];
+    GLuint framebuffer = framebufferNumber.unsignedIntegerValue;
+    glDeleteFramebuffers(1, &framebuffer);
+    [self.passTargetFramebuffers removeObjectForKey:@(pass)];
+}
+
 - (void)setDefaultFilter
 {
     self.programs = @[[GLKProgram defaultProgram]];
@@ -709,13 +740,17 @@ float pagesToMB(int pages);
 {
     [EAGLContext setCurrentContext:self.context];
     
-    for (int pass = 0; pass < self.programs.count; ++pass) {
+    for (NSUInteger pass = 0; pass < self.programs.count; ++pass) {
         GLKProgram *program = [self.programs objectAtIndex:pass];
         
         if (self.programs.count > 1) {
             if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
                 glViewport(0, 0, self.viewportWidth, self.viewportHeight);
                 glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+            }
+            else if (self.passTargetFramebuffers[@(pass)] != nil) {
+                glViewport(0, 0, self.textureWidth, self.textureHeight);
+                glBindFramebuffer(GL_FRAMEBUFFER, [self.passTargetFramebuffers[@(pass)] unsignedIntegerValue]);
             }
             else if (pass%2 == 0) {
                 glViewport(0, 0, self.textureWidth, self.textureHeight);

@@ -43,6 +43,9 @@
 - (BOOL)setFilterFragmentShaderPaths:(NSArray *)fsPaths vertexShaderPaths:(NSArray *)vsPaths error:(NSError *__autoreleasing *)error;
 - (void)setDefaultFilter;
 
+- (GLuint)createTargetTextureForPass:(NSUInteger)pass;
+- (void)destroyTargetTextureForPass:(NSUInteger)pass;
+
 /* 
  * Returns an image with the contents of the framebuffer. 
  */

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B33462D1748F4B500753357 /* XBFilteredVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B33462C1748F4B500753357 /* XBFilteredVideoView.m */; };
+		1B33463217495F1F00753357 /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B33463117495F1F00753357 /* VideoViewController.m */; };
 		1B653E48170CA09C009041D6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653DFE170CA09C009041D6 /* AppDelegate.m */; };
 		1B653E49170CA09C009041D6 /* CameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B653E00170CA09C009041D6 /* CameraViewController.m */; };
 		1B653E4A170CA09C009041D6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1B653E01170CA09C009041D6 /* InfoPlist.strings */; };
@@ -115,6 +117,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1B33462B1748F4B500753357 /* XBFilteredVideoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBFilteredVideoView.h; sourceTree = "<group>"; };
+		1B33462C1748F4B500753357 /* XBFilteredVideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBFilteredVideoView.m; sourceTree = "<group>"; };
+		1B33463017495F1F00753357 /* VideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewController.h; sourceTree = "<group>"; };
+		1B33463117495F1F00753357 /* VideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoViewController.m; sourceTree = "<group>"; };
 		1B653DFD170CA09C009041D6 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1B653DFE170CA09C009041D6 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		1B653DFF170CA09C009041D6 /* CameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraViewController.h; sourceTree = "<group>"; };
@@ -241,6 +247,8 @@
 				1B653E06170CA09C009041D6 /* ImageViewController.m */,
 				1B653E08170CA09C009041D6 /* ProcessingViewController.h */,
 				1B653E09170CA09C009041D6 /* ProcessingViewController.m */,
+				1B33463017495F1F00753357 /* VideoViewController.h */,
+				1B33463117495F1F00753357 /* VideoViewController.m */,
 				1B653E03170CA09C009041D6 /* MainStoryboard.storyboard */,
 				1B653E0A170CA09C009041D6 /* Resources */,
 				1B653E7A170CA0BC009041D6 /* Supporting Files */,
@@ -312,6 +320,8 @@
 				1B653E41170CA09C009041D6 /* XBCameraTargetView.m */,
 				1B653E42170CA09C009041D6 /* XBFilteredCameraView.h */,
 				1B653E43170CA09C009041D6 /* XBFilteredCameraView.m */,
+				1B33462B1748F4B500753357 /* XBFilteredVideoView.h */,
+				1B33462C1748F4B500753357 /* XBFilteredVideoView.m */,
 				1B653E44170CA09C009041D6 /* XBFilteredImageView.h */,
 				1B653E45170CA09C009041D6 /* XBFilteredImageView.m */,
 				1B653E46170CA09C009041D6 /* XBFilteredView.h */,
@@ -552,6 +562,8 @@
 				1B653E77170CA09C009041D6 /* XBFilteredCameraView.m in Sources */,
 				1B653E78170CA09C009041D6 /* XBFilteredImageView.m in Sources */,
 				1B653E79170CA09C009041D6 /* XBFilteredView.m in Sources */,
+				1B33462D1748F4B500753357 /* XBFilteredVideoView.m in Sources */,
+				1B33463217495F1F00753357 /* VideoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

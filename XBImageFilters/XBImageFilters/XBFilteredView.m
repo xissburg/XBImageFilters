@@ -15,7 +15,7 @@
 const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
 
 typedef struct {
-    GLKVector3 position;
+    GLKVector4 position;
     GLKVector2 texCoord;
 } Vertex;
 
@@ -677,7 +677,7 @@ float pagesToMB(int pages);
         
         // Enable vertex position and texCoord attributes
         GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
-        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+        glVertexAttribPointer(positionAttribute.location, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
         glEnableVertexAttribArray(positionAttribute.location);
         
         GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
@@ -772,7 +772,7 @@ float pagesToMB(int pages);
         
         glBindBuffer(GL_ARRAY_BUFFER, self.imageQuadVertexBuffer);
         GLKAttribute *positionAttribute = [program.attributes objectForKey:@"a_position"];
-        glVertexAttribPointer(positionAttribute.location, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
+        glVertexAttribPointer(positionAttribute.location, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, position));
         glEnableVertexAttribArray(positionAttribute.location);
         
         GLKAttribute *texCoordAttribute = [program.attributes objectForKey:@"a_texCoord"];
@@ -838,10 +838,10 @@ float pagesToMB(int pages);
     
     // Create vertices
     Vertex vertices[] = {
-        {{ 1,  1, 0}, {1, 1}},
-        {{-1,  1, 0}, {0, 1}},
-        {{ 1, -1, 0}, {1, 0}},
-        {{-1, -1, 0}, {0, 0}}
+        {{ 1,  1, 0, 1}, {1, 1}},
+        {{-1,  1, 0, 1}, {0, 1}},
+        {{ 1, -1, 0, 1}, {1, 0}},
+        {{-1, -1, 0, 1}, {0, 0}}
     };
     
     // Create vertex buffer and fill it with data

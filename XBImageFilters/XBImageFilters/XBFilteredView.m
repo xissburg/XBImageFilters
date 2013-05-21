@@ -666,6 +666,9 @@ float pagesToMB(int pages);
         if (i == 0) { // First pass always uses the original image
             sourceTexture = self.mainTexture;
         }
+        else if (self.passTargetTextures[@(i-1)] != nil) {
+            sourceTexture = [self.passTargetTextures[@(i-1)] unsignedIntegerValue];
+        }
         else if (i%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
             sourceTexture = self.evenPassTexture;
         }

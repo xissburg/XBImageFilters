@@ -13,4 +13,6 @@
 
 @property (nonatomic, weak) IBOutlet XBFilteredVideoView *videoView;
 
+- (IBAction)saveButtonTouchUpInside:(id)sender;
+
 @end

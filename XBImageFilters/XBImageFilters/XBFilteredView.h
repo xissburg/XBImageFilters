@@ -58,6 +58,7 @@
  * Draws the OpenGL contents immediately.
  */
 - (void)display;
+- (void)displayWithFramebuffer:(GLuint)framebuffer width:(GLsizei)width height:(GLsizei)height present:(BOOL)present;
 
 /*
  * Returns an string containing memory usage information.

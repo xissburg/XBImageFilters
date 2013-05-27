@@ -47,4 +47,27 @@
     }];
 }
 
+#pragma mark - Buttons
+
+- (void)saveButtonTouchUpInside:(id)sender
+{
+    NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+    NSString *videoPath = [documentsPath stringByAppendingPathComponent:@"FilteredView.mov"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:videoPath]) {
+        NSError *error = nil;
+        if (![[NSFileManager defaultManager] removeItemAtPath:videoPath error:&error]) {
+            NSLog(@"Failed to delete video file: %@", error);
+        }
+    }
+    
+    NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
+    NSError *error = nil;
+    if (![self.videoView saveFilteredVideoToURL:videoURL error:&error completion:^{
+        NSLog(@"Filtered video saved.");
+    }]) {
+        NSLog(@"Failed to save video: %@", error);
+    }
+}
+
 @end

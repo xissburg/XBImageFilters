@@ -741,6 +741,11 @@ float pagesToMB(int pages);
 
 - (void)display
 {
+    [self displayWithFramebuffer:self.framebuffer width:self.viewportWidth height:self.viewportHeight present:YES];
+}
+
+- (void)displayWithFramebuffer:(GLuint)framebuffer width:(GLsizei)width height:(GLsizei)height present:(BOOL)present
+{
     [EAGLContext setCurrentContext:self.context];
     
     for (NSUInteger pass = 0; pass < self.programs.count; ++pass) {
@@ -748,8 +753,8 @@ float pagesToMB(int pages);
         
         if (self.programs.count > 1) {
             if (pass == self.programs.count - 1) { // Last pass, bind screen framebuffer
-                glViewport(0, 0, self.viewportWidth, self.viewportHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+                glViewport(0, 0, width, height);
+                glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
             }
             else if (self.passTargetFramebuffers[@(pass)] != nil) {
                 glViewport(0, 0, self.textureWidth, self.textureHeight);
@@ -765,8 +770,8 @@ float pagesToMB(int pages);
             }
         }
         else {
-            glViewport(0, 0, self.viewportWidth, self.viewportHeight);
-            glBindFramebuffer(GL_FRAMEBUFFER, self.framebuffer);
+            glViewport(0, 0, width, height);
+            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
         }
         
         glClear(GL_COLOR_BUFFER_BIT);
@@ -784,7 +789,9 @@ float pagesToMB(int pages);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
-    [self.context presentRenderbuffer:GL_RENDERBUFFER];
+    if (present) {
+        [self.context presentRenderbuffer:GL_RENDERBUFFER];
+    }
     
     const GLenum discards[] = {GL_COLOR_ATTACHMENT0};
     if (self.evenPassFrambuffer != 0) {

@@ -296,19 +296,17 @@
                 CFRelease(sampleBuffer);
             }
             else {
+                glDeleteFramebuffers(1, &framebuffer);
+                
+                if (completion) {
+                    completion();
+                }
+                
                 [self.writerInput markAsFinished];
+                self.assetWriter = nil;
+                self.writerInput = nil;
+                self.writerPixelBufferAdaptor = nil;
             }
-        }
-        else if (self.assetReader.status == AVAssetReaderStatusCompleted) {
-            glDeleteFramebuffers(1, &framebuffer);
-            
-            if (completion) {
-                completion();
-            }
-            
-            self.assetWriter = nil;
-            self.writerInput = nil;
-            self.writerPixelBufferAdaptor = nil;
         }
     }];
     

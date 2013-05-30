@@ -99,9 +99,10 @@
     AVAssetTrack *videoTrack = [self.asset tracksWithMediaType:AVMediaTypeVideo][0];
     id outputSettings = @{(__bridge NSString *)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA)};
     self.videoTrackOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:videoTrack outputSettings:outputSettings];
-    self.videoTrackOutput.alwaysCopiesSampleData = NO;/*
+    self.videoTrackOutput.alwaysCopiesSampleData = NO;
     self.videoWidth = videoTrack.naturalSize.width;
-    self.videoHeight = videoTrack.naturalSize.height;*/
+    self.videoHeight = videoTrack.naturalSize.height;
+    self.contentSize = CGSizeMake(self.videoWidth, self.videoHeight);
     
     CGAffineTransform t = videoTrack.preferredTransform;
     GLKMatrix4 r = GLKMatrix4Make(t.a, t.b, 0, 0, t.c, t.d, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -214,6 +215,7 @@
     id outputSettings = @{AVVideoCodecKey: AVVideoCodecH264, AVVideoWidthKey: @(self.videoWidth), AVVideoHeightKey: @(self.videoHeight)};
     self.writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
     self.writerInput.expectsMediaDataInRealTime = NO;
+    self.writerInput.transform = self.videoTrackOutput.track.preferredTransform;
     [self.assetWriter addInput:self.writerInput];
     
     id pixelBufferAttributes = @{(__bridge NSString *)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA), (__bridge NSString *)kCVPixelBufferWidthKey: @(self.videoWidth), (__bridge NSString *)kCVPixelBufferHeightKey: @(self.videoHeight)};
@@ -264,6 +266,11 @@
         return NO;
     }
     
+    GLKMatrix4 previousContentTransform = self.contentTransform;
+    UIViewContentMode previousContentMode = self.contentMode;
+    self.contentTransform = GLKMatrix4Identity;
+    self.contentMode = UIViewContentModeScaleToFill;
+    
     [self.writerInput requestMediaDataWhenReadyOnQueue:dispatch_get_main_queue() usingBlock:^{
         if (self.assetReader.status == AVAssetReaderStatusReading) {
             CMSampleBufferRef sampleBuffer = [self.videoTrackOutput copyNextSampleBuffer];
@@ -306,6 +313,9 @@
                 self.assetWriter = nil;
                 self.writerInput = nil;
                 self.writerPixelBufferAdaptor = nil;
+                
+                self.contentTransform = previousContentTransform;
+                self.contentMode = previousContentMode;
             }
         }
     }];

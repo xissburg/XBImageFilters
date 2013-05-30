@@ -21,6 +21,7 @@ typedef struct {
 
 void ImageProviderReleaseData(void *info, const void *data, size_t size);
 float pagesToMB(int pages);
+CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
 
 @interface XBFilteredView ()
 
@@ -169,7 +170,7 @@ float pagesToMB(int pages);
 - (void)setContentTransform:(GLKMatrix4)contentTransform
 {
     _contentTransform = contentTransform;
-    [self refreshContentTransform];
+    [self refreshContentModeTransform];
 }
 
 - (void)setContentModeTransform:(GLKMatrix4)contentModeTransform
@@ -655,7 +656,7 @@ float pagesToMB(int pages);
         GLKMatrix4 m = GLKMatrix4Identity;
         
         if (i == _programs.count - 1) {
-            m = GLKMatrix4Multiply(self.contentTransform, self.contentModeTransform);
+            m = GLKMatrix4Multiply(self.contentModeTransform, self.contentTransform);
         }
         
         [program setValue:&m forUniformNamed:@"u_contentTransform"];
@@ -944,7 +945,7 @@ float pagesToMB(int pages);
 
 - (void)refreshContentTransform
 {
-    GLKMatrix4 composedTransform = GLKMatrix4Multiply(self.contentTransform, self.contentModeTransform);
+    GLKMatrix4 composedTransform = GLKMatrix4Multiply(self.contentModeTransform, self.contentTransform);
     
     // The contentTransform is only applied on the last program otherwise it would be reapplied in each filter. Also, the contentTransform's
     // purpose is to adjust the final image on the framebuffer/screen. That is why it is applied only in the end.
@@ -954,7 +955,8 @@ float pagesToMB(int pages);
 
 - (GLKMatrix4)transformForAspectFitOrFill:(BOOL)fit
 {
-    float imageAspect = (float)self.contentSize.width/self.contentSize.height;
+    CGSize contentSize = CGSizeRotate(self.contentSize, self.contentTransform);
+    float imageAspect = contentSize.width/contentSize.height;
     float viewAspect = self.bounds.size.width/self.bounds.size.height;
     GLKMatrix4 transform;
     
@@ -970,8 +972,9 @@ float pagesToMB(int pages);
 
 - (GLKMatrix4)transformForPositionalContentMode:(UIViewContentMode)contentMode
 {
-    float widthRatio = self.bounds.size.width/self.contentSize.width*self.contentScaleFactor;
-    float heightRatio = self.bounds.size.height/self.contentSize.height*self.contentScaleFactor;
+    CGSize contentSize = CGSizeRotate(self.contentSize, self.contentTransform);
+    float widthRatio = self.bounds.size.width/contentSize.width*self.contentScaleFactor;
+    float heightRatio = self.bounds.size.height/contentSize.height*self.contentScaleFactor;
     GLKMatrix4 transform = GLKMatrix4Identity;
     
     switch (contentMode) {
@@ -1120,4 +1123,11 @@ GLKMatrix2 GLKMatrix2Multiply(GLKMatrix2 m0, GLKMatrix2 m1)
     m.m10 = m0.m10*m1.m00 + m0.m11*m1.m10;
     m.m11 = m0.m10*m1.m01 + m0.m11*m1.m11;
     return m;
+}
+
+CGSize CGSizeRotate(CGSize size, GLKMatrix4 m)
+{
+    CGPoint p = CGPointMake(size.width/2, size.height/2);
+    GLKVector4 v = GLKMatrix4MultiplyVector4(m, GLKVector4Make(p.x, p.y, 0, 1));
+    return CGSizeMake(fabsf(v.x) * 2, fabsf(v.y) * 2);
 }

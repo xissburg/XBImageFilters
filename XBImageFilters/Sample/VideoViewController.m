@@ -17,13 +17,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    //self.videoView.contentMode = UIViewContentModeScaleAspectFit;
-    
+    /*
     NSString *hBlurVSPath = [[NSBundle mainBundle] pathForResource:@"HBlur" ofType:@"vsh"];
     NSString *vBlurVSPath = [[NSBundle mainBundle] pathForResource:@"VBlur" ofType:@"vsh"];
     NSString *blurFSPath = [[NSBundle mainBundle] pathForResource:@"Blur" ofType:@"fsh"];
-    NSArray *vsPaths = [[NSArray alloc] initWithObjects:vBlurVSPath, hBlurVSPath, nil];
-    NSArray *fsPaths = [[NSArray alloc] initWithObjects:blurFSPath, blurFSPath, nil];
+    NSArray *vsPaths = @[vBlurVSPath, hBlurVSPath];
+    NSArray *fsPaths = @[blurFSPath, blurFSPath];
     NSError *error = nil;
     if (![self.videoView setFilterFragmentShaderPaths:fsPaths vertexShaderPaths:vsPaths error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
@@ -31,19 +30,35 @@
     float blurRadius = 0.04;
     for (GLKProgram *p in self.videoView.programs) {
         [p setValue:&blurRadius forUniformNamed:@"u_radius"];
+    }*/
+    
+    NSString *fsPath = [[NSBundle mainBundle] pathForResource:@"Luminance" ofType:@"fsh"];
+    NSError *error = nil;
+    if (![self.videoView setFilterFragmentShaderPath:fsPath error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
     }
     
     self.videoView.replay = YES;
+    self.videoView.contentMode = UIViewContentModeScaleAspectFit;
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_1844.MOV"]];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    NSURL *requestURL = [NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_2171.MOV"];
+    //NSURL *requestURL = [NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_1844.MOV"];
+    NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
     [NSURLConnection sendAsynchronousRequest:request queue:NSOperationQueue.mainQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-        NSString *videoPath = [[documentsPath stringByAppendingPathComponent:@"video"] stringByAppendingPathExtension:@"mov"];
-        NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
-        [data writeToURL:videoURL atomically:YES];
-        
-        self.videoView.videoURL = videoURL;
-        [self.videoView play];
+        if (error) {
+            [[[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil] show];
+        }
+        else {
+            NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+            NSString *videoPath = [documentsPath stringByAppendingPathComponent:requestURL.lastPathComponent];
+            NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
+            [data writeToURL:videoURL atomically:YES];
+            
+            self.videoView.videoURL = videoURL;
+            [self.videoView play];
+        }
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     }];
 }
 
@@ -52,7 +67,7 @@
 - (void)saveButtonTouchUpInside:(id)sender
 {
     NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-    NSString *videoPath = [documentsPath stringByAppendingPathComponent:@"FilteredView.mov"];
+    NSString *videoPath = [documentsPath stringByAppendingPathComponent:@"FilteredVideo.mov"];
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:videoPath]) {
         NSError *error = nil;

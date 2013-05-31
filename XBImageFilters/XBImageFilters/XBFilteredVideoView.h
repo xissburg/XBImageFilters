@@ -16,6 +16,6 @@
 - (void)play;
 - (void)pause;
 - (void)stop;
-- (BOOL)saveFilteredVideoToURL:(NSURL *)URL error:(NSError **)error completion:(void (^)(void))completion;
+- (void)saveFilteredVideoToURL:(NSURL *)URL completion:(void (^)(BOOL success, NSError *error))completion;
 
 @end

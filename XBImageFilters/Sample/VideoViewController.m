@@ -77,12 +77,14 @@
     }
     
     NSURL *videoURL = [NSURL fileURLWithPath:videoPath];
-    NSError *error = nil;
-    if (![self.videoView saveFilteredVideoToURL:videoURL error:&error completion:^{
-        NSLog(@"Filtered video saved.");
-    }]) {
-        NSLog(@"Failed to save video: %@", error);
-    }
+    [self.videoView saveFilteredVideoToURL:videoURL completion:^(BOOL success, NSError *error) {
+        if (success) {
+            NSLog(@"Filtered video saved.");
+        }
+        else {
+            NSLog(@"Failed to save video: %@", error);
+        }
+    }];
 }
 
 @end

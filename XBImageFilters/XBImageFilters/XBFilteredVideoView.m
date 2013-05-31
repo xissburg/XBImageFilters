@@ -204,11 +204,15 @@
     }
 }
 
-- (BOOL)saveFilteredVideoToURL:(NSURL *)URL error:(NSError **)error completion:(void (^)(void))completion
+- (void)saveFilteredVideoToURL:(NSURL *)URL completion:(void (^)(BOOL success, NSError *error))completion
 {
-    self.assetWriter = [[AVAssetWriter alloc] initWithURL:URL fileType:AVFileTypeQuickTimeMovie error:error];
+    NSError *error = nil;
+    self.assetWriter = [[AVAssetWriter alloc] initWithURL:URL fileType:AVFileTypeQuickTimeMovie error:&error];
     if (self.assetWriter == nil) {
-        return NO;
+        if (completion) {
+            completion(NO, error);
+        }
+        return;
     }
     
     self.assetWriter.movieFragmentInterval = CMTimeMakeWithSeconds(1.0, 1000);
@@ -222,10 +226,10 @@
     self.writerPixelBufferAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.writerInput sourcePixelBufferAttributes:pixelBufferAttributes];
     
     if (![self.assetWriter startWriting]) {
-        if (error != NULL) {
-            *error = self.assetWriter.error;
+        if (completion) {
+            completion(NO, self.assetWriter.error);
         }
-        return NO;
+        return;
     }
     
     [self stop];
@@ -240,8 +244,11 @@
     CVReturn ret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)self.context, NULL, &textureCache);
 #endif
     if (ret != kCVReturnSuccess) {
-        NSLog(@"Error at CVOpenGLESTextureCacheCreate: %d", ret);
-        return NO;
+        if (completion) {
+            NSString *description = [NSString stringWithFormat:@"Error at CVOpenGLESTextureCacheCreate: %d", ret];
+            completion(NO, [[NSError alloc] initWithDomain:@"XBImageFiltersDomain" code:ret userInfo:@{NSLocalizedDescriptionKey: description}]);
+        }
+        return;
     }
     
     CVPixelBufferRef pixelBuffer;
@@ -262,8 +269,11 @@
     
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        NSLog(@"Failed to create framebuffer: %x", status);
-        return NO;
+        if (completion) {
+            NSString *description = [NSString stringWithFormat:@"Failed to create framebuffer: %x", status];
+            completion(NO, [[NSError alloc] initWithDomain:@"XBImageFiltersDomain" code:ret userInfo:@{NSLocalizedDescriptionKey: description}]);
+        }
+        return;
     }
     
     GLKMatrix4 previousContentTransform = self.contentTransform;
@@ -306,7 +316,7 @@
                 glDeleteFramebuffers(1, &framebuffer);
                 
                 if (completion) {
-                    completion();
+                    completion(YES, nil);
                 }
                 
                 [self.writerInput markAsFinished];
@@ -319,8 +329,6 @@
             }
         }
     }];
-    
-    return YES;
 }
 
 @end

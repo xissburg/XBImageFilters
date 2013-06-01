@@ -337,6 +337,7 @@
                 
                 [self _setTextureDataWithTextureCache:self.videoTextureCache texture:&_videoMainTexture imageBuffer:imageBuffer];
                 [self displayWithFramebuffer:framebuffer width:width height:height present:NO];
+                glFinish();
                 
                 CMTime presentationTimeStamp = CMSampleBufferGetOutputPresentationTimeStamp(sampleBuffer);
                 if (![self.writerPixelBufferAdaptor appendPixelBuffer:pixelBuffer withPresentationTime:presentationTimeStamp]) {

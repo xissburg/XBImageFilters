@@ -42,8 +42,8 @@
     self.videoView.contentMode = UIViewContentModeScaleAspectFit;
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    NSURL *requestURL = [NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_2171.MOV"];
-    //NSURL *requestURL = [NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_1844.MOV"];
+    //NSURL *requestURL = [NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_2171.MOV"];
+    NSURL *requestURL = [NSURL URLWithString:@"http://xissburg.com/wp-content/uploads/IMG_1844.MOV"];
     NSURLRequest *request = [NSURLRequest requestWithURL:requestURL];
     [NSURLConnection sendAsynchronousRequest:request queue:NSOperationQueue.mainQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {

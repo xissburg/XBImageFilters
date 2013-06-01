@@ -15,13 +15,15 @@
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) AVAssetReader *assetReader;
 @property (nonatomic, strong) AVAssetReaderTrackOutput *videoTrackOutput;
+@property (nonatomic, strong) AVAssetReaderTrackOutput *audioTrackOutput;
 @property (assign, nonatomic) size_t videoWidth, videoHeight;
 @property (assign, nonatomic) CVOpenGLESTextureCacheRef videoTextureCache;
 @property (assign, nonatomic) CVOpenGLESTextureRef videoMainTexture;
 @property (assign, nonatomic) BOOL playWhenReady;
 
 @property (strong, nonatomic) AVAssetWriter *assetWriter;
-@property (strong, nonatomic) AVAssetWriterInput *writerInput;
+@property (strong, nonatomic) AVAssetWriterInput *writerVideoInput;
+@property (strong, nonatomic) AVAssetWriterInput *writerAudioInput;
 @property (strong, nonatomic) AVAssetWriterInputPixelBufferAdaptor *writerPixelBufferAdaptor;
 
 @end
@@ -96,6 +98,13 @@
 
 - (void)createAssetReader
 {
+    NSError *error = nil;
+    self.assetReader = [[AVAssetReader alloc] initWithAsset:self.asset error:&error];
+    if (self.assetReader == nil) {
+        NSLog(@"Failed to initialize AssetReader: %@", error);
+        return;
+    }
+    
     AVAssetTrack *videoTrack = [self.asset tracksWithMediaType:AVMediaTypeVideo][0];
     id outputSettings = @{(__bridge NSString *)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA)};
     self.videoTrackOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack:videoTrack outputSettings:outputSettings];
@@ -109,13 +118,16 @@
     GLKMatrix4 s = GLKMatrix4MakeScale(1, -1, 1);
     self.contentTransform = GLKMatrix4Multiply(s, r);
     
-    NSError *error = nil;
-    self.assetReader = [[AVAssetReader alloc] initWithAsset:self.asset error:&error];
-    if (self.assetReader == nil) {
-        NSLog(@"Failed to initialize AssetReader: %@", error);
-        return;
-    }
     [self.assetReader addOutput:self.videoTrackOutput];
+    
+    NSArray *audioTracks = [self.asset tracksWithMediaType:AVMediaTypeAudio];
+    if (audioTracks.count > 0) {
+        self.audioTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTracks[0] outputSettings:nil];
+        [self.assetReader addOutput:self.audioTrackOutput];
+    }
+    else {
+        self.audioTrackOutput = nil;
+    }
     
     if (![self.assetReader startReading]) {
         NSLog(@"Failed to start reading from asset: %@", self.assetReader.error);
@@ -216,14 +228,29 @@
     }
     
     self.assetWriter.movieFragmentInterval = CMTimeMakeWithSeconds(1.0, 1000);
-    id outputSettings = @{AVVideoCodecKey: AVVideoCodecH264, AVVideoWidthKey: @(self.videoWidth), AVVideoHeightKey: @(self.videoHeight)};
-    self.writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
-    self.writerInput.expectsMediaDataInRealTime = NO;
-    self.writerInput.transform = self.videoTrackOutput.track.preferredTransform;
-    [self.assetWriter addInput:self.writerInput];
+    
+    id videoOutputSettings = @{AVVideoCodecKey: AVVideoCodecH264, AVVideoWidthKey: @(self.videoWidth), AVVideoHeightKey: @(self.videoHeight)};
+    self.writerVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoOutputSettings];
+    self.writerVideoInput.expectsMediaDataInRealTime = NO;
+    self.writerVideoInput.transform = self.videoTrackOutput.track.preferredTransform;
+    [self.assetWriter addInput:self.writerVideoInput];
     
     id pixelBufferAttributes = @{(__bridge NSString *)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA), (__bridge NSString *)kCVPixelBufferWidthKey: @(self.videoWidth), (__bridge NSString *)kCVPixelBufferHeightKey: @(self.videoHeight)};
-    self.writerPixelBufferAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.writerInput sourcePixelBufferAttributes:pixelBufferAttributes];
+    self.writerPixelBufferAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.writerVideoInput sourcePixelBufferAttributes:pixelBufferAttributes];
+    
+    if (self.audioTrackOutput != nil) {
+        double sampleRate = [[AVAudioSession sharedInstance] currentHardwareSampleRate];
+        AudioChannelLayout audioChannelLayout;
+        bzero(&audioChannelLayout, sizeof(audioChannelLayout));
+        audioChannelLayout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+        id audioOutputSettings = @{AVFormatIDKey: @(kAudioFormatMPEG4AAC), AVNumberOfChannelsKey: @1, AVSampleRateKey: @(sampleRate), AVEncoderBitRateKey: @64000, AVChannelLayoutKey: [NSData dataWithBytes:&audioChannelLayout length:sizeof(audioChannelLayout)]};
+        self.writerAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:nil];
+        self.writerAudioInput.expectsMediaDataInRealTime = NO;
+        [self.assetWriter addInput:self.writerAudioInput];
+    }
+    else {
+        self.writerAudioInput = nil;
+    }
     
     if (![self.assetWriter startWriting]) {
         if (completion) {
@@ -281,7 +308,10 @@
     self.contentTransform = GLKMatrix4Identity;
     self.contentMode = UIViewContentModeScaleToFill;
     
-    [self.writerInput requestMediaDataWhenReadyOnQueue:dispatch_get_main_queue() usingBlock:^{
+    __block BOOL finishedProcessingVideo = NO;
+    __block BOOL finishedProcessingAudio = self.writerAudioInput == nil;
+    
+    [self.writerVideoInput requestMediaDataWhenReadyOnQueue:dispatch_get_main_queue() usingBlock:^{
         if (self.assetReader.status == AVAssetReaderStatusReading) {
             CMSampleBufferRef sampleBuffer = [self.videoTrackOutput copyNextSampleBuffer];
             if (sampleBuffer) {
@@ -314,18 +344,37 @@
             }
             else {
                 glDeleteFramebuffers(1, &framebuffer);
-                
-                if (completion) {
-                    completion(YES, nil);
-                }
-                
-                [self.writerInput markAsFinished];
+                [self.writerVideoInput markAsFinished];
                 self.assetWriter = nil;
-                self.writerInput = nil;
+                self.writerVideoInput = nil;
                 self.writerPixelBufferAdaptor = nil;
+                CFRelease(textureCache);
+                CFRelease(textureTarget);
+                CVPixelBufferRelease(pixelBuffer);
                 
                 self.contentTransform = previousContentTransform;
                 self.contentMode = previousContentMode;
+                
+                finishedProcessingVideo = YES;
+                if (finishedProcessingAudio && completion) {
+                    completion(YES, nil);
+                }
+            }
+        }
+    }];
+    
+    [self.writerAudioInput requestMediaDataWhenReadyOnQueue:dispatch_get_main_queue() usingBlock:^{
+        CMSampleBufferRef sampleBuffer = [self.audioTrackOutput copyNextSampleBuffer];
+        if (sampleBuffer) {
+            [self.writerAudioInput appendSampleBuffer:sampleBuffer];
+            CMSampleBufferInvalidate(sampleBuffer);
+            CFRelease(sampleBuffer);
+        }
+        else {
+            [self.writerAudioInput markAsFinished];
+            finishedProcessingAudio = YES;
+            if (finishedProcessingVideo && completion) {
+                completion(YES, nil);
             }
         }
     }];

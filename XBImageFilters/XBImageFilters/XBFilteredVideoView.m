@@ -11,7 +11,6 @@
 
 @interface XBFilteredVideoView ()
 
-@property (nonatomic, strong) CADisplayLink *displayLink;
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) AVAssetReader *assetReader;
 @property (nonatomic, strong) AVAssetReaderTrackOutput *videoTrackOutput;
@@ -20,6 +19,7 @@
 @property (assign, nonatomic) CVOpenGLESTextureCacheRef videoTextureCache;
 @property (assign, nonatomic) CVOpenGLESTextureRef videoMainTexture;
 @property (assign, nonatomic) BOOL playWhenReady;
+@property (assign, nonatomic) dispatch_source_t timer;
 
 @property (strong, nonatomic) AVAssetWriter *assetWriter;
 @property (strong, nonatomic) AVAssetWriterInput *writerVideoInput;
@@ -142,24 +142,25 @@
         return;
     }
     
-    [self.displayLink invalidate];
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(draw:)];
-    self.displayLink.frameInterval = 2;
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-}
-
-- (void)pause
-{
-    self.displayLink.paused = YES;
+    if (self.timer != NULL) {
+        dispatch_release(self.timer);
+    }
+    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+    dispatch_source_set_timer(self.timer, dispatch_time(DISPATCH_TIME_NOW, 0), (1/self.videoTrackOutput.track.nominalFrameRate) * 1e9, 1e8);
+    dispatch_source_set_event_handler(self.timer, ^{
+        [self draw];
+    });
+    dispatch_resume(self.timer);
 }
 
 - (void)stop
 {
     self.playWhenReady = NO;
     [self.assetReader cancelReading];
-    CADisplayLink *displayLink = self.displayLink;
-    self.displayLink = nil;
-    [displayLink invalidate];
+    if (self.timer != NULL) {
+        dispatch_release(self.timer);
+        self.timer = NULL;
+    }
 }
 
 - (void)cleanUpTextures
@@ -172,7 +173,7 @@
     CVOpenGLESTextureCacheFlush(self.videoTextureCache, 0);
 }
 
-- (void)draw:(CADisplayLink *)displayLink
+- (void)draw
 {
     if (self.assetReader.status == AVAssetReaderStatusReading) {
         CMSampleBufferRef sampleBuffer = [self.videoTrackOutput copyNextSampleBuffer];
@@ -229,7 +230,12 @@
     
     self.assetWriter.movieFragmentInterval = CMTimeMakeWithSeconds(1.0, 1000);
     
-    id videoOutputSettings = @{AVVideoCodecKey: AVVideoCodecH264, AVVideoWidthKey: @(self.videoWidth), AVVideoHeightKey: @(self.videoHeight)};
+    int numPixels = self.videoWidth * self.videoHeight;
+    int bitsPerPixel = numPixels < 640 * 480? 4.05: 11.4;
+    int bitsPerSecond = numPixels * bitsPerPixel;
+    
+    id compressionSettings = @{AVVideoAverageBitRateKey: @(bitsPerSecond), AVVideoMaxKeyFrameIntervalKey: @30};
+    id videoOutputSettings = @{AVVideoCodecKey: AVVideoCodecH264, AVVideoWidthKey: @(self.videoWidth), AVVideoHeightKey: @(self.videoHeight), AVVideoCompressionPropertiesKey: compressionSettings};
     self.writerVideoInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoOutputSettings];
     self.writerVideoInput.expectsMediaDataInRealTime = NO;
     self.writerVideoInput.transform = self.videoTrackOutput.track.preferredTransform;
@@ -239,11 +245,9 @@
     self.writerPixelBufferAdaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:self.writerVideoInput sourcePixelBufferAttributes:pixelBufferAttributes];
     
     if (self.audioTrackOutput != nil) {
-        double sampleRate = [[AVAudioSession sharedInstance] currentHardwareSampleRate];
         AudioChannelLayout audioChannelLayout;
         bzero(&audioChannelLayout, sizeof(audioChannelLayout));
         audioChannelLayout.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
-        id audioOutputSettings = @{AVFormatIDKey: @(kAudioFormatMPEG4AAC), AVNumberOfChannelsKey: @1, AVSampleRateKey: @(sampleRate), AVEncoderBitRateKey: @64000, AVChannelLayoutKey: [NSData dataWithBytes:&audioChannelLayout length:sizeof(audioChannelLayout)]};
         self.writerAudioInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio outputSettings:nil];
         self.writerAudioInput.expectsMediaDataInRealTime = NO;
         [self.assetWriter addInput:self.writerAudioInput];

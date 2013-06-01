@@ -14,7 +14,6 @@
 @property (nonatomic, assign) BOOL replay;
 
 - (void)play;
-- (void)pause;
 - (void)stop;
 - (void)saveFilteredVideoToURL:(NSURL *)URL completion:(void (^)(BOOL success, NSError *error))completion;
 

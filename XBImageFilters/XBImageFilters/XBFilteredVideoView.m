@@ -371,6 +371,11 @@
                         completion(NO, self.assetReader.error);
                     }
                 }
+                else {
+                    if (finishedProcessingAudio && completion) {
+                        completion(NO, nil);
+                    }
+                }
             }
         }
     }];
@@ -396,6 +401,11 @@
             else if (self.assetReader.status == AVAssetReaderStatusFailed) {
                 if (finishedProcessingVideo && completion) {
                     completion(NO, self.assetReader.error);
+                }
+            }
+            else {
+                if (finishedProcessingVideo && completion) {
+                    completion(NO, nil);
                 }
             }
         }

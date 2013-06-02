@@ -359,10 +359,17 @@
                 
                 self.contentTransform = previousContentTransform;
                 self.contentMode = previousContentMode;
-                
                 finishedProcessingVideo = YES;
-                if (finishedProcessingAudio && completion) {
-                    completion(YES, nil);
+                
+                if (self.assetReader.status == AVAssetReaderStatusCompleted) {
+                    if (finishedProcessingAudio && completion) {
+                        completion(YES, nil);
+                    }
+                }
+                else if (self.assetReader.status == AVAssetReaderStatusFailed) {
+                    if (finishedProcessingAudio && completion) {
+                        completion(NO, self.assetReader.error);
+                    }
                 }
             }
         }
@@ -371,15 +378,25 @@
     [self.writerAudioInput requestMediaDataWhenReadyOnQueue:dispatch_get_main_queue() usingBlock:^{
         CMSampleBufferRef sampleBuffer = [self.audioTrackOutput copyNextSampleBuffer];
         if (sampleBuffer) {
-            [self.writerAudioInput appendSampleBuffer:sampleBuffer];
+            if (![self.writerAudioInput appendSampleBuffer:sampleBuffer]) {
+                NSLog(@"Failed to append audio sample buffer.");
+            }
             CMSampleBufferInvalidate(sampleBuffer);
             CFRelease(sampleBuffer);
         }
         else {
             [self.writerAudioInput markAsFinished];
             finishedProcessingAudio = YES;
-            if (finishedProcessingVideo && completion) {
-                completion(YES, nil);
+            
+            if (self.assetReader.status == AVAssetReaderStatusCompleted) {
+                if (finishedProcessingVideo && completion) {
+                    completion(YES, nil);
+                }
+            }
+            else if (self.assetReader.status == AVAssetReaderStatusFailed) {
+                if (finishedProcessingVideo && completion) {
+                    completion(NO, self.assetReader.error);
+                }
             }
         }
     }];

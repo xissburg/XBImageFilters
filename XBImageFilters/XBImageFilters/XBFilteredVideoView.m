@@ -19,7 +19,7 @@
 @property (assign, nonatomic) CVOpenGLESTextureCacheRef videoTextureCache;
 @property (assign, nonatomic) CVOpenGLESTextureRef videoMainTexture;
 @property (assign, nonatomic) BOOL playWhenReady;
-@property (assign, nonatomic) dispatch_source_t timer;
+@property (strong, nonatomic) dispatch_source_t timer;
 
 @property (strong, nonatomic) AVAssetWriter *assetWriter;
 @property (strong, nonatomic) AVAssetWriterInput *writerVideoInput;
@@ -142,9 +142,6 @@
         return;
     }
     
-    if (self.timer != NULL) {
-        dispatch_release(self.timer);
-    }
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
     dispatch_source_set_timer(self.timer, dispatch_time(DISPATCH_TIME_NOW, 0), (1/self.videoTrackOutput.track.nominalFrameRate) * 1e9, 1e8);
     dispatch_source_set_event_handler(self.timer, ^{
@@ -158,7 +155,6 @@
     self.playWhenReady = NO;
     [self.assetReader cancelReading];
     if (self.timer != NULL) {
-        dispatch_release(self.timer);
         self.timer = NULL;
     }
 }

@@ -64,6 +64,11 @@
 
 - (void)setVideoURL:(NSURL *)videoURL
 {
+    [self setVideoURL:videoURL withCompletion:nil];
+}
+
+- (void)setVideoURL:(NSURL *)videoURL withCompletion:(void (^)(void))completion
+{
     if (videoURL == _videoURL) {
         return;
     }
@@ -82,6 +87,10 @@
         
         if (self.playWhenReady) {
             [self play];
+        }
+        
+        if (completion) {
+            completion();
         }
     };
     

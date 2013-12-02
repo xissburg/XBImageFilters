@@ -161,6 +161,7 @@
         [self draw];
     });
     dispatch_resume(self.timer);
+    _playing = YES;
 }
 
 - (void)stop
@@ -171,6 +172,7 @@
     if (self.timer != NULL) {
         self.timer = NULL;
     }
+    _playing = NO;
 }
 
 - (void)cleanUpTextures

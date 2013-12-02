@@ -12,6 +12,7 @@
 
 @property (nonatomic, copy) NSURL *videoURL;
 @property (nonatomic, assign) BOOL replay;
+@property (nonatomic, readonly, getter = isPlaying) BOOL playing;
 
 - (void)play;
 - (void)stop;

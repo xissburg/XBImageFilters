@@ -146,6 +146,10 @@
 
 - (void)play
 {
+    if (self.assetReader == nil) {
+        [self createAssetReader];
+    }
+    
     if (self.assetReader.status != AVAssetReaderStatusReading) {
         self.playWhenReady = YES;
         return;
@@ -163,6 +167,7 @@
 {
     self.playWhenReady = NO;
     [self.assetReader cancelReading];
+    self.assetReader = nil;
     if (self.timer != NULL) {
         self.timer = NULL;
     }

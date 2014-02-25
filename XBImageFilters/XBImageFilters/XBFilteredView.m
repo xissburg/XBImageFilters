@@ -216,8 +216,6 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
 {
     [EAGLContext setCurrentContext:self.context];
     
-    glDeleteTextures(1, &_mainTexture);
-    
     if (width != self.textureWidth || height != self.textureHeight) {
         [self destroyEvenPass];
         [self destroyOddPass];
@@ -225,6 +223,7 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
         self.textureWidth = width;
         self.textureHeight = height;
         
+        glDeleteTextures(1, &_mainTexture);
         self.mainTexture = [self generateDefaultTextureWithWidth:self.textureWidth height:self.textureHeight data:textureData];
         
         // Resize the even and odd textures because their size have to match that of the mainTexture

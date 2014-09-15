@@ -11,6 +11,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import <mach/host_info.h>
 #import <mach/mach.h>
+#import <OpenGLES/ES2/glext.h>
 
 const GLKMatrix2 GLKMatrix2Identity = {1, 0, 0, 1};
 

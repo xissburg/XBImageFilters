@@ -8,6 +8,7 @@
 
 #import "XBFilteredVideoView.h"
 #import <AVFoundation/AVFoundation.h>
+#import <OpenGLES/ES2/glext.h>
 
 @interface XBFilteredVideoView ()
 

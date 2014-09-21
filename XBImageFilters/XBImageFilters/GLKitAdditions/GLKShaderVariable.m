@@ -7,6 +7,7 @@
 //
 
 #import "GLKShaderVariable.h"
+@import OpenGLES;
 
 @implementation GLKShaderVariable
 

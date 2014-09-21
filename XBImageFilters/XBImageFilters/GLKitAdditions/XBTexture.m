@@ -8,7 +8,7 @@
 
 #import "XBTexture.h"
 #import "XBTextureInfo.h"
-#import <OpenGLES/ES2/glext.h>
+@import OpenGLES;
 
 @implementation XBTexture
 

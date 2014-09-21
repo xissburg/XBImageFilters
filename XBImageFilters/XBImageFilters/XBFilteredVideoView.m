@@ -8,6 +8,7 @@
 
 #import "XBFilteredVideoView.h"
 #import <AVFoundation/AVFoundation.h>
+@import OpenGLES;
 
 @interface XBFilteredVideoView ()
 

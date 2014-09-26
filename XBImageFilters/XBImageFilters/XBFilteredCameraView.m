@@ -280,7 +280,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             NSLog(@"XBFilteredCameraView: Failed to enable automatic low light boost: %@", [error localizedDescription]);
             return;
         }
-        objc_msgSend(self.device, @selector(setAutomaticallyEnablesLowLightBoostWhenAvailable:), automaticallyEnablesLowLightBoostWhenAvailable);
+        ((void(*)(id, SEL, BOOL))objc_msgSend)(self.device, @selector(setAutomaticallyEnablesLowLightBoostWhenAvailable:), automaticallyEnablesLowLightBoostWhenAvailable);
         [self.device unlockForConfiguration];
     }
 }
@@ -496,8 +496,8 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
         
         // Compensate for padding. A small black line will be visible on the right. Adjust the texture coordinate transform to fix this.
-        size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
-        size_t height = CVPixelBufferGetHeight(imageBuffer);
+        GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+        GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
         
         XBPhotoOrientation orientation = self.photoOrientation != XBPhotoOrientationAuto? :[self photoOrientationForDeviceOrientation];
         BOOL portrait = orientation == XBPhotoOrientationPortrait || orientation == XBPhotoOrientationPortraitUpsideDown;
@@ -513,7 +513,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             UIImage *image = [self _imageWithData:baseAddress width:width height:height orientation:UIImageOrientationUp ownsData:NO];
             CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
             
-            size_t newWidth = 0, newHeight = 0;
+            GLint newWidth = 0, newHeight = 0;
             
             if (width > height) {
                 newWidth = self.maxTextureSize;
@@ -531,7 +531,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
             size_t bitsPerComponent = 8;
             size_t bytesPerRow = newWidth * 4;
             CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-            CGContextRef context = CGBitmapContextCreate(NULL, newWidth, newHeight, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+            CGContextRef context = CGBitmapContextCreate(NULL, newWidth, newHeight, bitsPerComponent, bytesPerRow, colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
             CGColorSpaceRelease(colorSpace);
             // Invert vertically for OpenGL
             CGContextDrawImage(context, CGRectMake(0, 0, newWidth, newHeight), CGImage);

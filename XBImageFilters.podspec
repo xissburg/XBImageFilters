@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "XBImageFilters"
-  s.version      = "1.0.0"
+  s.version      = "1.1.0"
   s.summary      = "OpenGL ES 2-based image and real-time camera filters for iOS."
 
   s.description  = <<-DESC

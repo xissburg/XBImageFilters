@@ -56,7 +56,7 @@ Pod::Spec.new do |s|
   s.author             = { "xissburg" => "xissburg@gmail.com" }
   # Or just: s.author    = "xissburg"
   # s.authors            = { "xissburg" => "xissburg@gmail.com" }
-  # s.social_media_url   = "http://twitter.com/xissburg"
+  s.social_media_url   = "http://twitter.com/xissburg"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -65,7 +65,7 @@ Pod::Spec.new do |s|
   #
 
   # s.platform     = :ios
-  # s.platform     = :ios, "5.0"
+  s.platform     = :ios, "6.0"
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"
@@ -115,7 +115,7 @@ Pod::Spec.new do |s|
   #
 
   # s.framework  = "SomeFramework"
-  # s.frameworks = "SomeFramework", "AnotherFramework"
+  s.frameworks = "CoreGraphics", "GLKit", "QuartzCore", "UIKit", "AVFoundation", "CoreMedia", "CoreVideo", "OpenGLES", "Foundation"
 
   # s.library   = "iconv"
   # s.libraries = "iconv", "xml2"

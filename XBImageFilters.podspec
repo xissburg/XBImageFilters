@@ -78,7 +78,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "git@github.com:xissburg/XBImageFilters.git", :tag => "1.0.0" }
+  s.source       = { :git => "https://github.com/xissburg/XBImageFilters.git", :tag => "1.1.0" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -89,10 +89,10 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "XBImageFilters/XBImageFilters/**/*.{h,m}"
+  s.source_files  = "XBImageFilters/*/*.{h,m}", "XBImageFilters/*.{h,m}"
   # s.exclude_files = "Classes/Exclude"
 
-  # s.public_header_files = "Classes/**/*.h"
+  s.public_header_files = "XBImageFilters/XBImageFilters/GLKitAdditions/*.{h,m}", "XBImageFilters/XBImageFilters/*.{h,m}"
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -103,7 +103,7 @@ Pod::Spec.new do |s|
   #  non-essential files like tests, examples and documentation.
   #
 
-  s.resources = "XBImageFilters/XBImageFilters/Resources/**/**"
+  s.resources = "XBImageFilters/XBImageFilters/Resources/Shaders/*.{vsh,fsh}"
 
   # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
 

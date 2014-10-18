@@ -31,6 +31,7 @@
 - (id)initWithContentsOfFile:(NSString *)path options:(NSDictionary *)options error:(NSError *__autoreleasing *)error
 {
     GLKTextureInfo *textureInfo = [GLKTextureLoader textureWithContentsOfFile:path options:options error:error];
+    
     if (textureInfo == nil) {
         self = nil;
         return nil;
@@ -52,6 +53,19 @@
     }
     return self;
 }
+
+- (id)initWithImage:(UIImage *)image options:(NSDictionary *)options error:(NSError *__autoreleasing *)error
+{
+    GLKTextureInfo *textureInfo = [GLKTextureLoader textureWithCGImage:image.CGImage options:options error:error];
+    
+    if (textureInfo == nil) {
+        self = nil;
+        return nil;
+    }
+    
+    return [self initWithTextureInfo:textureInfo];
+}
+
 
 - (void)dealloc
 {

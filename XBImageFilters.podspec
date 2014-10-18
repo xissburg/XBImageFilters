@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "XBImageFilters"
-  s.version      = "1.1.0"
+  s.version      = "1.1.1"
   s.summary      = "OpenGL ES 2-based image and real-time camera filters for iOS."
 
   s.description  = <<-DESC
@@ -78,7 +78,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/xissburg/XBImageFilters.git", :tag => "1.1.0" }
+  s.source       = { :git => "https://github.com/xissburg/XBImageFilters.git", :tag => "1.1.1" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -89,10 +89,10 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "XBImageFilters/*/*.{h,m}", "XBImageFilters/*.{h,m}"
+  s.source_files  = "XBImageFilters/XBImageFilters/*/*.{h,m}", "XBImageFilters/XBImageFilters/*.{h,m}"
   # s.exclude_files = "Classes/Exclude"
 
-  s.public_header_files = "XBImageFilters/XBImageFilters/GLKitAdditions/*.{h,m}", "XBImageFilters/XBImageFilters/*.{h,m}"
+  # s.public_header_files = "XBImageFilters/XBImageFilters/GLKitAdditions/*.h", "XBImageFilters/XBImageFilters/*.h"
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

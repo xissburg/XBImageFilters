@@ -30,8 +30,8 @@
     
     // Create an RGBA bitmap context
     CGImageRef CGImage = image.CGImage;
-    size_t width = CGImageGetWidth(CGImage);
-    size_t height = CGImageGetHeight(CGImage);
+    GLint width = (GLint)CGImageGetWidth(CGImage);
+    GLint height = (GLint)CGImageGetHeight(CGImage);
     size_t bitsPerComponent = 8;
     size_t bytesPerRow = width * 4;
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();

@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "XBImageFilters"
-  s.version      = "1.1.1"
+  s.version      = "1.1.2"
   s.summary      = "OpenGL ES 2-based image and real-time camera filters for iOS."
 
   s.description  = <<-DESC
@@ -78,7 +78,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/xissburg/XBImageFilters.git", :tag => "1.1.1" }
+  s.source       = { :git => "https://github.com/xissburg/XBImageFilters.git", :tag => "1.1.2" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

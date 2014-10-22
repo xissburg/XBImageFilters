@@ -82,6 +82,7 @@
 		1B653E90170CA24C009041D6 /* XBFilteredCameraView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B653E42170CA09C009041D6 /* XBFilteredCameraView.h */; };
 		1B653E91170CA24C009041D6 /* XBFilteredImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B653E44170CA09C009041D6 /* XBFilteredImageView.h */; };
 		1B653E92170CA24C009041D6 /* XBFilteredView.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B653E46170CA09C009041D6 /* XBFilteredView.h */; };
+		1BA7FA2319F8058C007F2784 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1BA7FA2219F8058C007F2784 /* Default-568h@2x.png */; };
 		1BD8E55A1501BB4300875FD3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BD8E5591501BB4200875FD3 /* AVFoundation.framework */; };
 		1BD8E55D1501D97000875FD3 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BD8E55C1501D97000875FD3 /* CoreVideo.framework */; };
 		1BD8E55F1501D98200875FD3 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BD8E55E1501D98200875FD3 /* CoreMedia.framework */; };
@@ -187,6 +188,7 @@
 		1B653E45170CA09C009041D6 /* XBFilteredImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBFilteredImageView.m; sourceTree = "<group>"; };
 		1B653E46170CA09C009041D6 /* XBFilteredView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XBFilteredView.h; sourceTree = "<group>"; };
 		1B653E47170CA09C009041D6 /* XBFilteredView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XBFilteredView.m; sourceTree = "<group>"; };
+		1BA7FA2219F8058C007F2784 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../../Default-568h@2x.png"; sourceTree = "<group>"; };
 		1BD8E5591501BB4200875FD3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		1BD8E55C1501D97000875FD3 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		1BD8E55E1501D98200875FD3 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -239,6 +241,7 @@
 		1B653DFC170CA09C009041D6 /* Sample */ = {
 			isa = PBXGroup;
 			children = (
+				1BA7FA2219F8058C007F2784 /* Default-568h@2x.png */,
 				1B653DFD170CA09C009041D6 /* AppDelegate.h */,
 				1B653DFE170CA09C009041D6 /* AppDelegate.m */,
 				1B653DFF170CA09C009041D6 /* CameraViewController.h */,
@@ -528,6 +531,7 @@
 				1B653E63170CA09C009041D6 /* Discretize.fsh in Resources */,
 				1B653E64170CA09C009041D6 /* HBlur.vsh in Resources */,
 				1B653E65170CA09C009041D6 /* Luminance.fsh in Resources */,
+				1BA7FA2319F8058C007F2784 /* Default-568h@2x.png in Resources */,
 				1B653E66170CA09C009041D6 /* Overlay.fsh in Resources */,
 				1B653E67170CA09C009041D6 /* Overlay.vsh in Resources */,
 				1B653E68170CA09C009041D6 /* Pixelate.fsh in Resources */,

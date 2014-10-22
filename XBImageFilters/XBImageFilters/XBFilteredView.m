@@ -268,8 +268,8 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
     [EAGLContext setCurrentContext:self.context];
     
     // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-    size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
-    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
     
     CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0, texture);
     if (ret != kCVReturnSuccess) {
@@ -323,8 +323,8 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
 {
     [EAGLContext setCurrentContext:self.context];
     
-    size_t textureWidth = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
-    size_t textureHeight = CVPixelBufferGetHeight(imageBuffer);
+    GLint textureWidth = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    GLint textureHeight = (GLint)CVPixelBufferGetHeight(imageBuffer);
     
     float ratio = (float)CVPixelBufferGetWidth(imageBuffer)/textureWidth;
     GLKMatrix2 texCoordTransform = (GLKMatrix2){ratio, 0, 0, 1};
@@ -668,7 +668,7 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
             sourceTexture = self.mainTexture;
         }
         else if (self.passTargetTextures[@(i-1)] != nil) {
-            sourceTexture = [self.passTargetTextures[@(i-1)] unsignedIntegerValue];
+            sourceTexture = [self.passTargetTextures[@(i-1)] unsignedIntValue];
         }
         else if (i%2 == 1) { // Second pass uses the result of the first, and the first is 0, hence even
             sourceTexture = self.evenPassTexture;
@@ -707,12 +707,12 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
 - (void)destroyTargetTextureForPass:(NSUInteger)pass
 {
     NSNumber *textureNumber = self.passTargetTextures[@(pass)];
-    GLuint texture = textureNumber.unsignedIntegerValue;
+    GLuint texture = textureNumber.unsignedIntValue;
     glDeleteTextures(1, &texture);
     [self.passTargetTextures removeObjectForKey:@(pass)];
     
     NSNumber *framebufferNumber = self.passTargetFramebuffers[@(pass)];
-    GLuint framebuffer = framebufferNumber.unsignedIntegerValue;
+    GLuint framebuffer = framebufferNumber.unsignedIntValue;
     glDeleteFramebuffers(1, &framebuffer);
     [self.passTargetFramebuffers removeObjectForKey:@(pass)];
 }
@@ -759,7 +759,7 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
             }
             else if (self.passTargetFramebuffers[@(pass)] != nil) {
                 glViewport(0, 0, self.textureWidth, self.textureHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, [self.passTargetFramebuffers[@(pass)] unsignedIntegerValue]);
+                glBindFramebuffer(GL_FRAMEBUFFER, [self.passTargetFramebuffers[@(pass)] unsignedIntValue]);
             }
             else if (pass%2 == 0) {
                 glViewport(0, 0, self.textureWidth, self.textureHeight);
@@ -1015,7 +1015,7 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
             break;
             
         default:
-            NSLog(@"Warning: Invalid contentMode given to transformForPositionalContentMode: %d", contentMode);
+            NSLog(@"Warning: Invalid contentMode given to transformForPositionalContentMode: %ld", contentMode);
             break;
     }
     

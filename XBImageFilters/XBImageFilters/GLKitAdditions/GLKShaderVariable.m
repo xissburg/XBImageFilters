@@ -9,6 +9,8 @@
 #import "GLKShaderVariable.h"
 @import OpenGLES;
 
+GLint TypeSizeForType(GLenum type);
+
 @implementation GLKShaderVariable
 
 @synthesize name = _name;
@@ -32,9 +34,9 @@
 
 @end
 
-size_t TypeSizeForType(GLenum type)
+GLint TypeSizeForType(GLenum type)
 {
-    size_t size = 0;
+    GLint size = 0;
     
     switch (type) {
         case GL_FLOAT:

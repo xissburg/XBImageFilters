@@ -16,7 +16,7 @@
 @property (nonatomic, strong) AVAssetReader *assetReader;
 @property (nonatomic, strong) AVAssetReaderTrackOutput *videoTrackOutput;
 @property (nonatomic, strong) AVAssetReaderTrackOutput *audioTrackOutput;
-@property (assign, nonatomic) size_t videoWidth, videoHeight;
+@property (assign, nonatomic) GLint videoWidth, videoHeight;
 @property (assign, nonatomic) CVOpenGLESTextureCacheRef videoTextureCache;
 @property (assign, nonatomic) CVOpenGLESTextureRef videoMainTexture;
 @property (assign, nonatomic) BOOL playWhenReady;
@@ -196,8 +196,8 @@
             [self cleanUpTextures];
             CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-            size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
-            size_t height = CVPixelBufferGetHeight(imageBuffer);
+            GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+            GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
             
             if (width != self.videoWidth || height != self.videoHeight) {
                 self.videoWidth = width;
@@ -337,8 +337,8 @@
                 
                 CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
                 // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-                size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
-                size_t height = CVPixelBufferGetHeight(imageBuffer);
+                GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+                GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
                 
                 if (width != self.videoWidth || height != self.videoHeight) {
                     self.videoWidth = width;

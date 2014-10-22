@@ -17,20 +17,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    /*
-    NSString *hBlurVSPath = [[NSBundle mainBundle] pathForResource:@"HBlur" ofType:@"vsh"];
-    NSString *vBlurVSPath = [[NSBundle mainBundle] pathForResource:@"VBlur" ofType:@"vsh"];
-    NSString *blurFSPath = [[NSBundle mainBundle] pathForResource:@"Blur" ofType:@"fsh"];
-    NSArray *vsPaths = @[vBlurVSPath, hBlurVSPath];
-    NSArray *fsPaths = @[blurFSPath, blurFSPath];
-    NSError *error = nil;
-    if (![self.videoView setFilterFragmentShaderPaths:fsPaths vertexShaderPaths:vsPaths error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-    }
-    float blurRadius = 0.04;
-    for (GLKProgram *p in self.videoView.programs) {
-        [p setValue:&blurRadius forUniformNamed:@"u_radius"];
-    }*/
     
     NSString *fsPath = [[NSBundle mainBundle] pathForResource:@"Luminance" ofType:@"fsh"];
     NSError *error = nil;

@@ -40,5 +40,3 @@
 - (id)initWithName:(NSString *)name location:(GLint)location size:(GLint)size type:(GLenum)type;
 
 @end
-
-size_t TypeSizeForType(GLenum type);

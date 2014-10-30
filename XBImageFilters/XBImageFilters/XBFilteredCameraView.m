@@ -496,7 +496,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
         CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(imageDataSampleBuffer);
         
         // Compensate for padding. A small black line will be visible on the right. Adjust the texture coordinate transform to fix this.
-        GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+        GLint width = (GLint)CVPixelBufferGetWidth(imageBuffer);
         GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
         
         XBPhotoOrientation orientation = self.photoOrientation != XBPhotoOrientationAuto? :[self photoOrientationForDeviceOrientation];
@@ -874,7 +874,7 @@ NSString *const XBCaptureQuality352x288 = @"XBCaptureQuality352x288";
     [self cleanUpTextures];
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-    size_t width = CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
     size_t height = CVPixelBufferGetHeight(imageBuffer);
     
     if (width != self.videoWidth || height != self.videoHeight) {

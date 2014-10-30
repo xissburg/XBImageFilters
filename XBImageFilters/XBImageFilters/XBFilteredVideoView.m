@@ -196,7 +196,7 @@
             [self cleanUpTextures];
             CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-            GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+            GLint width = (GLint)CVPixelBufferGetWidth(imageBuffer);
             GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
             
             if (width != self.videoWidth || height != self.videoHeight) {
@@ -337,9 +337,9 @@
                 
                 CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
                 // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-                GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+                GLint width = (GLint)CVPixelBufferGetWidth(imageBuffer);
                 GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
-                
+                i
                 if (width != self.videoWidth || height != self.videoHeight) {
                     self.videoWidth = width;
                     self.videoHeight = height;

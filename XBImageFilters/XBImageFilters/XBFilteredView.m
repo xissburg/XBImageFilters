@@ -268,7 +268,7 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
     [EAGLContext setCurrentContext:self.context];
     
     // Compensate for padding. A small black line will be visible on the right. Also adjust the texture coordinate transform to fix this.
-    GLint width = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    GLint width = (GLint)CVPixelBufferGetWidth(imageBuffer);
     GLint height = (GLint)CVPixelBufferGetHeight(imageBuffer);
     
     CVReturn ret = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, imageBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, width, height, GL_BGRA, GL_UNSIGNED_BYTE, 0, texture);
@@ -323,7 +323,7 @@ CGSize CGSizeRotate(CGSize size, GLKMatrix4 m);
 {
     [EAGLContext setCurrentContext:self.context];
     
-    GLint textureWidth = (GLint)CVPixelBufferGetBytesPerRow(imageBuffer)/4;
+    GLint textureWidth = (GLint)CVPixelBufferGetWidth(imageBuffer);
     GLint textureHeight = (GLint)CVPixelBufferGetHeight(imageBuffer);
     
     float ratio = (float)CVPixelBufferGetWidth(imageBuffer)/textureWidth;
